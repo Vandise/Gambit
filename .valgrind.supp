@@ -1,0 +1,15 @@
+{
+    libtrace initialization false positive
+    Memcheck:Param
+    msg->desc.port.name
+    fun:mach_msg_trap
+    fun:mach_msg
+    fun:task_set_special_port
+    fun:_os_trace_create_debug_control_port
+    fun:_libtrace_init
+}
+{
+    /usr/local/Cellar/valgrind/3.13.0/lib/valgrind/vgpreload_memcheck-amd64-darwin.so
+    Memcheck:Leak
+    fun:calloc
+}

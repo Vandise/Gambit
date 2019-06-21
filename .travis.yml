@@ -1,0 +1,17 @@
+language: c
+sudo: required
+env: VALGRIND=1
+before_script:
+  - sudo apt-get update -qq
+#  - sudo apt-get install -qq valgrind
+  - bash .travis/valgrind-3.13.0.sh
+  - mkdir .tmp
+  - sudo autoconf && sudo ./configure
+  - find ./test/ -name "*.c"
+before_install:
+  - export LD_LIBRARY_PATH=/usr/local/lib
+script:
+  - sudo make directories
+  - sudo make tests
+  - valgrind --version
+  - valgrind --leak-check=yes --error-exitcode=1 ./bin/test_suite

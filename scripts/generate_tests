@@ -1,0 +1,11 @@
+#! /bin/sh
+
+mkdir .tmp
+mkdir .tmp/gt
+
+FILES=$(find ./test/ -name "*.gt")
+for f in $FILES
+do
+  echo "Generating test: $f"
+  ruby scripts/generate_test_file.rb $f
+done
