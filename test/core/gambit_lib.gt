@@ -1,0 +1,41 @@
+#include "cspec.h"
+#include "cspec_output_header.h"
+#include "cspec_output_verbose.h"
+#include "cspec_output_unit.h"
+#include "gambit_lib.h"
+
+extern int status;
+
+DESCRIBE(gambit_lib_module_get_error_module, "Gambit Lib Module - get_error_module")
+  IT("returns the error module")
+    SHOULD_NOT_BE_NULL(GambitLibModule.get_error_module(&GambitLibModule))
+  END_IT
+END_DESCRIBE
+
+DESCRIBE(gambit_lib_module_initialize, "Gambit Lib Module - initialize")
+  IT("sets the initialized property to TRUE")
+    GambitLibModule.initialize(&GambitLibModule);
+
+    SHOULD_BE_TRUE(GambitLibModule.initialized)
+  END_IT
+
+  IT("sets the library list")
+    for (int i = 0; i < __GAMBITLIB_LIST_SIZE; i++) {
+      SHOULD_NOT_BE_NULL(&GambitLibModule.libraries[i]);
+    }
+  END_IT
+END_DESCRIBE
+
+DESCRIBE(gambit_lib_module, "Gambit Lib Module ")
+	IT("is present")
+    SHOULD_NOT_BE_NULL(&GambitLibModule)
+	END_IT
+
+  IT("is not initialized")
+    SHOULD_BE_FALSE(GambitLibModule.initialized)
+  END_IT
+
+  status += CSpec_Run( DESCRIPTION( gambit_lib_module_initialize ), CSpec_NewOutputVerbose() );
+  status += CSpec_Run( DESCRIPTION( gambit_lib_module_get_error_module ), CSpec_NewOutputVerbose() );
+
+END_DESCRIBE
