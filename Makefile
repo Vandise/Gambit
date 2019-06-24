@@ -34,7 +34,7 @@ INC         := -I$(INCDIR) -I/usr/local/include -Isrc -Isrc/test -I$(EXTDIR)
 LINKLIB     := -L$(LIBDIR)
 SHAREDPARAM := -shared
 
-PROGRAMFILES := $(shell find $(SRCDIR)/ -type f -name "*.$(SRCEXT)")
+PROGRAMFILES := $(shell find $(SRCDIR)/ -type f -name "*.$(SRCEXT)" -not -path "*modules*")
 TESTFILES  := $(shell find $(TESTDIR)/ $(SRCDIR)/ ! -name 'main.c' -type f -name "*.$(SRCEXT)" )
 OBJECTS     := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(PROGRAMFILES:.$(SRCEXT)=.$(OBJEXT)))
 
@@ -65,6 +65,8 @@ $(BUILDDIR)/%.$(OBJEXT): $(SRCDIR)/%.$(SRCEXT)
 	@sed -e 's|.*:|$(BUILDDIR)/$*.$(OBJEXT):|' < $(BUILDDIR)/$*.$(DEPEXT).tmp > $(BUILDDIR)/$*.$(DEPEXT)
 	@sed -e 's/.*://' -e 's/\\$$//' < $(BUILDDIR)/$*.$(DEPEXT).tmp | fmt -1 | sed -e 's/^ *//' -e 's/$$/:/' >> $(BUILDDIR)/$*.$(DEPEXT)
 	@rm -f $(BUILDDIR)/$*.$(DEPEXT).tmp
+
+-include build/error_module.mk
 
 tests:
 	$(CC) $(CXXSTD) $(INC) $(LINKLIB) $(TESTFILES) -lcspec -lm -o $(TARGETDIR)/$(TESTTARGET)

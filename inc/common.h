@@ -1,6 +1,9 @@
 #ifndef __PROJECT_COMMON__
 #define __PROJECT_COMMON__ 1
 
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
 #include "util/memory.h"
 
 #define PROJECT_MEMORY_DEBUG 1

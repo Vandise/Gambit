@@ -7,3 +7,5 @@ autom4te.cache/
 config.log
 config.status
 configure
+*.so
+*.dSYM
