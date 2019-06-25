@@ -1,0 +1,50 @@
+#include "cspec.h"
+#include "cspec_output_header.h"
+#include "cspec_output_verbose.h"
+#include "cspec_output_unit.h"
+#include "shared/tokens.h"
+
+extern int status;
+
+DESCRIBE(token_module_string_is_reserved_word, "Token Module - string_is_reserved_word")
+  IT("returns TRUE if reserved")
+    SHOULD_BE_TRUE(TokenModule.string_is_reserved_word("module"));
+  END_IT
+
+  IT("returns FALSE if not reserved")
+    SHOULD_BE_FALSE(TokenModule.string_is_reserved_word("isnotreserved"));
+  END_IT
+END_DESCRIBE
+
+DESCRIBE(token_module_get_token_code, "Token Module - get_token_code")
+  IT("returns the token code if exists")
+    SHOULD_EQUAL(TokenModule.get_token_code("module"), T_MODULE);
+  END_IT
+
+  IT("returns NO_TOKEN if it does not exist")
+    SHOULD_EQUAL(TokenModule.get_token_code("doesnotexist"), NO_TOKEN);
+  END_IT
+END_DESCRIBE
+
+DESCRIBE(token_module_initialize, "Token Module - initialize")
+  IT("initializes the module")
+    TokenModule.initialize(&TokenModule);
+
+    SHOULD_BE_TRUE(TokenModule.initialized);
+  END_IT
+END_DESCRIBE
+
+DESCRIBE(token_module, "Token Module ")
+	IT("is present")
+    SHOULD_NOT_BE_NULL(&TokenModule)
+	END_IT
+
+  IT("is not initialized")
+    SHOULD_BE_FALSE(TokenModule.initialized)
+  END_IT
+
+  status += CSpec_Run( DESCRIPTION( token_module_initialize ), CSpec_NewOutputVerbose() );
+  status += CSpec_Run( DESCRIPTION( token_module_get_token_code ), CSpec_NewOutputVerbose() );
+  status += CSpec_Run( DESCRIPTION( token_module_string_is_reserved_word ), CSpec_NewOutputVerbose() );
+
+END_DESCRIBE
