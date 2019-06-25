@@ -1,0 +1,28 @@
+#! /bin/sh
+
+test_chsum=""
+project_chsum=""
+
+watch_tests() {
+  chsum2=`find test/ -type f -name "*.gt" -mtime -5 -exec md5 {} \;`
+  if [[ $test_chsum != $chsum2 ]] ; then
+    echo "\n== Compiling Tests ==\n"
+    sh scripts/generate_tests && make tests
+    test_chsum=$chsum2
+  fi
+}
+
+watch_project() {
+  chsum2=`find src/ inc/ -type f \( -name "*.c" -o -name "*.h" \) -not -path "*modules*" -mtime -5 -exec md5 {} \;`
+  if [[ $project_chsum != $chsum2 ]] ; then
+    echo "\n== Compiling Main ==\n"
+    make directories && make main
+    project_chsum=$chsum2
+  fi
+}
+
+while [[ true ]]
+do
+  watch_project
+  watch_tests
+done

@@ -9,9 +9,6 @@
 
 DEFINE_DESCRIPTION(initial_test)
 DEFINE_DESCRIPTION(utility_generic_linked_list)
-DEFINE_DESCRIPTION(error_module)
-DEFINE_DESCRIPTION(gambit_lib_module)
-DEFINE_DESCRIPTION(token_module)
 
 int status = 0;
 
@@ -32,31 +29,6 @@ int main(int argc, const char* argv[]) {
   
   */
     status += CSpec_Run( DESCRIPTION( utility_generic_linked_list ), CSpec_NewOutputVerbose() );
-
-
-  /*
-
-    Error Module
-
-  */
-
-  status += CSpec_Run( DESCRIPTION( error_module ), CSpec_NewOutputVerbose() );
-
-  /*
-
-    Gambit Lib Module
-
-  */
-
-  status += CSpec_Run( DESCRIPTION( gambit_lib_module ), CSpec_NewOutputVerbose() );
-
-  /*
-
-    Token Module
-
-  */
-
-  status += CSpec_Run( DESCRIPTION( token_module ), CSpec_NewOutputVerbose() );
 
 
   print_memory_summary();
