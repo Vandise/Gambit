@@ -21,6 +21,26 @@ void* malloc_trace(size_t size, const char *file, int line, const char *func) {
   return p;
 }
 
+void* realloc_trace(void *pp, size_t size, const char *file, int line, const char *func) {
+  void *p = realloc(pp, size);
+  remove_memory_list_item(pp);
+
+  if (PROJECT_MEMORY_DEBUG) {
+    memory_list_init();
+
+    MemoryItem *itm = malloc(sizeof(MemoryItem));
+    itm->file = file; itm->line = line; itm->func = func;
+    itm->pp = p;
+    list_ins_next(&memory_list, NULL, itm);
+
+    #if PROJECT_MEMORY_DEBUG_VERBOSE == 1
+      printf ("ReAllocated = %s, %i, %s, %p[%li]\n", file, line, func, p, size);
+    #endif
+  }
+
+  return p;
+}
+
 void free_trace(void *p, const char *file, int line, const char *func) {
   if (PROJECT_MEMORY_DEBUG) {
     memory_list_init();

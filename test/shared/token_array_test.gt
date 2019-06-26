@@ -1,0 +1,73 @@
+#include <stdio.h>
+#include "cspec.h"
+#include "cspec_output_header.h"
+#include "cspec_output_verbose.h"
+#include "cspec_output_unit.h"
+
+#include "shared/token_array.h"
+
+extern int status;
+
+DESCRIBE(token_array_init_token_array, "Token Array - init_token_array")
+
+  TokenArray ta;
+  init_token_array(&ta, 10);
+
+  IT("initializes an array with n elements")
+    SHOULD_EQUAL(ta.size, 10);
+  END_IT  
+
+  IT("sets used to 0")
+    SHOULD_EQUAL(ta.used, 0);
+  END_IT
+
+  free_token_array(&ta);
+
+END_DESCRIBE
+
+DESCRIBE(token_array_insert_token_array, "Token Array - insert_token_array")
+
+  IT("adds the token to the array")
+    TokenArray ta;
+    init_token_array(&ta, 10);
+
+    Token t;
+    t.code = NO_TOKEN;
+
+    insert_token_array(&ta, t);
+
+    SHOULD_EQUAL(ta.used, 1);
+    SHOULD_EQUAL(ta.array[0].code, NO_TOKEN);
+
+    free_token_array(&ta);
+  END_IT  
+
+  IT("grows the array when the threshold is hit ((n * 3) / 2 + 8 )")
+    TokenArray ta;
+    init_token_array(&ta, 10);
+
+    int new_size = (ta.size * 3) / 2 + 8;
+    int current_size = ta.size;
+
+    for (int i = 0; i < current_size + 1; i++) {
+      Token t;
+      insert_token_array(&ta, t);
+    }
+
+    SHOULD_EQUAL(ta.size, new_size);
+
+    free_token_array(&ta);
+  END_IT
+
+END_DESCRIBE
+
+DESCRIBE(token_array, "Token Array")
+
+  IT("defines the TokenArray struct")
+    TokenArray ta;
+    SHOULD_EQUAL(&ta, &ta);
+  END_IT
+
+  status += CSpec_Run( DESCRIPTION( token_array_init_token_array ), CSpec_NewOutputVerbose() );
+  status += CSpec_Run( DESCRIPTION( token_array_insert_token_array ), CSpec_NewOutputVerbose() );
+END_DESCRIBE

@@ -9,6 +9,7 @@
 
 DEFINE_DESCRIPTION(initial_test)
 DEFINE_DESCRIPTION(utility_generic_linked_list)
+DEFINE_DESCRIPTION(token_array)
 
 int status = 0;
 
@@ -30,6 +31,13 @@ int main(int argc, const char* argv[]) {
   */
     status += CSpec_Run( DESCRIPTION( utility_generic_linked_list ), CSpec_NewOutputVerbose() );
 
+  /*
+
+    Shared Section
+
+  */
+
+  status += CSpec_Run( DESCRIPTION( token_array ), CSpec_NewOutputVerbose() );
 
   print_memory_summary();
 
