@@ -11,6 +11,7 @@ DEFINE_DESCRIPTION(initial_test)
 DEFINE_DESCRIPTION(utility_generic_linked_list)
 DEFINE_DESCRIPTION(token_array)
 DEFINE_DESCRIPTION(scanner_scanner);
+DEFINE_DESCRIPTION(tokens)
 
 int status = 0;
 
@@ -39,6 +40,7 @@ int main(int argc, const char* argv[]) {
   */
 
   status += CSpec_Run( DESCRIPTION( token_array ), CSpec_NewOutputVerbose() );
+  status += CSpec_Run( DESCRIPTION( tokens ), CSpec_NewOutputVerbose() );
 
   /*
 

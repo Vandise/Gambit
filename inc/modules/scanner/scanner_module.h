@@ -7,6 +7,7 @@
 #include "shared/token_array.h"
 
 #define __GAMBIT_SCANNER_TOKENLIST_SIZE 100
+#define CHAR_CODE(scanner) scanner->char_table[scanner->current_char]
 
 typedef struct GambitScannerToken {
   char word_string[MAX_TOKEN_STRING_LENGTH];
@@ -38,14 +39,17 @@ typedef struct GambitScanner {
   TokenArray tokens;
 } Scanner;
 
-Scanner* init_scanner(char *file_name);
-void populate_char_table(Scanner *scanner);
-BOOLEAN open_source_file(Scanner *scanner);
-void get_character(Scanner *scanner);
+Scanner* init_scanner(char* file_name);
+void populate_char_table(Scanner* scanner);
+BOOLEAN open_source_file(Scanner* scanner);
+void get_character(Scanner* scanner);
 BOOLEAN get_source_line(Scanner* scanner);
 void skip_blanks(Scanner* scanner);
 void skip_comment(Scanner* scanner);
+void get_token(Scanner* scanner);
+void get_special(Scanner* scanner);
+void get_word(Scanner* scanner, BOOLEAN is_constant);
 
-void exit_scanner(Scanner *scanner);
+void exit_scanner(Scanner* scanner);
 
 #endif

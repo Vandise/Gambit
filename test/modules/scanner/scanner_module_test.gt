@@ -185,6 +185,54 @@ DESCRIBE(scanner_scanner_skip_blanks, "Scanner - skip_blanks")
 
 END_DESCRIBE
 
+DESCRIBE(scanner_scanner_get_token, "Scanner - get_token")
+
+--FILE eof.g--
+--ENDFILE--
+
+  IT("should extract an end of file token")
+    Scanner* scanner = init_scanner(__TEST_FILE__(eof.g));
+    get_token(scanner);
+    SHOULD_EQUAL(scanner->current_token.token, T_END_OF_FILE);
+    exit_scanner(scanner);
+  END_IT
+
+--FILE newline.g--
+
+
+--ENDFILE--
+
+  IT("should extract a newline token")
+    Scanner* scanner = init_scanner(__TEST_FILE__(newline.g));
+    get_token(scanner);
+    SHOULD_EQUAL(scanner->current_token.token, T_NEWLINE);
+    exit_scanner(scanner);
+  END_IT
+
+--FILE identifier.g--
+variable
+--ENDFILE--
+
+  IT("should extract a T_IDENTIFIER token")
+    Scanner* scanner = init_scanner(__TEST_FILE__(identifier.g));
+    get_token(scanner);
+    SHOULD_EQUAL(scanner->current_token.token, T_IDENTIFIER);
+    exit_scanner(scanner);
+  END_IT
+
+--FILE identifier_underscore.g--
+__variable_here__name
+--ENDFILE--
+
+  IT("should extract a T_IDENTIFIER token with underscores")
+    Scanner* scanner = init_scanner(__TEST_FILE__(identifier_underscore.g));
+    get_token(scanner);
+    SHOULD_EQUAL(scanner->current_token.token, T_IDENTIFIER);
+    exit_scanner(scanner);
+  END_IT
+
+END_DESCRIBE
+
 DESCRIBE(scanner_scanner, "Scanner")
 
   IT("defines the Scanner struct")
@@ -204,5 +252,6 @@ DESCRIBE(scanner_scanner, "Scanner")
   status += CSpec_Run( DESCRIPTION( scanner_scanner_get_source_line ), CSpec_NewOutputVerbose() );
   status += CSpec_Run( DESCRIPTION( scanner_scanner_skip_comment ), CSpec_NewOutputVerbose() );
   status += CSpec_Run( DESCRIPTION( scanner_scanner_skip_blanks ), CSpec_NewOutputVerbose() );
+  status += CSpec_Run( DESCRIPTION( scanner_scanner_get_token ), CSpec_NewOutputVerbose() );
 
 END_DESCRIBE

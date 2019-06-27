@@ -37,6 +37,7 @@ void populate_char_table(Scanner *scanner) {
   for (ch = 'a'; ch <= 'z'; ++ch) scanner->char_table[ch] = LETTER;
   scanner->char_table['\''] = QUOTE;
   scanner->char_table['\n'] = NEWLINE;
+  scanner->char_table['_'] = LETTER;
   scanner->char_table[EOF_CHAR] = EOF_CODE;
 }
 
@@ -99,6 +100,53 @@ void skip_blanks(Scanner* scanner) {
   while(scanner->current_char == ' ') {
     get_character(scanner);
   }
+}
+
+void get_token(Scanner* scanner) {
+  skip_blanks(scanner);
+
+  scanner->current_token.tokenp = scanner->current_token.token_string;
+
+  switch(CHAR_CODE(scanner)) {
+    case NEWLINE:
+      scanner->current_token.token = T_NEWLINE;
+      *(scanner->current_token.tokenp) = '\0';
+      get_character(scanner);
+      break;
+    case LETTER:
+      get_word(scanner, FALSE);
+      break;
+    case UPPERCASE_LETTER:
+      get_word(scanner, TRUE);
+      break;
+    case EOF_CODE:
+      scanner->current_token.token = T_END_OF_FILE;
+      break;
+    default: get_special(scanner);
+  }
+}
+
+void get_word(Scanner* scanner, BOOLEAN is_constant) {
+  while(CHAR_CODE(scanner) == LETTER || CHAR_CODE(scanner) == UPPERCASE_LETTER) {
+    *(scanner->current_token.tokenp)++ = scanner->current_char;
+    get_character(scanner);
+  }
+
+  *(scanner->current_token.tokenp) = '\0';
+
+  if(!string_is_reserved_word(scanner->current_token.token_string)) {
+    if (is_constant) {
+      scanner->current_token.token = T_CONSTANT;
+    } else {
+      scanner->current_token.token = T_IDENTIFIER;
+    }
+  } else {
+    scanner->current_token.token = get_token_code(scanner->current_token.token_string);
+  }
+}
+
+void get_special(Scanner *scanner) {
+
 }
 
 void exit_scanner(Scanner *scanner) {

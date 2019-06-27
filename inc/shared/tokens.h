@@ -6,6 +6,8 @@
 #define EOF_CHAR '\x7f'
 #define NEWLINE_CHAR '\n'
 #define COMMENT_CHAR '#'
+#define MIN_RESERVED_WORD_LENGTH 3
+#define MAX_RESERVED_WORD_LENGTH 3
 
 typedef enum {
   INTEGER_LIT, REAL_LIT, STRING_LIT,
@@ -16,7 +18,7 @@ typedef enum {
 } CHAR_CODE;
 
 typedef enum {
-  NO_TOKEN
+  NO_TOKEN, T_NEWLINE, T_END_OF_FILE, T_CONSTANT, T_IDENTIFIER, T_LET
 } TOKEN_CODE;
 
 typedef struct {
@@ -44,5 +46,8 @@ typedef struct {
   TOKEN_CODE code;
   LITERAL literal;
 } Token;
+
+BOOLEAN string_is_reserved_word(const char* word_string);
+TOKEN_CODE get_token_code(const char* word_string);
 
 #endif
