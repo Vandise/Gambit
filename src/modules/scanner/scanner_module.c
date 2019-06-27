@@ -67,13 +67,11 @@ void get_character(Scanner *scanner) {
   scanner->current_char = *(scanner->source_bufferp)++;
 
   switch(scanner->current_char) {
-    /*
-    case '#':
+    case COMMENT_CHAR:
       scanner->buffer_offset += 1;
       skip_comment(scanner);
-      scanner->ch = ' ';
+      scanner->current_char = ' ';
       break;
-    */
     default:
       scanner->buffer_offset += 1;
   }
@@ -89,6 +87,18 @@ BOOLEAN get_source_line(Scanner* scanner) {
     return TRUE;
   }
   return FALSE;
+}
+
+void skip_comment(Scanner* scanner) {
+  do {
+    get_character(scanner);
+  } while ( (scanner->current_char != NEWLINE_CHAR) && (scanner->current_char != EOF_CHAR) );
+}
+
+void skip_blanks(Scanner* scanner) {
+  while(scanner->current_char == ' ') {
+    get_character(scanner);
+  }
 }
 
 void exit_scanner(Scanner *scanner) {

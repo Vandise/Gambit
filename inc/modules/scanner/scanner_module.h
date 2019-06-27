@@ -43,6 +43,8 @@ void populate_char_table(Scanner *scanner);
 BOOLEAN open_source_file(Scanner *scanner);
 void get_character(Scanner *scanner);
 BOOLEAN get_source_line(Scanner* scanner);
+void skip_blanks(Scanner* scanner);
+void skip_comment(Scanner* scanner);
 
 void exit_scanner(Scanner *scanner);
 

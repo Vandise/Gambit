@@ -153,6 +153,38 @@ DESCRIBE(scanner_scanner_get_source_line, "Scanner - get_source_line")
 
 END_DESCRIBE
 
+DESCRIBE(scanner_scanner_skip_comment, "Scanner - skip comment")
+
+--FILE comment_text.g--
+# this is a comment that will be skipped
+Hello World!
+--ENDFILE--
+
+  IT("skips the comment line")
+    Scanner* scanner = init_scanner(__TEST_FILE__(comment_text.g));
+    get_character(scanner);
+    SHOULD_EQUAL(scanner->current_char, 'H');
+    exit_scanner(scanner);
+  END_IT
+
+END_DESCRIBE
+
+DESCRIBE(scanner_scanner_skip_blanks, "Scanner - skip_blanks")
+
+--FILE blanks_text.g--
+     Hello World!
+--ENDFILE--
+
+  IT("gets the first token after skipping blanks")
+    Scanner* scanner = init_scanner(__TEST_FILE__(blanks_text.g));
+    get_character(scanner);
+    skip_blanks(scanner);
+    SHOULD_EQUAL(scanner->current_char, 'H');
+    exit_scanner(scanner);
+  END_IT
+
+END_DESCRIBE
+
 DESCRIBE(scanner_scanner, "Scanner")
 
   IT("defines the Scanner struct")
@@ -170,5 +202,7 @@ DESCRIBE(scanner_scanner, "Scanner")
   status += CSpec_Run( DESCRIPTION( scanner_scanner_get_character ), CSpec_NewOutputVerbose() );
   status += CSpec_Run( DESCRIPTION( scanner_scanner_open_source_file ), CSpec_NewOutputVerbose() );
   status += CSpec_Run( DESCRIPTION( scanner_scanner_get_source_line ), CSpec_NewOutputVerbose() );
+  status += CSpec_Run( DESCRIPTION( scanner_scanner_skip_comment ), CSpec_NewOutputVerbose() );
+  status += CSpec_Run( DESCRIPTION( scanner_scanner_skip_blanks ), CSpec_NewOutputVerbose() );
 
 END_DESCRIBE

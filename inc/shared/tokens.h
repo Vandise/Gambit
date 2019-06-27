@@ -4,6 +4,8 @@
 #include "common.h"
 
 #define EOF_CHAR '\x7f'
+#define NEWLINE_CHAR '\n'
+#define COMMENT_CHAR '#'
 
 typedef enum {
   INTEGER_LIT, REAL_LIT, STRING_LIT,

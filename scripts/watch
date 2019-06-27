@@ -2,6 +2,7 @@
 
 test_chsum=""
 project_chsum=""
+modules_chsum=""
 
 watch_tests() {
   chsum2=`find test/ -type f -name "*.gt" -mtime -5 -exec md5 {} \;`
@@ -21,8 +22,18 @@ watch_project() {
   fi
 }
 
+watch_modules() {
+  chsum2=`find src/modules inc/ -type f \( -name "*.c" -o -name "*.h" \) -mtime -5 -exec md5 {} \;`
+  if [[ $modules_chsum != $chsum2 ]] ; then
+    echo "\n== Compiling Modules ==\n"
+    make directories && make main && sh scripts/generate_tests && make tests
+    modules_chsum=$chsum2
+  fi
+}
+
 while [[ true ]]
 do
   watch_project
+  watch_modules
   watch_tests
 done
