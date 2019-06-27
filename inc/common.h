@@ -1,6 +1,7 @@
 #ifndef __PROJECT_COMMON__
 #define __PROJECT_COMMON__ 1
 
+#include <errno.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>

@@ -1,0 +1,174 @@
+#include "cspec.h"
+#include "cspec_output_header.h"
+#include "cspec_output_verbose.h"
+#include "cspec_output_unit.h"
+
+#include "test/macros.h"
+#include "modules/scanner/scanner_module.h"
+
+extern int status;
+
+--FILE exists.g--
+This file exists!
+--ENDFILE--
+
+--FILE exists_multiple.g--
+Hello
+World!
+--ENDFILE--
+
+DESCRIBE(scanner_scanner_init_scanner, "Scanner - Init Scanner")
+
+  IT("sets the line_number to 1")
+    Scanner* scanner = init_scanner(__TEST_FILE__(exists.g));
+    SHOULD_EQUAL(scanner->line_number, 1);
+    exit_scanner(scanner);
+  END_IT
+
+  IT("sets the level to 0")
+    Scanner* scanner = init_scanner(__TEST_FILE__(exists.g));
+    SHOULD_EQUAL(scanner->level, 0);
+    exit_scanner(scanner);
+  END_IT
+
+  IT("sets the buffer_offset to 1")
+    Scanner* scanner = init_scanner(__TEST_FILE__(exists.g));
+    SHOULD_EQUAL(scanner->buffer_offset, 1);
+    exit_scanner(scanner);
+  END_IT
+
+  IT("sets the source_name from the file_name parameter")
+    Scanner* scanner = init_scanner(__TEST_FILE__(exists.g));
+    SHOULD_MATCH(scanner->source_name, __TEST_FILE__(exists.g));
+    exit_scanner(scanner);
+  END_IT
+
+  IT("opens the file from the file_name parameter")
+    Scanner* scanner = init_scanner(__TEST_FILE__(exists.g));
+    SHOULD_EQUAL(errno, 0);
+    SHOULD_NOT_BE_NULL(scanner->source_file);
+    exit_scanner(scanner);
+  END_IT
+
+  IT("returns null if the input file cannot be found")
+    Scanner* scanner = init_scanner(__TEST_FILE__(does_not_exists.g));
+    SHOULD_NOT_EQUAL(errno, 0);
+    SHOULD_BE_NULL(scanner);
+  END_IT
+
+END_DESCRIBE
+
+DESCRIBE(scanner_scanner_populate_char_table, "Scanner - populate_char_table")
+
+  IT("assigns a CHAR_CODE for each character")
+    Scanner* scanner = init_scanner(__TEST_FILE__(exists.g));
+    int ch;
+
+    for (ch = 0; ch < 256; ++ch) {
+      CHAR_CODE code = scanner->char_table[ch];
+      if (code != LETTER && code != DIGIT &&
+          code != QUOTE && code != SPECIAL &&
+          code != EOF_CODE && code != NEWLINE && code != UPPERCASE_LETTER) {
+        SHOULD_BE_TRUE(0);
+      }
+    }
+    SHOULD_BE_TRUE(1);
+    exit_scanner(scanner);
+  END_IT
+
+END_DESCRIBE
+
+DESCRIBE(scanner_scanner_get_character, "Scanner - get_character")
+
+  IT("gets the next character")
+    Scanner* scanner = init_scanner(__TEST_FILE__(exists.g));
+    SHOULD_EQUAL(scanner->current_char, 'T');
+    get_character(scanner);
+    SHOULD_EQUAL(scanner->current_char, 'h');
+    exit_scanner(scanner);
+  END_IT
+
+  IT("sets the current character to EOF_CHAR when the buffer is exhausted")
+    Scanner* scanner = init_scanner(__TEST_FILE__(exists_multiple.g));
+    get_source_line(scanner);
+    get_source_line(scanner);
+
+    int i;
+
+    for(i = 0; i < 7; i++) {
+      get_character(scanner);
+    }
+
+    SHOULD_EQUAL(scanner->current_char, EOF_CHAR);
+
+    exit_scanner(scanner);
+  END_IT
+
+END_DESCRIBE
+
+DESCRIBE(scanner_scanner_open_source_file, "Scanner - open_source_file")
+
+  IT("returns true on success")
+    Scanner* scanner = init_scanner(__TEST_FILE__(exists.g));
+    SHOULD_EQUAL(open_source_file(scanner), TRUE);
+    exit_scanner(scanner);
+  END_IT
+
+  IT("returns false on failure")
+    Scanner* scanner = init_scanner(__TEST_FILE__(exists.g));
+    strcpy(scanner->source_name, "not_found.in");;
+    SHOULD_EQUAL(open_source_file(scanner), FALSE);
+    exit_scanner(scanner);
+  END_IT
+
+END_DESCRIBE
+
+DESCRIBE(scanner_scanner_get_source_line, "Scanner - get_source_line")
+
+  IT("returns TRUE on success")
+    // TODO: called by init_scanner
+    //Scanner* scanner = init_scanner(__TEST_FILE__(exists.g));
+    //SHOULD_EQUAL(get_source_line(scanner), TRUE);
+    //exit_scanner(scanner);
+  END_IT
+
+  IT("returns FALSE on failure")
+    Scanner* scanner = init_scanner(__TEST_FILE__(does_not_exist.g));
+    SHOULD_EQUAL(get_source_line(scanner), FALSE);
+  END_IT
+
+  IT("increments the line_number")
+    Scanner* scanner = init_scanner(__TEST_FILE__(exists.g));
+    get_source_line(scanner);
+    SHOULD_EQUAL(scanner->line_number, 1);
+    exit_scanner(scanner);
+  END_IT
+
+  IT("sets the source_buffer")
+    Scanner* scanner = init_scanner(__TEST_FILE__(exists.g));
+    get_source_line(scanner);
+    SHOULD_MATCH(scanner->source_buffer, "This file exists!");
+    exit_scanner(scanner);
+  END_IT
+
+END_DESCRIBE
+
+DESCRIBE(scanner_scanner, "Scanner")
+
+  IT("defines the Scanner struct")
+    Scanner scanner;
+    SHOULD_EQUAL(&scanner, &scanner);
+  END_IT
+
+  IT("defines the ScannerToken struct")
+    ScannerToken sc;
+    SHOULD_EQUAL(&sc, &sc);
+  END_IT
+
+  status += CSpec_Run( DESCRIPTION( scanner_scanner_init_scanner ), CSpec_NewOutputVerbose() );
+  status += CSpec_Run( DESCRIPTION( scanner_scanner_populate_char_table ), CSpec_NewOutputVerbose() );
+  status += CSpec_Run( DESCRIPTION( scanner_scanner_get_character ), CSpec_NewOutputVerbose() );
+  status += CSpec_Run( DESCRIPTION( scanner_scanner_open_source_file ), CSpec_NewOutputVerbose() );
+  status += CSpec_Run( DESCRIPTION( scanner_scanner_get_source_line ), CSpec_NewOutputVerbose() );
+
+END_DESCRIBE
