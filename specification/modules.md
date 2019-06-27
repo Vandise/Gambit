@@ -22,10 +22,10 @@ Where `T_IDENTIFIER` is not a keyword and expressions includes constant definiti
 module MyModule do
 	using(fetch) from Window
 	
-	DEFAULT_STATUS: 404
+	DEFAULT_STATUS = 404
 	
 	struct HttpResponse do
-		status: DEFAULT_STATUS,
+		status: DEFAULT_STATUS
 		response: null
 	end
 	
