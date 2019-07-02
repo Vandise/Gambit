@@ -231,6 +231,37 @@ __variable_here__name
     exit_scanner(scanner);
   END_IT
 
+--FILE constant_underscore.g--
+Module_Name
+--ENDFILE--
+  IT("should extract a T_CONSTANT token")
+    Scanner* scanner = init_scanner(__TEST_FILE__(constant_underscore.g));
+    get_token(scanner);
+    SHOULD_EQUAL(scanner->current_token.token, T_CONSTANT);
+    exit_scanner(scanner);
+  END_IT
+
+--FILE let_keyword.g--
+let
+--ENDFILE--
+  IT("should extract a T_LET token")
+    Scanner* scanner = init_scanner(__TEST_FILE__(let_keyword.g));
+    get_token(scanner);
+    SHOULD_EQUAL(scanner->current_token.token, T_LET);
+    exit_scanner(scanner);
+  END_IT
+
+--FILE parens.g--
+()
+--ENDFILE--
+  IT("should extract T_PAREN tokens")
+    Scanner* scanner = init_scanner(__TEST_FILE__(parens.g));
+    get_token(scanner);
+    SHOULD_EQUAL(scanner->current_token.token, T_LPAREN);
+    get_token(scanner);
+    SHOULD_EQUAL(scanner->current_token.token, T_RPAREN);
+    exit_scanner(scanner);
+  END_IT
 END_DESCRIBE
 
 DESCRIBE(scanner_scanner, "Scanner")

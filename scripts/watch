@@ -27,6 +27,13 @@ watch_modules() {
   if [[ $modules_chsum != $chsum2 ]] ; then
     echo "\n== Compiling Modules ==\n"
     make directories && make main && sh scripts/generate_tests && make tests
+
+    for f in src/modules/*; do
+      if [ -d ${f} ]; then
+        make $(basename $f)
+      fi
+    done
+
     modules_chsum=$chsum2
   fi
 }

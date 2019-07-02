@@ -76,7 +76,6 @@ void get_character(Scanner *scanner) {
     default:
       scanner->buffer_offset += 1;
   }
-
 }
 
 BOOLEAN get_source_line(Scanner* scanner) {
@@ -146,7 +145,17 @@ void get_word(Scanner* scanner, BOOLEAN is_constant) {
 }
 
 void get_special(Scanner *scanner) {
+  *(scanner->current_token.tokenp) = scanner->current_char;
 
+  switch(scanner->current_char) {
+    case '(':   scanner->current_token.token = T_LPAREN; get_character(scanner);  break;
+    case ')':   scanner->current_token.token = T_RPAREN; get_character(scanner);  break;
+    case ',':   scanner->current_token.token = T_COMMA;  get_character(scanner);  break;
+    default:
+      scanner->current_token.token = T_ERROR;
+  }
+
+  *(scanner->current_token.tokenp) = '\0';
 }
 
 void exit_scanner(Scanner *scanner) {
