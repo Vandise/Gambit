@@ -1,0 +1,34 @@
+#include "cspec.h"
+#include "cspec_output_header.h"
+#include "cspec_output_verbose.h"
+#include "cspec_output_unit.h"
+
+#include "test/macros.h"
+#include "modules/parser/parser_module.h"
+
+extern int status;
+
+DESCRIBE(gambit_parser_init_parser, "Parser - init_parser")
+
+  IT("sets the token_array")
+    TokenArray tokens;
+    init_token_array(&tokens, 10);
+    Parser* p = init_parser(&tokens);
+
+    SHOULD_EQUAL(p->token_array, &tokens);
+
+    exit_parser(p);
+  END_IT
+
+END_DESCRIBE
+
+DESCRIBE(gambit_parser, "Parser")
+
+  IT("defines the Parser struct")
+    Parser p;
+    SHOULD_EQUAL(&p, &p);
+  END_IT
+
+  status += CSpec_Run(DESCRIPTION(gambit_parser_init_parser), CSpec_NewOutputVerbose());
+
+END_DESCRIBE

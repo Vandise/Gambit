@@ -1,0 +1,198 @@
+#include "cspec.h"
+#include "cspec_output_header.h"
+#include "cspec_output_verbose.h"
+#include "cspec_output_unit.h"
+
+#include "test/macros.h"
+#include "modules/parser/ast/symbol_table.h"
+
+extern int status;
+
+DESCRIBE(ast_symbol_table_insert_symbol_table, "AST Symbol Table - insert_symbol_table")
+
+  IT("sets the root node if empty")
+    ASTNodePtr root = NULL;
+    ASTNodePtr np;
+
+    np = insert_symbol_table("TEST", &root);
+
+    SHOULD_EQUAL(np, root);
+
+    free_symbol_table_node(np);
+  END_IT
+
+  IT("inserts a new node if it doesn't exist")
+    ASTNodePtr root = NULL;
+    ASTNodePtr np;
+
+    np = insert_symbol_table("TEST", &root);
+
+    SHOULD_MATCH(np->name, "TEST");
+
+    free_symbol_table_node(np);
+  END_IT
+
+  IT("swaps root nodes based on name-size")
+    ASTNodePtr root = NULL;
+    ASTNodePtr n1;
+    ASTNodePtr n2;
+
+    n1 = insert_symbol_table("LARGER", &root);
+    n2 = insert_symbol_table("SMALL", &root);
+
+    SHOULD_MATCH(root->name, "LARGER");
+    SHOULD_MATCH(root->right->name, "SMALL");
+
+    free_symbol_table_node(n1);
+    free_symbol_table_node(n2);
+  END_IT
+
+  IT("swaps left and right nodes based on name-size")
+    ASTNodePtr root = NULL;
+    ASTNodePtr n1;
+    ASTNodePtr n2;
+    ASTNodePtr n3;
+
+    n1 = insert_symbol_table("LARGER", &root);
+    n2 = insert_symbol_table("SMALL", &root);
+    n3 = insert_symbol_table("EST", &root);
+
+    SHOULD_MATCH(root->name, "LARGER");
+    SHOULD_MATCH(root->right->name, "SMALL");
+    SHOULD_MATCH(root->left->name, "EST");
+
+    free_symbol_table_node(n1);
+    free_symbol_table_node(n2);
+    free_symbol_table_node(n3);
+  END_IT
+END_DESCRIBE
+
+DESCRIBE(ast_symbol_table_search_symbol_table, "AST Symbol Table - search_symbol_table")
+
+  IT("returns NULL if the node isn't found")
+    SHOULD_EQUAL(search_symbol_table("TEST", NULL), NULL);
+  END_IT
+
+  IT("returns the node if present")
+    ASTNodePtr root = NULL;
+    ASTNodePtr n1;
+
+    n1 = insert_symbol_table("TEST", &root);
+    ASTNodePtr result = search_symbol_table("TEST", root);
+
+    SHOULD_EQUAL(n1, result);
+    SHOULD_MATCH(result->name, "TEST");
+
+    free_symbol_table_node(n1);
+  END_IT
+
+END_DESCRIBE
+
+DESCRIBE(ast_symbol_table_init_symbol_table, "AST Symbol Table - init_symbol_table")
+
+  IT("initializes Integer types")
+    ASTNodePtr root = NULL;
+
+    init_symbol_table(&root);
+
+    ASTNodePtr result = search_symbol_table("Integer", root);
+    SHOULD_MATCH(result->name, "Integer");
+
+    exit_symbol_table(root);
+  END_IT
+
+  IT("initializes Real types")
+    ASTNodePtr root = NULL;
+
+    init_symbol_table(&root);
+
+    ASTNodePtr result = search_symbol_table("Real", root);
+    SHOULD_MATCH(result->name, "Real");
+
+    exit_symbol_table(root);
+  END_IT
+
+  IT("initializes Boolean types")
+    ASTNodePtr root = NULL;
+
+    init_symbol_table(&root);
+
+    ASTNodePtr result = search_symbol_table("Boolean", root);
+    SHOULD_MATCH(result->name, "Boolean");
+
+    exit_symbol_table(root);
+  END_IT
+
+  IT("initializes Char types")
+    ASTNodePtr root = NULL;
+
+    init_symbol_table(&root);
+
+    ASTNodePtr result = search_symbol_table("Char", root);
+    SHOULD_MATCH(result->name, "Char");
+
+    exit_symbol_table(root);
+  END_IT
+
+  IT("initializes False types")
+    ASTNodePtr root = NULL;
+
+    init_symbol_table(&root);
+
+    ASTNodePtr result = search_symbol_table("False", root);
+    SHOULD_MATCH(result->name, "False");
+
+    exit_symbol_table(root);
+  END_IT
+
+  IT("initializes True types")
+    ASTNodePtr root = NULL;
+
+    init_symbol_table(&root);
+
+    ASTNodePtr result = search_symbol_table("True", root);
+    SHOULD_MATCH(result->name, "True");
+
+    exit_symbol_table(root);
+  END_IT
+END_DESCRIBE
+
+DESCRIBE(ast_symbol_table, "AST Symbol Table")
+
+  IT("defines the Value struct")
+    Value v;
+    SHOULD_EQUAL(&v, &v);
+  END_IT
+
+  IT("defines the DefnStruct struct")
+    DefnStruct dfn;
+    SHOULD_EQUAL(&dfn, &dfn);
+  END_IT
+
+  IT("defines the ASTNode struct")
+    ASTNode n;
+    SHOULD_EQUAL(&n, &n);
+  END_IT
+
+  IT("defines the ASTNodePtr struct")
+    ASTNodePtr n = __MALLOC__(sizeof(ASTNode));
+    SHOULD_EQUAL(n, n);
+    __FREE__(n);
+  END_IT
+
+  IT("defines the TypeStruct struct")
+    TypeStruct t;
+    SHOULD_EQUAL(&t, &t);
+  END_IT
+
+  IT("defines the TypeStructPtr struct")
+    TypeStructPtr t = __MALLOC__(sizeof(TypeStruct));
+    SHOULD_EQUAL(t, t);
+    __FREE__(t);
+  END_IT
+
+  status += CSpec_Run( DESCRIPTION( ast_symbol_table_insert_symbol_table ), CSpec_NewOutputVerbose() );
+  status += CSpec_Run( DESCRIPTION( ast_symbol_table_search_symbol_table ), CSpec_NewOutputVerbose() );
+  status += CSpec_Run( DESCRIPTION( ast_symbol_table_init_symbol_table ), CSpec_NewOutputVerbose() );
+
+END_DESCRIBE
