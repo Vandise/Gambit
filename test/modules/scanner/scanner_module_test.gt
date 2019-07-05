@@ -262,6 +262,39 @@ let
     SHOULD_EQUAL(scanner->current_token.token, T_RPAREN);
     exit_scanner(scanner);
   END_IT
+
+--FILE string.g--
+'This is a string!'
+--ENDFILE--
+  IT("should extract a T_STRING token")
+    Scanner* scanner = init_scanner(__TEST_FILE__(string.g));
+
+    get_token(scanner);
+    SHOULD_EQUAL(scanner->current_token.token, T_STRING);
+    SHOULD_EQUAL( strcmp(scanner->current_token.literal.value.string, "This is a string!"), 0);
+    SHOULD_EQUAL(scanner->current_token.literal.type, STRING_LIT);
+    exit_scanner(scanner);
+  END_IT
+END_DESCRIBE
+
+DESCRIBE(scanner_scanner_commit_token, "Scanner - commit token")
+
+  IT("pushes the token to the tokens array")
+    Scanner* scanner = init_scanner(__TEST_FILE__(let_keyword.g));
+    get_token(scanner);
+
+    SHOULD_EQUAL(scanner->current_token.token, T_LET);
+
+    commit_token(scanner);
+
+    SHOULD_EQUAL( (scanner->tokens.array[0]).code, T_LET );
+    SHOULD_EQUAL( (scanner->tokens.array[0]).line_number, 1 );
+    SHOULD_EQUAL( strcmp((scanner->tokens.array[0]).source_name, ".tmp/gt/let_keyword.g"), 0 );
+    SHOULD_EQUAL( strcmp((scanner->tokens.array[0]).token_string, "let"), 0 );
+
+    exit_scanner(scanner);
+  END_IT
+
 END_DESCRIBE
 
 DESCRIBE(scanner_scanner, "Scanner")
@@ -284,5 +317,6 @@ DESCRIBE(scanner_scanner, "Scanner")
   status += CSpec_Run( DESCRIPTION( scanner_scanner_skip_comment ), CSpec_NewOutputVerbose() );
   status += CSpec_Run( DESCRIPTION( scanner_scanner_skip_blanks ), CSpec_NewOutputVerbose() );
   status += CSpec_Run( DESCRIPTION( scanner_scanner_get_token ), CSpec_NewOutputVerbose() );
+  status += CSpec_Run( DESCRIPTION( scanner_scanner_commit_token ), CSpec_NewOutputVerbose() );
 
 END_DESCRIBE

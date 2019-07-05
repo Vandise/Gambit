@@ -118,11 +118,38 @@ void get_token(Scanner* scanner) {
     case UPPERCASE_LETTER:
       get_word(scanner, TRUE);
       break;
+    case QUOTE:
+        get_string(scanner);
+        break;
     case EOF_CODE:
       scanner->current_token.token = T_END_OF_FILE;
       break;
     default: get_special(scanner);
   }
+}
+
+void get_string(Scanner* scanner) {
+  char* literalp = scanner->current_token.literal.value.string; 
+  *(scanner->current_token.tokenp)++ = '\'';
+
+  get_character(scanner);
+
+  while(scanner->current_char != EOF_CHAR) {
+    if(scanner->current_char == '\'') {
+      *(scanner->current_token.tokenp)++ = scanner->current_char;
+      get_character(scanner);
+      if(scanner->current_char != '\'') { break; }
+    }
+
+    *(scanner->current_token.tokenp)++ = scanner->current_char;
+    *literalp++ = scanner->current_char;
+    get_character(scanner);
+  }
+
+  *(scanner->current_token.tokenp) = '\0';
+  *literalp = '\0';
+  scanner->current_token.token = T_STRING;
+  scanner->current_token.literal.type = STRING_LIT;
 }
 
 void get_word(Scanner* scanner, BOOLEAN is_constant) {
@@ -151,11 +178,34 @@ void get_special(Scanner *scanner) {
     case '(':   scanner->current_token.token = T_LPAREN; get_character(scanner);  break;
     case ')':   scanner->current_token.token = T_RPAREN; get_character(scanner);  break;
     case ',':   scanner->current_token.token = T_COMMA;  get_character(scanner);  break;
+    case '=':   scanner->current_token.token = T_EQUAL;  get_character(scanner);  break;
     default:
       scanner->current_token.token = T_ERROR;
   }
 
   *(scanner->current_token.tokenp) = '\0';
+}
+
+void commit_token(Scanner* scanner) {
+  Token t = {
+    .line_number = scanner->line_number,
+    .level = scanner->level,
+    .source_name = '\0',
+    .word_string = '\0',
+    .token_string = '\0',
+    .code = scanner->current_token.token,
+    .literal = scanner->current_token.literal
+  };
+
+  strcpy(t.source_name, scanner->source_name);
+  strcpy(t.word_string, scanner->current_token.word_string);
+  strcpy(t.token_string, scanner->current_token.token_string);
+
+  insert_token_array(&(scanner->tokens), t);
+}
+
+TokenArray* get_tokens(Scanner* scanner) {
+  return &(scanner->tokens);
 }
 
 void exit_scanner(Scanner *scanner) {

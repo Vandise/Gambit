@@ -30,6 +30,7 @@ watch_modules() {
 
     for f in src/modules/*; do
       if [ -d ${f} ]; then
+        echo "\n == Making module: $(basename $f) == \n"
         make $(basename $f)
       fi
     done
@@ -43,4 +44,5 @@ do
   watch_project
   watch_modules
   watch_tests
+  sleep 5
 done

@@ -1,10 +1,7 @@
 #ifndef __GAMBIT_SCANNER_MODULEH
 #define __GAMBIT_SCANNER_MODULEH 1
 
-#include "common.h"
-#include "shared/error.h"
-#include "shared/tokens.h"
-#include "shared/token_array.h"
+#include "shared/scanner.h"
 
 #define __GAMBIT_SCANNER_TOKENLIST_SIZE 100
 #define CHAR_CODE(scanner) scanner->char_table[scanner->current_char]
@@ -39,7 +36,6 @@ typedef struct GambitScanner {
   TokenArray tokens;
 } Scanner;
 
-Scanner* init_scanner(char* file_name);
 void populate_char_table(Scanner* scanner);
 BOOLEAN open_source_file(Scanner* scanner);
 void get_character(Scanner* scanner);
@@ -49,7 +45,7 @@ void skip_comment(Scanner* scanner);
 void get_token(Scanner* scanner);
 void get_special(Scanner* scanner);
 void get_word(Scanner* scanner, BOOLEAN is_constant);
-
-void exit_scanner(Scanner* scanner);
+void get_string(Scanner* scanner);
+void commit_token(Scanner* scanner);
 
 #endif
