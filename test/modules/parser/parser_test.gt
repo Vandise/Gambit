@@ -8,6 +8,60 @@
 
 extern int status;
 
+DESCRIBE(gambit_parser_next_token, "Parser - next_token")
+
+  IT("returns and sets the next token")
+    TokenArray tokens;
+    init_token_array(&tokens, 2);
+
+    Token ts[2] = {
+      { .line_number = 1 },
+      { .line_number = 2 }
+    };
+
+    for (int i = 0; i < 2; i++) {
+      insert_token_array(&tokens, ts[i]);  
+    }
+
+    Parser* p = init_parser(&tokens);
+    SHOULD_EQUAL(p->current_token->line_number, 1);  
+    SHOULD_EQUAL((next_token(p))->line_number, 2);
+    SHOULD_EQUAL(p->current_token->line_number, 2);
+
+    exit_parser(p);
+  END_IT
+
+END_DESCRIBE
+
+DESCRIBE(gambit_parser_peek_token, "Parser - peek_token")
+  
+  IT("returns N tokens ahead")
+    TokenArray tokens;
+    init_token_array(&tokens, 2);
+
+    Token ts[6] = {
+      { .line_number = 1 },
+      { .line_number = 2 },
+      { .line_number = 3 },
+      { .line_number = 4 },
+      { .line_number = 5 },
+      { .line_number = 6 }
+    };
+
+    for (int i = 0; i < 6; i++) {
+      insert_token_array(&tokens, ts[i]);  
+    }
+
+    Parser* p = init_parser(&tokens);
+ 
+    SHOULD_EQUAL(p->current_token->line_number, 1); 
+    SHOULD_EQUAL((peek_token(p, 3))->line_number, 4);
+
+    exit_parser(p);
+  END_IT
+
+END_DESCRIBE
+
 DESCRIBE(gambit_parser_init_parser, "Parser - init_parser")
 
   IT("sets the token_array")
@@ -30,5 +84,8 @@ DESCRIBE(gambit_parser, "Parser")
   END_IT
 
   status += CSpec_Run(DESCRIPTION(gambit_parser_init_parser), CSpec_NewOutputVerbose());
+  status += CSpec_Run(DESCRIPTION(gambit_parser_next_token), CSpec_NewOutputVerbose());
+  status += CSpec_Run(DESCRIPTION(gambit_parser_peek_token), CSpec_NewOutputVerbose());
+
 
 END_DESCRIBE
