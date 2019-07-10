@@ -9,6 +9,79 @@
 
 extern int status;
 
+/*
+
+  TODO: finish expressions AST, then create free_node method
+
+*/
+
+DESCRIBE(gambit_parser_expressions_factor, "Parser - Expressions factor")
+
+  IT("returns Integer literal nodes")
+    Scanner* scanner = init_scanner(__TEST_FILE__(exp_simple_math.g));
+    get_token(scanner);
+    commit_token(scanner);
+
+    Parser* p = init_parser(get_tokens(scanner));
+
+    ASTNodePtr n = factor(p);
+    SHOULD_BE_FALSE(p->errored);
+    SHOULD_EQUAL(n->type, LITERAL_NODE);
+
+    LiteralNodePtr l = (LiteralNodePtr)(n->node);
+
+    SHOULD_EQUAL(l->type, INTEGER_LIT);
+    SHOULD_EQUAL(l->value.integer, 5);
+
+    __FREE__(l); __FREE__(n);
+
+    exit_parser(p);
+    exit_scanner(scanner);
+  END_IT
+
+
+  IT("returns String literal nodes")
+    Scanner* scanner = init_scanner(__TEST_FILE__(exp_strings.g));
+    get_token(scanner);
+    commit_token(scanner);
+
+    Parser* p = init_parser(get_tokens(scanner));
+
+    ASTNodePtr n = factor(p);
+    SHOULD_BE_FALSE(p->errored);
+    SHOULD_EQUAL(n->type, LITERAL_NODE);
+
+    LiteralNodePtr l = (LiteralNodePtr)(n->node);
+
+    SHOULD_EQUAL(l->type, STRING_LIT);
+    SHOULD_EQUAL(strcmp(l->value.stringp, "String"), 0);
+
+    __FREE__(l); __FREE__(n);
+
+    exit_parser(p);
+    exit_scanner(scanner);
+  END_IT
+
+  IT("returns GetLocal nodes")
+    Scanner* scanner = init_scanner(__TEST_FILE__(exp_math_var.g));
+    get_token(scanner);
+    commit_token(scanner);
+
+    Parser* p = init_parser(get_tokens(scanner));
+
+    ASTNodePtr n = factor(p);
+    SHOULD_BE_FALSE(p->errored);
+    SHOULD_EQUAL(n->type, GET_LOCAL_NODE);
+
+    GetLocalNodePtr l = (GetLocalNodePtr)(n->node);
+    SHOULD_EQUAL(strcmp(l->identifier, "x"), 0);
+
+    __FREE__(l); __FREE__(n);
+
+    exit_parser(p);
+    exit_scanner(scanner);
+  END_IT
+END_DESCRIBE
 
 DESCRIBE(gambit_parser_expressions, "Parser - Expressions")
 
@@ -92,5 +165,7 @@ x + 3
     exit_parser(p);
     exit_scanner(scanner);
   END_IT
+
+  status += CSpec_Run( DESCRIPTION( gambit_parser_expressions_factor ), CSpec_NewOutputVerbose() );
 
 END_DESCRIBE

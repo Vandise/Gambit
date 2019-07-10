@@ -5,7 +5,7 @@
 #include "shared/tokens.h"
 
 typedef enum {
-  NOOP_NODE, LITERAL_NODE, VARIABLE_DECLARATION_NODE
+  NOOP_NODE, LITERAL_NODE, GET_LOCAL_NODE, VARIABLE_DECLARATION_NODE
 } NODE_TYPE;
 
 typedef union {
@@ -22,6 +22,7 @@ typedef struct ASTNodeStruct {
   NODE_TYPE type;
   void* node;
   struct ASTNodeStruct *next;
+  struct ASTNodeStruct *left, *right;
 } ASTNode, *ASTNodePtr;
 
 //
@@ -38,6 +39,13 @@ typedef struct LiteralNodeStruct {
   LITERAL_TYPE type;
   Value value;
 } LiteralNode, *LiteralNodePtr;
+
+//
+// GetLocalNode, for getting local definitions
+//
+typedef struct GetLocalNodeStruct {
+  char* identifier;
+} GetLocalNode, *GetLocalNodePtr;
 
 ASTNodePtr build_node(NODE_TYPE type, void* node);
 

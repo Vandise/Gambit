@@ -4,9 +4,9 @@
 #include "shared/tokens.h"
 #include "modules/parser/parser_module.h"
 
-void expression(Parser* parser);
-void simple_expression(Parser* parser);
-void term(Parser* parser);
-void factor(Parser* parser);
+ASTNodePtr expression(Parser* parser);
+ASTNodePtr simple_expression(Parser* parser);
+ASTNodePtr term(Parser* parser);
+ASTNodePtr factor(Parser* parser);
 
 #endif
