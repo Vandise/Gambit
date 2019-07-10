@@ -51,5 +51,6 @@ typedef struct {
 
 BOOLEAN string_is_reserved_word(const char* word_string);
 TOKEN_CODE get_token_code(const char* word_string);
+BOOLEAN token_in_list(TOKEN_CODE token, TOKEN_CODE token_list[]);
 
 #endif

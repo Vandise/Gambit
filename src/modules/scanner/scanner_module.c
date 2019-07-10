@@ -118,6 +118,9 @@ void get_token(Scanner* scanner) {
     case UPPERCASE_LETTER:
       get_word(scanner, TRUE);
       break;
+    case DIGIT:
+      get_number(scanner);
+      break;
     case QUOTE:
         get_string(scanner);
         break;

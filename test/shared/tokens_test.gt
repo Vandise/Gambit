@@ -29,6 +29,16 @@ DESCRIBE(tokens_get_token_code, "Tokens - get_token_code")
   END_IT
 END_DESCRIBE
 
+DESCRIBE(tokens_token_in_list, "Tokens - token_in_list")
+  IT("returns true if token is found")
+    //token_in_list
+  END_IT
+
+  IT("returns false if token is not found")
+    //token_in_list
+  END_IT
+END_DESCRIBE
+
 DESCRIBE(tokens, "Tokens")
 
   IT("defines the LITERAL struct")
@@ -48,4 +58,5 @@ DESCRIBE(tokens, "Tokens")
 
   status += CSpec_Run( DESCRIPTION( tokens_string_is_reserved_word ), CSpec_NewOutputVerbose() );
   status += CSpec_Run( DESCRIPTION( tokens_get_token_code ), CSpec_NewOutputVerbose() );
+  status += CSpec_Run( DESCRIPTION( tokens_token_in_list ), CSpec_NewOutputVerbose() );
 END_DESCRIBE

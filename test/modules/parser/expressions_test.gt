@@ -5,33 +5,92 @@
 
 #include "test/macros.h"
 #include "modules/scanner/scanner_module.h"
-//#include "modules/parser/expressions.h"
+#include "modules/parser/expressions.h"
 
 extern int status;
 
-DESCRIBE(gambit_parser_expressions, "Parser Expressions")
 
-  IT("parses STRING literal nodes")
-  /*
-    Scanner* scanner = init_scanner(__TEST_FILE__(string.g));
-    get_token(scanner);
-    commit_token(scanner);
+DESCRIBE(gambit_parser_expressions, "Parser - Expressions")
+
+--FILE exp_simple_math.g--
+5 + 3
+--ENDFILE--
+
+  IT("can parse simple math expressions")
+    Scanner* scanner = init_scanner(__TEST_FILE__(exp_simple_math.g));
+    do {
+      get_token(scanner);
+      commit_token(scanner);
+    } while (scanner->current_token.token != T_END_OF_FILE && scanner->current_token.token != T_ERROR);
 
     Parser* p = init_parser(get_tokens(scanner));
 
     expression(p);
 
-    SHOULD_EQUAL(p->current_node->type, LITERAL_NODE);
-
-    LiteralNodePtr np = p->current_node->node;
-    SHOULD_EQUAL(np->type, STRING_LIT);
-    SHOULD_EQUAL(strcmp(np->value.stringp, "This is a string!"), 0);
+    SHOULD_BE_FALSE(p->errored);
 
     exit_parser(p);
     exit_scanner(scanner);
-  */
   END_IT
 
-  //status += CSpec_Run(DESCRIPTION(gambit_parser_init_parser), CSpec_NewOutputVerbose());
+--FILE exp_math_var.g--
+x + 3
+--ENDFILE--
+  IT("regonizes variables in expressions")
+    Scanner* scanner = init_scanner(__TEST_FILE__(exp_math_var.g));
+    do {
+      get_token(scanner);
+      commit_token(scanner);
+    } while (scanner->current_token.token != T_END_OF_FILE && scanner->current_token.token != T_ERROR);
+
+    Parser* p = init_parser(get_tokens(scanner));
+
+    expression(p);
+
+    SHOULD_BE_FALSE(p->errored);
+
+    exit_parser(p);
+    exit_scanner(scanner);
+  END_IT
+
+--FILE exp_math_precedence.g--
+((x + 3) * 5)
+--ENDFILE--
+  IT("regonizes precedence in expressions")
+    Scanner* scanner = init_scanner(__TEST_FILE__(exp_math_precedence.g));
+    do {
+      get_token(scanner);
+      commit_token(scanner);
+    } while (scanner->current_token.token != T_END_OF_FILE && scanner->current_token.token != T_ERROR);
+
+    Parser* p = init_parser(get_tokens(scanner));
+
+    expression(p);
+
+    SHOULD_BE_FALSE(p->errored);
+
+    exit_parser(p);
+    exit_scanner(scanner);
+  END_IT
+
+--FILE exp_strings.g--
+'String' + 'String'
+--ENDFILE--
+  IT("regonizes strings in expressions")
+    Scanner* scanner = init_scanner(__TEST_FILE__(exp_strings.g));
+    do {
+      get_token(scanner);
+      commit_token(scanner);
+    } while (scanner->current_token.token != T_END_OF_FILE && scanner->current_token.token != T_ERROR);
+
+    Parser* p = init_parser(get_tokens(scanner));
+
+    expression(p);
+
+    SHOULD_BE_FALSE(p->errored);
+
+    exit_parser(p);
+    exit_scanner(scanner);
+  END_IT
 
 END_DESCRIBE
