@@ -179,6 +179,35 @@ void get_special(Scanner *scanner) {
     case ')':   scanner->current_token.token = T_RPAREN; get_character(scanner);  break;
     case ',':   scanner->current_token.token = T_COMMA;  get_character(scanner);  break;
     case '=':   scanner->current_token.token = T_EQUAL;  get_character(scanner);  break;
+    case '^':   scanner->current_token.token = T_PIN;    get_character(scanner);  break;
+    case '*':   scanner->current_token.token = T_STAR;   get_character(scanner);  break;
+    case '-':   scanner->current_token.token = T_MINUS;  get_character(scanner);  break;
+    case '+':   scanner->current_token.token = T_PLUS;   get_character(scanner);  break;
+    case '[':   scanner->current_token.token = T_LBRACKET;	get_character(scanner);  break;
+    case ']':   scanner->current_token.token = T_RBRACKET;	get_character(scanner);  break;
+    case ';':   scanner->current_token.token = T_SEMICOLON; get_character(scanner);  break;
+    case '/':   scanner->current_token.token = T_SLASH;     get_character(scanner);  break;
+    case '.':   scanner->current_token.token = T_PERIOD;     get_character(scanner);  break;
+    case '<':
+      get_character(scanner);
+      if (scanner->current_char == '=') {
+        *(scanner->current_token.tokenp)++ = '=';
+        scanner->current_token.token= T_LE;
+        get_character(scanner);
+      } else {
+        scanner->current_token.token = T_LT;
+      }
+      break;
+    case '>':
+      get_character(scanner);
+      if (scanner->current_char == '=') {
+        *(scanner->current_token.tokenp)++ = '=';
+        scanner->current_token.token = T_GE;
+        get_character(scanner);
+      } else {
+        scanner->current_token.token = T_GT;
+      }
+      break;
     default:
       scanner->current_token.token = T_ERROR;
   }

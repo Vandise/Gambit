@@ -39,4 +39,6 @@ typedef struct LiteralNodeStruct {
   Value value;
 } LiteralNode, *LiteralNodePtr;
 
+ASTNodePtr build_node(NODE_TYPE type, void* node);
+
 #endif

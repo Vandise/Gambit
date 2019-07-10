@@ -28,11 +28,7 @@ Token* peek_token(Parser* parser, int n) {
   return look_ahead;
 }
 
-void push_node(Parser* parser, NODE_TYPE type, void* node) {
-  ASTNodePtr np = __MALLOC__(sizeof(ASTNode));
-  np->type = type;
-  np->node = node;
-
+void push_node(Parser* parser, ASTNodePtr np) {
   parser->current_node->next = np;
   parser->current_node = parser->current_node->next;
 }
