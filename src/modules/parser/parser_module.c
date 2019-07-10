@@ -12,7 +12,7 @@ Parser* init_parser(TokenArray* tokens) {
 }
 
 Token* next_token(Parser* parser) {
-  return ++(parser->current_token);  
+  return ++(parser->current_token);
 }
 
 Token* peek_token(Parser* parser, int n) {

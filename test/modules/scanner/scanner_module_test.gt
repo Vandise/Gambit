@@ -68,7 +68,7 @@ DESCRIBE(scanner_scanner_populate_char_table, "Scanner - populate_char_table")
       CHAR_CODE code = scanner->char_table[ch];
       if (code != LETTER && code != DIGIT &&
           code != QUOTE && code != SPECIAL &&
-          code != EOF_CODE && code != NEWLINE && code != UPPERCASE_LETTER) {
+          code != EOF_CODE && code != NEWLINE && code != UPPERCASE_LETTER && code != UNDERSCORE) {
         SHOULD_BE_TRUE(0);
       }
     }
@@ -221,7 +221,7 @@ variable
   END_IT
 
 --FILE identifier_underscore.g--
-__variable_here__name
+variable_here__name
 --ENDFILE--
 
   IT("should extract a T_IDENTIFIER token with underscores")

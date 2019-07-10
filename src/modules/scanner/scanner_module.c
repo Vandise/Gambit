@@ -37,7 +37,7 @@ void populate_char_table(Scanner *scanner) {
   for (ch = 'a'; ch <= 'z'; ++ch) scanner->char_table[ch] = LETTER;
   scanner->char_table['\''] = QUOTE;
   scanner->char_table['\n'] = NEWLINE;
-  scanner->char_table['_'] = LETTER;
+  scanner->char_table['_'] = UNDERSCORE;
   scanner->char_table[EOF_CHAR] = EOF_CODE;
 }
 
@@ -129,7 +129,7 @@ void get_token(Scanner* scanner) {
 }
 
 void get_string(Scanner* scanner) {
-  char* literalp = scanner->current_token.literal.value.string; 
+  char* literalp = scanner->current_token.literal.value.string;
   *(scanner->current_token.tokenp)++ = '\'';
 
   get_character(scanner);
@@ -153,7 +153,7 @@ void get_string(Scanner* scanner) {
 }
 
 void get_word(Scanner* scanner, BOOLEAN is_constant) {
-  while(CHAR_CODE(scanner) == LETTER || CHAR_CODE(scanner) == UPPERCASE_LETTER) {
+  while(CHAR_CODE(scanner) == LETTER || CHAR_CODE(scanner) == UPPERCASE_LETTER || CHAR_CODE(scanner) == UNDERSCORE) {
     *(scanner->current_token.tokenp)++ = scanner->current_char;
     get_character(scanner);
   }
