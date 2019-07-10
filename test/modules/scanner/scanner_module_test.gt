@@ -297,6 +297,63 @@ DESCRIBE(scanner_scanner_commit_token, "Scanner - commit token")
 
 END_DESCRIBE
 
+DESCRIBE(scanner_scanner_get_number, "Scanner - get_number")
+
+--FILE get_number_int.g--
+150
+--ENDFILE--
+
+  IT("sets the token to T_NUMBER")
+    Scanner* scanner = init_scanner(__TEST_FILE__(get_number_int.g));
+    get_number(scanner);
+    SHOULD_EQUAL(scanner->current_token.token, T_NUMBER);
+    exit_scanner(scanner);
+  END_IT
+
+  IT("scans integers")
+    Scanner* scanner = init_scanner(__TEST_FILE__(get_number_int.g));
+    get_number(scanner);
+    SHOULD_EQUAL(scanner->current_token.literal.type, INTEGER_LIT);
+    SHOULD_EQUAL(scanner->current_token.literal.value.integer, 150);
+    exit_scanner(scanner);
+  END_IT
+
+--FILE get_number_real.g--
+10.5
+--ENDFILE--
+
+  IT("scans reals")
+    Scanner* scanner = init_scanner(__TEST_FILE__(get_number_real.g));
+    get_number(scanner);
+    SHOULD_EQUAL(scanner->current_token.literal.type, REAL_LIT);
+    SHOULD_EQUAL(scanner->current_token.literal.value.real, 10.5);
+    exit_scanner(scanner);
+  END_IT
+
+END_DESCRIBE
+
+DESCRIBE(scanner_scanner_get_special, "Scanner - get_special")
+
+--FILE specials.g--
+^ < <= > >=
+.
+--ENDFILE--
+
+  IT("extracts a sequence of tokens")
+    Scanner* scanner = init_scanner(__TEST_FILE__(specials.g));
+    int i = 0;
+    TOKEN_CODE tlist[] = { T_PIN, T_LT, T_LE, T_GT, T_GE, T_NEWLINE, T_PERIOD, T_NEWLINE, T_END_OF_FILE };
+    do {
+      get_token(scanner);
+      SHOULD_EQUAL(scanner->current_token.token, tlist[i]);
+      i++;
+    } while (scanner->current_token.token != T_END_OF_FILE);
+    exit_scanner(scanner);
+  END_IT
+
+END_DESCRIBE
+
+
 DESCRIBE(scanner_scanner, "Scanner")
 
   IT("defines the Scanner struct")
@@ -318,5 +375,7 @@ DESCRIBE(scanner_scanner, "Scanner")
   status += CSpec_Run( DESCRIPTION( scanner_scanner_skip_blanks ), CSpec_NewOutputVerbose() );
   status += CSpec_Run( DESCRIPTION( scanner_scanner_get_token ), CSpec_NewOutputVerbose() );
   status += CSpec_Run( DESCRIPTION( scanner_scanner_commit_token ), CSpec_NewOutputVerbose() );
+  status += CSpec_Run( DESCRIPTION( scanner_scanner_get_number ), CSpec_NewOutputVerbose() );
+  status += CSpec_Run( DESCRIPTION( scanner_scanner_get_special ), CSpec_NewOutputVerbose() );
 
 END_DESCRIBE

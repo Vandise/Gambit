@@ -215,6 +215,79 @@ void get_special(Scanner *scanner) {
   *(scanner->current_token.tokenp) = '\0';
 }
 
+void get_number(Scanner* scanner) {
+  int whole_count = 0;
+  int decimal_offset = 0;
+  char exponent_sign = '+';
+  float nvalue = 0.0;
+
+  scanner->digit_count = 0;
+  scanner->count_error = FALSE;
+
+  scanner->current_token.token = NO_TOKEN;
+  scanner->current_token.literal.type = INTEGER_LIT;
+
+  accumulate_value(scanner, &nvalue);
+
+  if (scanner->current_token.token == T_ERROR) {
+    return;
+  }
+
+  whole_count = scanner->digit_count;
+
+  if (scanner->current_char == '.') {
+    get_character(scanner);
+    scanner->current_token.literal.type = REAL_LIT;
+    *(scanner->current_token.tokenp)++ = '.';
+
+    accumulate_value(scanner, &nvalue);
+
+    if (scanner->current_token.token == T_ERROR) {
+      return;
+    }
+
+    decimal_offset = whole_count - scanner->digit_count;
+  }
+
+  if (scanner->count_error) {
+    scanner->current_token.token = T_ERROR;
+    return;
+  }
+
+  if (scanner->current_token.literal.type == INTEGER_LIT) {
+    scanner->current_token.literal.value.integer = nvalue;
+  } else {
+    scanner->current_token.literal.value.real = nvalue;
+  }
+
+  *(scanner->current_token.tokenp) = '\0';
+  scanner->current_token.token = T_NUMBER;
+}
+
+void accumulate_value(Scanner *scanner, float *valuep) {
+  float value = *valuep;
+
+  if (CHAR_CODE(scanner) != DIGIT) {
+    scanner->current_token.token = T_ERROR;
+    return;
+  }
+
+  do {
+    *(scanner->current_token.tokenp)++ = scanner->current_char;
+
+    if (++scanner->digit_count <= MAX_DIGIT_COUNT) {
+      value = 10 * value + (scanner->current_char - '0');
+    } else {
+      scanner->count_error = TRUE;
+    }
+
+    get_character(scanner);
+
+  } while(CHAR_CODE(scanner) == DIGIT);
+
+  *valuep = value;
+}
+
 void commit_token(Scanner* scanner) {
   Token t = {
     .line_number = scanner->line_number,
