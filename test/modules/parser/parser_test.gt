@@ -29,6 +29,7 @@ DESCRIBE(gambit_parser_next_token, "Parser - next_token")
     SHOULD_EQUAL(p->current_token->line_number, 2);
 
     exit_parser(p);
+    free_token_array(&tokens);
   END_IT
 
 END_DESCRIBE
@@ -58,6 +59,7 @@ DESCRIBE(gambit_parser_peek_token, "Parser - peek_token")
     SHOULD_EQUAL((peek_token(p, 3))->line_number, 4);
 
     exit_parser(p);
+    free_token_array(&tokens);
   END_IT
 
 END_DESCRIBE
@@ -72,6 +74,7 @@ DESCRIBE(gambit_parser_init_parser, "Parser - init_parser")
     SHOULD_EQUAL(p->token_array, &tokens);
 
     exit_parser(p);
+    free_token_array(&tokens);
   END_IT
 
 END_DESCRIBE

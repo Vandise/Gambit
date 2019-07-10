@@ -2,11 +2,10 @@
 #define __GAMBIT_AST_NODEH 1
 
 #include "common.h"
-
-//https://stackoverflow.com/questions/252748/how-can-i-use-an-array-of-function-pointers
+#include "shared/tokens.h"
 
 typedef enum {
-  UNDEFINED_NODE, VARIABLE_DECLARATION_NODE
+  NOOP_NODE, LITERAL_NODE, VARIABLE_DECLARATION_NODE
 } NODE_TYPE;
 
 typedef union {
@@ -19,16 +18,25 @@ typedef union {
 //
 // High-Level node, every node is an ASTNode
 //
-typedef ASTNodeStruct {
+typedef struct ASTNodeStruct {
   NODE_TYPE type;
   void* node;
-} ASTNode;
+  struct ASTNodeStruct *next;
+} ASTNode, *ASTNodePtr;
 
 //
-// 
+// NO-OP Node - used for root and debugging
 //
-typedef VariableDeclarationNodeStruct {
-  
-} VariableDeclarationNode, *VariableDeclarationNodePtr;
+typedef struct NOOPNodeStruct {
+
+} NOOPNode, *NOOPNodePtr;
+
+//
+// Literal node for int, real, character, and string
+//
+typedef struct LiteralNodeStruct {
+  LITERAL_TYPE type;
+  Value value;
+} LiteralNode, *LiteralNodePtr;
 
 #endif

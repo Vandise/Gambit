@@ -1,0 +1,35 @@
+#include "cspec.h"
+#include "cspec_output_header.h"
+#include "cspec_output_verbose.h"
+#include "cspec_output_unit.h"
+
+#include "test/macros.h"
+#include "modules/scanner/scanner_module.h"
+#include "modules/parser/expressions.h"
+
+extern int status;
+
+DESCRIBE(gambit_parser_expressions, "Parser Expressions")
+
+  IT("parses STRING literal nodes")
+    Scanner* scanner = init_scanner(__TEST_FILE__(string.g));
+    get_token(scanner);
+    commit_token(scanner);
+
+    Parser* p = init_parser(get_tokens(scanner));
+
+    expression(p);
+
+    SHOULD_EQUAL(p->current_node->type, LITERAL_NODE);
+
+    LiteralNodePtr np = p->current_node->node;
+    SHOULD_EQUAL(np->type, STRING_LIT);
+    SHOULD_EQUAL(strcmp(np->value.stringp, "This is a string!"), 0);
+
+    exit_parser(p);
+    exit_scanner(scanner);
+  END_IT
+
+  //status += CSpec_Run(DESCRIPTION(gambit_parser_init_parser), CSpec_NewOutputVerbose());
+
+END_DESCRIBE

@@ -1,3 +1,4 @@
+/*
 #include "modules/parser/ast/symbol_table.h"
 
 // JS Primitives
@@ -118,3 +119,4 @@ void init_symbol_table(ASTNodePtr *root_node) {
   CharTypePtr->size     = sizeof(char);
   CharTypePtr->type_idp = char_idp;
 }
+*/
