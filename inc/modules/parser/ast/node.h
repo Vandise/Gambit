@@ -64,5 +64,6 @@ typedef struct UnaryOpNodeStruct {
 } UnaryOpNode, *UnaryOpNodePtr;
 
 ASTNodePtr build_node(NODE_TYPE type, void* node);
+void free_node_tree(ASTNodePtr root);
 
 #endif

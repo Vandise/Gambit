@@ -135,6 +135,8 @@ ASTNodePtr term(Parser* parser) {
   current_node = node = factor(parser);
 
   while ( token_in_list(parser->current_token->code, mult_op_list) ) {
+    printf("\n\n mult_op_list: (%p) \n\n", current_node);
+
     BinaryOpNodePtr b = __MALLOC__(sizeof(BinaryOpNode));
     b->op = parser->current_token->code;
 
@@ -193,7 +195,7 @@ ASTNodePtr factor(Parser* parser) {
 
     case T_LPAREN:
       next_token(parser);
-      expression(parser);
+      node = expression(parser);
       if (parser->current_token->code != T_RPAREN) {
         parser->errored = TRUE;
       }

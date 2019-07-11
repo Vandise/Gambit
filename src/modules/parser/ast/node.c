@@ -10,3 +10,15 @@ ASTNodePtr build_node(NODE_TYPE type, void* node) {
 
   return np;
 }
+
+void free_node_tree(ASTNodePtr root) {
+  if (root != NULL) {
+    free_node_tree(root->left);
+    free_node_tree(root->right);
+
+    __FREE__(root->node);
+    __FREE__(root);
+
+    root = NULL;
+  }
+}

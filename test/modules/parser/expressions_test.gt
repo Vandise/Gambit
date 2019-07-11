@@ -33,7 +33,7 @@ DESCRIBE(gambit_parser_expressions_factor, "Parser - Expressions factor")
     SHOULD_EQUAL(l->type, INTEGER_LIT);
     SHOULD_EQUAL(l->value.integer, 5);
 
-    __FREE__(l); __FREE__(n);
+    free_node_tree(n);
 
     exit_parser(p);
     exit_scanner(scanner);
@@ -56,7 +56,7 @@ DESCRIBE(gambit_parser_expressions_factor, "Parser - Expressions factor")
     SHOULD_EQUAL(l->type, STRING_LIT);
     SHOULD_EQUAL(strcmp(l->value.stringp, "String"), 0);
 
-    __FREE__(l); __FREE__(n);
+    free_node_tree(n);
 
     exit_parser(p);
     exit_scanner(scanner);
@@ -76,7 +76,7 @@ DESCRIBE(gambit_parser_expressions_factor, "Parser - Expressions factor")
     GetLocalNodePtr l = (GetLocalNodePtr)(n->node);
     SHOULD_EQUAL(strcmp(l->identifier, "x"), 0);
 
-    __FREE__(l); __FREE__(n);
+    free_node_tree(n);
 
     exit_parser(p);
     exit_scanner(scanner);
@@ -119,6 +119,8 @@ DESCRIBE(gambit_parser_expression, "Parser - Expression")
       ref = ref->left;
     } while(ref != NULL);
 
+    free_node_tree(expression_tree);
+
     exit_parser(p);
     exit_scanner(scanner);
   END_IT
@@ -140,13 +142,16 @@ DESCRIBE(gambit_parser_expressions, "Parser - Expressions")
 
     Parser* p = init_parser(get_tokens(scanner));
 
-    expression(p);
+    ASTNodePtr expression_tree = expression(p);
 
     SHOULD_BE_FALSE(p->errored);
+
+    free_node_tree(expression_tree);
 
     exit_parser(p);
     exit_scanner(scanner);
   END_IT
+
 
 --FILE exp_math_var.g--
 x + 3
@@ -160,18 +165,20 @@ x + 3
 
     Parser* p = init_parser(get_tokens(scanner));
 
-    expression(p);
+    ASTNodePtr expression_tree = expression(p);
 
     SHOULD_BE_FALSE(p->errored);
+
+    free_node_tree(expression_tree);
 
     exit_parser(p);
     exit_scanner(scanner);
   END_IT
 
 --FILE exp_math_precedence.g--
-((x + 3) * 5)
+((x + 3) + 5)
 --ENDFILE--
-  IT("regonizes precedence in expressions")
+  IT("recognizes precedence in expressions")
     Scanner* scanner = init_scanner(__TEST_FILE__(exp_math_precedence.g));
     do {
       get_token(scanner);
@@ -180,9 +187,11 @@ x + 3
 
     Parser* p = init_parser(get_tokens(scanner));
 
-    expression(p);
+    ASTNodePtr expression_tree = expression(p);
 
     SHOULD_BE_FALSE(p->errored);
+
+    free_node_tree(expression_tree);
 
     exit_parser(p);
     exit_scanner(scanner);
@@ -200,9 +209,11 @@ x + 3
 
     Parser* p = init_parser(get_tokens(scanner));
 
-    expression(p);
+    ASTNodePtr expression_tree = expression(p);
 
     SHOULD_BE_FALSE(p->errored);
+
+    free_node_tree(expression_tree);
 
     exit_parser(p);
     exit_scanner(scanner);
