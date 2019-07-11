@@ -111,6 +111,52 @@ DESCRIBE(gambit_parser_expression, "Parser - Expression")
     exit_scanner(scanner);
   END_IT
 
+--FILE bin_op.g--
+2 >= 5
+--ENDFILE--
+
+  IT("can parse a binary operation")
+    Scanner* scanner = init_scanner(__TEST_FILE__(bin_op.g));
+    do {
+      get_token(scanner);
+      commit_token(scanner);
+    } while (scanner->current_token.token != T_END_OF_FILE && scanner->current_token.token != T_ERROR);
+
+    Parser* p = init_parser(get_tokens(scanner));
+
+    ASTNodePtr expression_tree = expression(p);
+
+    SHOULD_BE_FALSE(p->errored);
+
+    free_node_tree(expression_tree);
+
+    exit_parser(p);
+    exit_scanner(scanner);
+  END_IT
+
+--FILE unary_op.g--
+-5
+--ENDFILE--
+
+  IT("can parse a unary operation")
+    Scanner* scanner = init_scanner(__TEST_FILE__(unary_op.g));
+    do {
+      get_token(scanner);
+      commit_token(scanner);
+    } while (scanner->current_token.token != T_END_OF_FILE && scanner->current_token.token != T_ERROR);
+
+    Parser* p = init_parser(get_tokens(scanner));
+
+    ASTNodePtr expression_tree = expression(p);
+
+    SHOULD_BE_FALSE(p->errored);
+
+    free_node_tree(expression_tree);
+
+    exit_parser(p);
+    exit_scanner(scanner);
+  END_IT
+
 END_DESCRIBE
 
 DESCRIBE(gambit_parser_expressions, "Parser - Expressions")
