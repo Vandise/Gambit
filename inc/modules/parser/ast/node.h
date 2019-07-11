@@ -7,7 +7,7 @@
 #define PRINT_TREE_COUNT 10
 
 typedef enum {
-  NOOP_NODE, LITERAL_NODE, GET_LOCAL_NODE, BINARY_OP_NODE, UNARY_OP_NODE, VARIABLE_DECLARATION_NODE
+  NOOP_NODE, LITERAL_NODE, GET_LOCAL_NODE, BINARY_OP_NODE, UNARY_OP_NODE, VARIABLE_DECLARATION_NODE, ASSIGNMENT_NODE
 } NODE_TYPE;
 
 typedef union {
@@ -64,6 +64,15 @@ typedef struct BinaryOpNodeStruct {
 typedef struct UnaryOpNodeStruct {
   TOKEN_CODE op;
 } UnaryOpNode, *UnaryOpNodePtr;
+
+//
+// Assignment Node
+//   left: identifier
+//   right: <expression>
+//
+typedef struct AssignmentNodeStruct {
+  // todo: type info
+} AssignmentNode, *AssignmentNodePtr;
 
 ASTNodePtr build_node(NODE_TYPE type, void* node);
 void print_node_tree(ASTNodePtr root, int space);

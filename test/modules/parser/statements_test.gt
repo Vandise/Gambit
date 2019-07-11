@@ -1,0 +1,40 @@
+#include "cspec.h"
+#include "cspec_output_header.h"
+#include "cspec_output_verbose.h"
+#include "cspec_output_unit.h"
+
+#include "test/macros.h"
+#include "modules/scanner/scanner_module.h"
+#include "modules/parser/statements.h"
+
+extern int status;
+
+DESCRIBE(gambit_parser_statements, "Parser - Statements")
+
+--FILE simple_assign.g--
+x = (2 * 3) + 4
+--ENDFILE--
+  IT("can parse assignment statements")
+    Scanner* scanner = init_scanner(__TEST_FILE__(simple_assign.g));
+    do {
+      get_token(scanner);
+      commit_token(scanner);
+    } while (scanner->current_token.token != T_END_OF_FILE && scanner->current_token.token != T_ERROR);
+
+    Parser* p = init_parser(get_tokens(scanner));
+
+    ASTNodePtr statement_tree = statement(p);
+
+    SHOULD_BE_FALSE(p->errored);
+
+    print_node_tree(statement_tree, 0);
+
+    free_node_tree(statement_tree);
+
+    exit_parser(p);
+    exit_scanner(scanner);
+  END_IT
+
+  //status += CSpec_Run( DESCRIPTION( gambit_parser_expressions_factor ), CSpec_NewOutputVerbose() );
+
+END_DESCRIBE
