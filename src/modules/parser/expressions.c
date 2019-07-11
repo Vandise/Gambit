@@ -193,17 +193,19 @@ ASTNodePtr factor(Parser* parser) {
       break;
     }
 
-    case T_LPAREN:
+    case T_LPAREN: {
       next_token(parser);
       node = expression(parser);
       if (parser->current_token->code != T_RPAREN) {
         parser->errored = TRUE;
-      }
+      } else { next_token(parser); }
       break;
+    }
 
-    default:
+    default: {
       parser->errored = TRUE;
       break;
+    }
   }
 
   return node;
