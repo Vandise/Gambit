@@ -119,6 +119,62 @@ DESCRIBE(gambit_parser_expression, "Parser - Expression")
     exit_scanner(scanner);
   END_IT
 
+--FILE bool_gt.g--
+10 > 5
+--ENDFILE--
+
+  IT("can parse boolean expressions")
+    Scanner* scanner = init_scanner(__TEST_FILE__(bool_gt.g));
+    do {
+      get_token(scanner);
+      commit_token(scanner);
+    } while (scanner->current_token.token != T_END_OF_FILE && scanner->current_token.token != T_ERROR);
+
+    Parser* p = init_parser(get_tokens(scanner));
+
+    ASTNodePtr expression_tree = expression(p);
+
+    SHOULD_BE_FALSE(p->errored);
+
+    SHOULD_EQUAL(expression_tree->type, BINARY_OP_NODE);
+    BinaryOpNodePtr node = expression_tree->node;
+
+    SHOULD_EQUAL(node->op, T_GT);
+
+    free_node_tree(expression_tree);
+
+    exit_parser(p);
+    exit_scanner(scanner);
+  END_IT
+
+--FILE unary_neg.g--
+-92
+--ENDFILE--
+
+  IT("can parse unary expressions")
+    Scanner* scanner = init_scanner(__TEST_FILE__(unary_neg.g));
+    do {
+      get_token(scanner);
+      commit_token(scanner);
+    } while (scanner->current_token.token != T_END_OF_FILE && scanner->current_token.token != T_ERROR);
+
+    Parser* p = init_parser(get_tokens(scanner));
+
+    ASTNodePtr expression_tree = expression(p);
+
+    SHOULD_BE_FALSE(p->errored);
+
+    SHOULD_EQUAL(expression_tree->type, UNARY_OP_NODE);
+    UnaryOpNodePtr node = expression_tree->node;
+
+    SHOULD_EQUAL(node->op, T_MINUS);
+
+    free_node_tree(expression_tree);
+
+    exit_parser(p);
+    exit_scanner(scanner);
+  END_IT
+
 END_DESCRIBE
 
 DESCRIBE(gambit_parser_expressions, "Parser - Expressions")
@@ -214,7 +270,7 @@ x + 3
   END_IT
 
 
-  //status += CSpec_Run( DESCRIPTION( gambit_parser_expressions_factor ), CSpec_NewOutputVerbose() );
-  //status += CSpec_Run( DESCRIPTION( gambit_parser_expression ), CSpec_NewOutputVerbose() );
+  status += CSpec_Run( DESCRIPTION( gambit_parser_expressions_factor ), CSpec_NewOutputVerbose() );
+  status += CSpec_Run( DESCRIPTION( gambit_parser_expression ), CSpec_NewOutputVerbose() );
 
 END_DESCRIBE
