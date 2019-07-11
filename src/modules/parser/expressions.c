@@ -127,20 +127,28 @@ ASTNodePtr simple_expression(Parser* parser) {
 }
 
 ASTNodePtr term(Parser* parser) {
-  TOKEN_CODE op;
-  ASTNodePtr node, node2 = NULL;
+  ASTNodePtr node, current_node, bn_op = NULL;
+  UnaryOpNodePtr unop;
 
   printf("\n\n term: %s (%d) \n\n", parser->current_token->token_string, parser->current_token->code);
 
-  factor(parser);
+  current_node = node = factor(parser);
 
   while ( token_in_list(parser->current_token->code, mult_op_list) ) {
-    op = parser->current_token->code;
+    BinaryOpNodePtr b = __MALLOC__(sizeof(BinaryOpNode));
+    b->op = parser->current_token->code;
+
+    bn_op = build_node(BINARY_OP_NODE, b);
+    bn_op->left = current_node;
+
     next_token(parser);
-    factor(parser);
+
+    bn_op->right = factor(parser);
+
+    current_node = bn_op;
   }
 
-  return node;
+  return current_node;
 }
 
 ASTNodePtr factor(Parser* parser) {

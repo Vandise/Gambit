@@ -83,6 +83,48 @@ DESCRIBE(gambit_parser_expressions_factor, "Parser - Expressions factor")
   END_IT
 END_DESCRIBE
 
+DESCRIBE(gambit_parser_expression, "Parser - Expression")
+
+--FILE exp_addition_chain.g--
+1 + 2 + 3 + 4
+--ENDFILE--
+
+  IT("can parse a math chain")
+    Scanner* scanner = init_scanner(__TEST_FILE__(exp_addition_chain.g));
+    do {
+      get_token(scanner);
+      commit_token(scanner);
+    } while (scanner->current_token.token != T_END_OF_FILE && scanner->current_token.token != T_ERROR);
+
+    Parser* p = init_parser(get_tokens(scanner));
+
+    ASTNodePtr expression_tree = expression(p);
+
+    SHOULD_BE_FALSE(p->errored);
+
+    // https://ruslanspivak.com/lsbasi-part7/
+
+    ASTNodePtr ref = expression_tree;
+    do {
+      printf("\n NodeType: %d \n", ref->type);
+
+      if (ref->type == LITERAL_NODE) {
+        LiteralNodePtr l = ref->node;
+        printf("\n Node Value: %d \n", l->value.integer);
+      } else {
+        UnaryOpNodePtr u = ref->node;
+        printf("\n Op Type: %d \n", u->op);
+      }
+
+      ref = ref->left;
+    } while(ref != NULL);
+
+    exit_parser(p);
+    exit_scanner(scanner);
+  END_IT
+
+END_DESCRIBE
+
 DESCRIBE(gambit_parser_expressions, "Parser - Expressions")
 
 --FILE exp_simple_math.g--
@@ -166,6 +208,8 @@ x + 3
     exit_scanner(scanner);
   END_IT
 
+
   status += CSpec_Run( DESCRIPTION( gambit_parser_expressions_factor ), CSpec_NewOutputVerbose() );
+  status += CSpec_Run( DESCRIPTION( gambit_parser_expression ), CSpec_NewOutputVerbose() );
 
 END_DESCRIBE
