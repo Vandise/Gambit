@@ -1,48 +1,136 @@
 #include "modules/parser/expressions.h"
 
+/*
+  precedence:
+  
+    left-to-right
+      .
+      postfix: ++, --
+      +, -
+      >, <, <=, >=, ==, !=
+
+    right-to-left
+      unary: +, -
+      prefix: ++, --
+      assignment: =
+*/
+
 TOKEN_CODE rel_op_list[] = { T_LT, T_LE, T_EQUAL, T_GE, T_GT, 0 };
 TOKEN_CODE add_op_list[] = { T_PLUS, T_MINUS, 0 };
 TOKEN_CODE mult_op_list[] = { T_STAR, T_SLASH, 0 };
 
 ASTNodePtr expression(Parser* parser) {
   TOKEN_CODE op;
-  ASTNodePtr node, node2 = NULL;
+  ASTNodePtr node, left, right = NULL;
 
-  simple_expression(parser);
+  printf("\n\n expression: %s (%d) \n\n", parser->current_token->token_string, parser->current_token->code);
+
+  node = simple_expression(parser);
 
   if (token_in_list(parser->current_token->code, rel_op_list)) {
     op = parser->current_token->code;
+    left = node; node = NULL;
+
     next_token(parser);
-    simple_expression(parser);
+
+    right = simple_expression(parser);
+
+    BinaryOpNodePtr bn = __MALLOC__(sizeof(BinaryOpNode));
+    bn->op = op;
+
+    node = build_node(BINARY_OP_NODE, bn);
+    node->left = left;
+    node->right = right;
   }
 
   return node;
 }
 
 ASTNodePtr simple_expression(Parser* parser) {
-  TOKEN_CODE op;
   TOKEN_CODE unary_op = T_PLUS;
-  ASTNodePtr node, node2 = NULL;
 
+  ASTNodePtr node, current_node, bn_op = NULL;
+
+  UnaryOpNodePtr unop;
+  BOOLEAN saw_unary_op = FALSE;
+
+  printf("\n\n simple expression: %s (%d) \n\n", parser->current_token->token_string, parser->current_token->code);
+
+  /*
+    possibly make unary a factor
+      then make the expression a factor
+  */
   if (parser->current_token->code == T_PLUS || parser->current_token->code == T_MINUS) {
-    unary_op = parser->current_token->code;
+    saw_unary_op = TRUE;
+    unop = __MALLOC__(sizeof(UnaryOpNode));
+    unop->op = parser->current_token->code;
     next_token(parser);
   }
 
-  term(parser);
+  if (saw_unary_op) {
+    node = build_node(UNARY_OP_NODE, unop);
+    node->right = term(parser);
+  } else {
+    node = term(parser);
+  }
+
+  //
+  // 1 + 2 + 3
+  //
+
+  //
+  // Literal 1 node
+  //
+  current_node = node;
+
 
   while( token_in_list(parser->current_token->code, add_op_list) ) {
-    op = parser->current_token->code;
+
+    printf("\n\n add_op_list: (%p) \n\n", current_node);
+
+    //
+    // it1 - current node = 1
+    //          l,r = null
+    //
+    // it2 - current_node: l = 1, r = 2
+    //
+    //
+    BinaryOpNodePtr b = __MALLOC__(sizeof(BinaryOpNode));
+    b->op = parser->current_token->code;
+
+    //
+    // it1 - bn_op: l = 1, r = null
+    //
+    // it2 - bn_op: l = BinOp{ l = 1, r = 2 }
+    //
+    bn_op = build_node(BINARY_OP_NODE, b);
+    bn_op->left = current_node;
+
     next_token(parser);
-    term(parser);
+
+    //
+    // it1 - bn_op: r = 2
+    //
+    // it2 - bn_op: r = 3, l = BinOp{ l = 1, r = 2 }
+    //
+    bn_op->right = term(parser);
+
+    //
+    // it1 - current_node = bn_op: l=1, r=2
+    //
+    // it2 - current_node = bn_op: r = 3, l = BinOp{ l = 1, r = 2 }
+    //
+    current_node = bn_op;
   }
 
-  return node;
+  return current_node;
 }
 
 ASTNodePtr term(Parser* parser) {
   TOKEN_CODE op;
   ASTNodePtr node, node2 = NULL;
+
+  printf("\n\n term: %s (%d) \n\n", parser->current_token->token_string, parser->current_token->code);
 
   factor(parser);
 
@@ -57,6 +145,8 @@ ASTNodePtr term(Parser* parser) {
 
 ASTNodePtr factor(Parser* parser) {
   ASTNodePtr node = NULL;
+
+  printf("\n\n factor: %s (%d) \n\n", parser->current_token->token_string, parser->current_token->code);
 
   switch( parser->current_token->code ) {
     case T_IDENTIFIER: {
