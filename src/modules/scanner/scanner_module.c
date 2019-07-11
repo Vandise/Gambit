@@ -37,7 +37,7 @@ void populate_char_table(Scanner *scanner) {
   for (ch = 'a'; ch <= 'z'; ++ch) scanner->char_table[ch] = LETTER;
   scanner->char_table['\''] = QUOTE;
   scanner->char_table['\n'] = NEWLINE;
-  scanner->char_table['_'] = LETTER;
+  scanner->char_table['_'] = UNDERSCORE;
   scanner->char_table[EOF_CHAR] = EOF_CODE;
 }
 
@@ -118,6 +118,9 @@ void get_token(Scanner* scanner) {
     case UPPERCASE_LETTER:
       get_word(scanner, TRUE);
       break;
+    case DIGIT:
+      get_number(scanner);
+      break;
     case QUOTE:
         get_string(scanner);
         break;
@@ -129,7 +132,7 @@ void get_token(Scanner* scanner) {
 }
 
 void get_string(Scanner* scanner) {
-  char* literalp = scanner->current_token.literal.value.string; 
+  char* literalp = scanner->current_token.literal.value.string;
   *(scanner->current_token.tokenp)++ = '\'';
 
   get_character(scanner);
@@ -153,7 +156,7 @@ void get_string(Scanner* scanner) {
 }
 
 void get_word(Scanner* scanner, BOOLEAN is_constant) {
-  while(CHAR_CODE(scanner) == LETTER || CHAR_CODE(scanner) == UPPERCASE_LETTER) {
+  while(CHAR_CODE(scanner) == LETTER || CHAR_CODE(scanner) == UPPERCASE_LETTER || CHAR_CODE(scanner) == UNDERSCORE) {
     *(scanner->current_token.tokenp)++ = scanner->current_char;
     get_character(scanner);
   }
@@ -179,11 +182,213 @@ void get_special(Scanner *scanner) {
     case ')':   scanner->current_token.token = T_RPAREN; get_character(scanner);  break;
     case ',':   scanner->current_token.token = T_COMMA;  get_character(scanner);  break;
     case '=':   scanner->current_token.token = T_EQUAL;  get_character(scanner);  break;
+    case '^':   scanner->current_token.token = T_PIN;    get_character(scanner);  break;
+    case '*':   scanner->current_token.token = T_STAR;   get_character(scanner);  break;
+    case '-':   scanner->current_token.token = T_MINUS;  get_character(scanner);  break;
+    case '+':   scanner->current_token.token = T_PLUS;   get_character(scanner);  break;
+    case '[':   scanner->current_token.token = T_LBRACKET;	get_character(scanner);  break;
+    case ']':   scanner->current_token.token = T_RBRACKET;	get_character(scanner);  break;
+    case ';':   scanner->current_token.token = T_SEMICOLON; get_character(scanner);  break;
+    case '/':   scanner->current_token.token = T_SLASH;     get_character(scanner);  break;
+    case '.':   scanner->current_token.token = T_PERIOD;     get_character(scanner);  break;
+    case '<':
+      get_character(scanner);
+      if (scanner->current_char == '=') {
+        *(scanner->current_token.tokenp)++ = '=';
+        scanner->current_token.token= T_LE;
+        get_character(scanner);
+      } else {
+        scanner->current_token.token = T_LT;
+      }
+      break;
+    case '>':
+      get_character(scanner);
+      if (scanner->current_char == '=') {
+        *(scanner->current_token.tokenp)++ = '=';
+        scanner->current_token.token = T_GE;
+        get_character(scanner);
+      } else {
+        scanner->current_token.token = T_GT;
+      }
+      break;
     default:
       scanner->current_token.token = T_ERROR;
   }
 
   *(scanner->current_token.tokenp) = '\0';
+}
+
+void get_number(Scanner* scanner) {
+int whole_count = 0;
+  int decimal_offset = 0;
+  char exponent_sign = '+';
+  int exponent = 0;
+  float nvalue = 0.0;
+  float evalue = 0.0;
+  BOOLEAN saw_dotdot = FALSE;
+
+  scanner->digit_count = 0;
+  scanner->count_error = FALSE;
+  scanner->current_token.token = NO_TOKEN;
+
+  scanner->current_token.literal.type = INTEGER_LIT;
+
+  // accumulate_value
+  accumulate_value(scanner, &nvalue);
+
+  if (scanner->current_token.token == T_ERROR) {
+    return;
+  }
+
+  whole_count = scanner->digit_count;
+
+  if (scanner->current_char == '.') {
+    get_character(scanner);
+
+    if (scanner->current_char == '.') {
+      saw_dotdot = TRUE;
+      --scanner->source_bufferp;
+    } else {
+      scanner->current_token.literal.type = REAL_LIT;
+      *(scanner->current_token.tokenp)++ = '.';
+
+      // accumulate_value
+      accumulate_value(scanner, &nvalue);
+
+      if (scanner->current_token.token == T_ERROR) {
+        return;
+      }
+
+      decimal_offset = whole_count - scanner->digit_count;
+    }
+  }
+
+  if (!saw_dotdot && ((scanner->current_char == 'E') || (scanner->current_char == 'e'))) {
+    scanner->current_token.literal.type = REAL_LIT;
+    *(scanner->current_token.tokenp)++ = scanner->current_char;
+    get_character(scanner);
+
+    if ((scanner->current_char == '+') || (scanner->current_char == '-')) {
+      *(scanner->current_token.tokenp)++ = exponent_sign = scanner->current_char;
+      get_character(scanner);
+    }
+
+    // accumulate_value
+    accumulate_value(scanner, &evalue);
+
+    if (scanner->current_token.token == T_ERROR) {
+      return;
+    }
+
+    if (exponent_sign == '-') {
+      evalue = -evalue;
+    }
+  }
+
+  if(scanner->count_error) {
+    scanner->current_token.token = T_ERROR;
+    return;
+  }
+
+  exponent = evalue + decimal_offset;
+
+  if ((exponent + whole_count < -MAX_EXPONENT) || (exponent + whole_count >  MAX_EXPONENT)) {
+    scanner->current_token.token = T_ERROR;
+    return;
+  }
+
+  if (exponent != 0) {
+    nvalue *= pow(10, exponent);
+  }
+
+  if (scanner->current_token.literal.type == INTEGER_LIT) {
+    if ((nvalue < -MAX_INTEGER) || (nvalue > MAX_INTEGER)) {
+      scanner->current_token.token = T_ERROR;
+      return;
+    }
+    scanner->current_token.literal.value.integer = nvalue;
+  } else {
+    scanner->current_token.literal.value.real = nvalue;
+  }
+
+  *(scanner->current_token.tokenp) = '\0';
+  scanner->current_token.token = T_NUMBER;
+}
+
+/*
+void get_number(Scanner* scanner) {
+  int whole_count = 0;
+  int decimal_offset = 0;
+  char exponent_sign = '+';
+  float nvalue = 0.0;
+
+  scanner->digit_count = 0;
+  scanner->count_error = FALSE;
+
+  scanner->current_token.token = NO_TOKEN;
+  scanner->current_token.literal.type = INTEGER_LIT;
+
+  accumulate_value(scanner, &nvalue);
+
+  if (scanner->current_token.token == T_ERROR) {
+    return;
+  }
+
+  whole_count = scanner->digit_count;
+
+  if (scanner->current_char == '.') {
+    get_character(scanner);
+    scanner->current_token.literal.type = REAL_LIT;
+    *(scanner->current_token.tokenp)++ = '.';
+
+    accumulate_value(scanner, &nvalue);
+
+    if (scanner->current_token.token == T_ERROR) {
+      return;
+    }
+
+    decimal_offset = whole_count - scanner->digit_count;
+  }
+
+  if (scanner->count_error) {
+    scanner->current_token.token = T_ERROR;
+    return;
+  }
+
+  if (scanner->current_token.literal.type == INTEGER_LIT) {
+    scanner->current_token.literal.value.integer = nvalue;
+  } else {
+    scanner->current_token.literal.value.real = nvalue;
+  }
+
+  *(scanner->current_token.tokenp) = '\0';
+  scanner->current_token.token = T_NUMBER;
+}
+*/
+
+
+void accumulate_value(Scanner *scanner, float *valuep) {
+  float value = *valuep;
+
+  if (CHAR_CODE(scanner) != DIGIT) {
+    scanner->current_token.token = T_ERROR;
+    return;
+  }
+
+  do {
+    *(scanner->current_token.tokenp)++ = scanner->current_char;
+
+    if (++scanner->digit_count <= MAX_DIGIT_COUNT) {
+      value = 10 * value + (scanner->current_char - '0');
+    } else {
+      scanner->count_error = TRUE;
+    }
+
+    get_character(scanner);
+
+  } while(CHAR_CODE(scanner) == DIGIT);
+
+  *valuep = value;
 }
 
 void commit_token(Scanner* scanner) {

@@ -1,0 +1,220 @@
+#include "cspec.h"
+#include "cspec_output_header.h"
+#include "cspec_output_verbose.h"
+#include "cspec_output_unit.h"
+
+#include "test/macros.h"
+#include "modules/scanner/scanner_module.h"
+#include "modules/parser/expressions.h"
+
+extern int status;
+
+DESCRIBE(gambit_parser_expressions_factor, "Parser - Expressions factor")
+
+  IT("returns Integer literal nodes")
+    Scanner* scanner = init_scanner(__TEST_FILE__(exp_simple_math.g));
+    get_token(scanner);
+    commit_token(scanner);
+
+    Parser* p = init_parser(get_tokens(scanner));
+
+    ASTNodePtr n = factor(p);
+    SHOULD_BE_FALSE(p->errored);
+    SHOULD_EQUAL(n->type, LITERAL_NODE);
+
+    LiteralNodePtr l = (LiteralNodePtr)(n->node);
+
+    SHOULD_EQUAL(l->type, INTEGER_LIT);
+    SHOULD_EQUAL(l->value.integer, 5);
+
+    free_node_tree(n);
+
+    exit_parser(p);
+    exit_scanner(scanner);
+  END_IT
+
+
+  IT("returns String literal nodes")
+    Scanner* scanner = init_scanner(__TEST_FILE__(exp_strings.g));
+    get_token(scanner);
+    commit_token(scanner);
+
+    Parser* p = init_parser(get_tokens(scanner));
+
+    ASTNodePtr n = factor(p);
+    SHOULD_BE_FALSE(p->errored);
+    SHOULD_EQUAL(n->type, LITERAL_NODE);
+
+    LiteralNodePtr l = (LiteralNodePtr)(n->node);
+
+    SHOULD_EQUAL(l->type, STRING_LIT);
+    SHOULD_EQUAL(strcmp(l->value.stringp, "String"), 0);
+
+    free_node_tree(n);
+
+    exit_parser(p);
+    exit_scanner(scanner);
+  END_IT
+
+  IT("returns GetLocal nodes")
+    Scanner* scanner = init_scanner(__TEST_FILE__(exp_math_var.g));
+    get_token(scanner);
+    commit_token(scanner);
+
+    Parser* p = init_parser(get_tokens(scanner));
+
+    ASTNodePtr n = factor(p);
+    SHOULD_BE_FALSE(p->errored);
+    SHOULD_EQUAL(n->type, GET_LOCAL_NODE);
+
+    GetLocalNodePtr l = (GetLocalNodePtr)(n->node);
+    SHOULD_EQUAL(strcmp(l->identifier, "x"), 0);
+
+    free_node_tree(n);
+
+    exit_parser(p);
+    exit_scanner(scanner);
+  END_IT
+END_DESCRIBE
+
+DESCRIBE(gambit_parser_expression, "Parser - Expression")
+
+--FILE exp_addition_chain.g--
+1 + 2 + 3 + 4
+--ENDFILE--
+
+  IT("can parse a math chain")
+    Scanner* scanner = init_scanner(__TEST_FILE__(exp_addition_chain.g));
+    do {
+      get_token(scanner);
+      commit_token(scanner);
+    } while (scanner->current_token.token != T_END_OF_FILE && scanner->current_token.token != T_ERROR);
+
+    Parser* p = init_parser(get_tokens(scanner));
+
+    ASTNodePtr expression_tree = expression(p);
+
+    SHOULD_BE_FALSE(p->errored);
+
+    // https://ruslanspivak.com/lsbasi-part7/
+
+    ASTNodePtr ref = expression_tree;
+    do {
+      printf("\n NodeType: %d \n", ref->type);
+
+      if (ref->type == LITERAL_NODE) {
+        LiteralNodePtr l = ref->node;
+        printf("\n Node Value: %d \n", l->value.integer);
+      } else {
+        UnaryOpNodePtr u = ref->node;
+        printf("\n Op Type: %d \n", u->op);
+      }
+
+      ref = ref->left;
+    } while(ref != NULL);
+
+    free_node_tree(expression_tree);
+
+    exit_parser(p);
+    exit_scanner(scanner);
+  END_IT
+
+END_DESCRIBE
+
+DESCRIBE(gambit_parser_expressions, "Parser - Expressions")
+
+--FILE exp_simple_math.g--
+5 + 3
+--ENDFILE--
+
+  IT("can parse simple math expressions")
+    Scanner* scanner = init_scanner(__TEST_FILE__(exp_simple_math.g));
+    do {
+      get_token(scanner);
+      commit_token(scanner);
+    } while (scanner->current_token.token != T_END_OF_FILE && scanner->current_token.token != T_ERROR);
+
+    Parser* p = init_parser(get_tokens(scanner));
+
+    ASTNodePtr expression_tree = expression(p);
+
+    SHOULD_BE_FALSE(p->errored);
+
+    free_node_tree(expression_tree);
+
+    exit_parser(p);
+    exit_scanner(scanner);
+  END_IT
+
+
+--FILE exp_math_var.g--
+x + 3
+--ENDFILE--
+  IT("regonizes variables in expressions")
+    Scanner* scanner = init_scanner(__TEST_FILE__(exp_math_var.g));
+    do {
+      get_token(scanner);
+      commit_token(scanner);
+    } while (scanner->current_token.token != T_END_OF_FILE && scanner->current_token.token != T_ERROR);
+
+    Parser* p = init_parser(get_tokens(scanner));
+
+    ASTNodePtr expression_tree = expression(p);
+
+    SHOULD_BE_FALSE(p->errored);
+
+    free_node_tree(expression_tree);
+
+    exit_parser(p);
+    exit_scanner(scanner);
+  END_IT
+
+--FILE exp_math_precedence.g--
+((x + 3) * 5)
+--ENDFILE--
+  IT("recognizes precedence in expressions")
+    Scanner* scanner = init_scanner(__TEST_FILE__(exp_math_precedence.g));
+    do {
+      get_token(scanner);
+      commit_token(scanner);
+    } while (scanner->current_token.token != T_END_OF_FILE && scanner->current_token.token != T_ERROR);
+
+    Parser* p = init_parser(get_tokens(scanner));
+
+    ASTNodePtr expression_tree = expression(p);
+
+    SHOULD_BE_FALSE(p->errored);
+
+    free_node_tree(expression_tree);
+
+    exit_parser(p);
+    exit_scanner(scanner);
+  END_IT
+
+--FILE exp_strings.g--
+'String' + 'String'
+--ENDFILE--
+  IT("regonizes strings in expressions")
+    Scanner* scanner = init_scanner(__TEST_FILE__(exp_strings.g));
+    do {
+      get_token(scanner);
+      commit_token(scanner);
+    } while (scanner->current_token.token != T_END_OF_FILE && scanner->current_token.token != T_ERROR);
+
+    Parser* p = init_parser(get_tokens(scanner));
+
+    ASTNodePtr expression_tree = expression(p);
+
+    SHOULD_BE_FALSE(p->errored);
+
+    free_node_tree(expression_tree);
+
+    exit_parser(p);
+    exit_scanner(scanner);
+  END_IT
+
+
+  //status += CSpec_Run( DESCRIPTION( gambit_parser_expressions_factor ), CSpec_NewOutputVerbose() );
+  //status += CSpec_Run( DESCRIPTION( gambit_parser_expression ), CSpec_NewOutputVerbose() );
+
+END_DESCRIBE

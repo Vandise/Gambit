@@ -33,3 +33,19 @@ TOKEN_CODE get_token_code(const char* word_string) {
   }
   return NO_TOKEN;
 }
+
+BOOLEAN token_in_list(TOKEN_CODE token, TOKEN_CODE token_list[]) {
+  TOKEN_CODE *tokenp;
+
+  if (token_list == NULL) {
+    return FALSE;
+  }
+
+  for (tokenp = &token_list[0]; *tokenp; ++tokenp) {
+    if (token == *tokenp) {
+      return TRUE;
+    }
+  }
+
+  return FALSE;
+}

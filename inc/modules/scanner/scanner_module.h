@@ -1,9 +1,13 @@
 #ifndef __GAMBIT_SCANNER_MODULEH
 #define __GAMBIT_SCANNER_MODULEH 1
 
+#include <math.h>
 #include "shared/scanner.h"
 
 #define __GAMBIT_SCANNER_TOKENLIST_SIZE 100
+#define MAX_DIGIT_COUNT 20
+#define MAX_EXPONENT    37
+#define MAX_INTEGER     4294967295
 #define CHAR_CODE(scanner) scanner->char_table[scanner->current_char]
 
 typedef struct GambitScannerToken {
@@ -47,5 +51,7 @@ void get_special(Scanner* scanner);
 void get_word(Scanner* scanner, BOOLEAN is_constant);
 void get_string(Scanner* scanner);
 void commit_token(Scanner* scanner);
+void get_number(Scanner* scanner);
+void accumulate_value(Scanner *scanner, float *valuep);
 
 #endif

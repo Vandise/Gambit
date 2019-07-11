@@ -68,7 +68,7 @@ DESCRIBE(scanner_scanner_populate_char_table, "Scanner - populate_char_table")
       CHAR_CODE code = scanner->char_table[ch];
       if (code != LETTER && code != DIGIT &&
           code != QUOTE && code != SPECIAL &&
-          code != EOF_CODE && code != NEWLINE && code != UPPERCASE_LETTER) {
+          code != EOF_CODE && code != NEWLINE && code != UPPERCASE_LETTER && code != UNDERSCORE) {
         SHOULD_BE_TRUE(0);
       }
     }
@@ -221,7 +221,7 @@ variable
   END_IT
 
 --FILE identifier_underscore.g--
-__variable_here__name
+variable_here__name
 --ENDFILE--
 
   IT("should extract a T_IDENTIFIER token with underscores")
@@ -297,6 +297,67 @@ DESCRIBE(scanner_scanner_commit_token, "Scanner - commit token")
 
 END_DESCRIBE
 
+DESCRIBE(scanner_scanner_get_number, "Scanner - get_number")
+
+--FILE get_number_int.g--
+150
+--ENDFILE--
+
+  IT("sets the token to T_NUMBER")
+    Scanner* scanner = init_scanner(__TEST_FILE__(get_number_int.g));
+    get_number(scanner);
+    SHOULD_EQUAL(scanner->current_token.token, T_NUMBER);
+    exit_scanner(scanner);
+  END_IT
+
+  IT("scans integers")
+    Scanner* scanner = init_scanner(__TEST_FILE__(get_number_int.g));
+    get_number(scanner);
+    SHOULD_EQUAL(scanner->current_token.literal.type, INTEGER_LIT);
+    SHOULD_EQUAL(scanner->current_token.literal.value.integer, 150);
+    exit_scanner(scanner);
+  END_IT
+
+--FILE get_number_real.g--
+10.5
+--ENDFILE--
+
+  IT("scans reals")
+    Scanner* scanner = init_scanner(__TEST_FILE__(get_number_real.g));
+    get_number(scanner);
+
+    SHOULD_EQUAL(scanner->current_token.literal.type, REAL_LIT);
+    SHOULD_EQUAL(scanner->current_token.literal.value.real, 10.5);
+
+    printf("\n\n literal value: %f -- %s \n\n", scanner->current_token.literal.value.real, scanner->current_token.token_string);
+
+    exit_scanner(scanner);
+  END_IT
+
+END_DESCRIBE
+
+DESCRIBE(scanner_scanner_get_special, "Scanner - get_special")
+
+--FILE specials.g--
+^ < <= > >=
+.
+--ENDFILE--
+
+  IT("extracts a sequence of tokens")
+    Scanner* scanner = init_scanner(__TEST_FILE__(specials.g));
+    int i = 0;
+    TOKEN_CODE tlist[] = { T_PIN, T_LT, T_LE, T_GT, T_GE, T_NEWLINE, T_PERIOD, T_END_OF_FILE };
+    do {
+      get_token(scanner);
+      SHOULD_EQUAL(scanner->current_token.token, tlist[i]);
+      i++;
+    } while (scanner->current_token.token != T_END_OF_FILE);
+    exit_scanner(scanner);
+  END_IT
+
+END_DESCRIBE
+
+
 DESCRIBE(scanner_scanner, "Scanner")
 
   IT("defines the Scanner struct")
@@ -318,5 +379,7 @@ DESCRIBE(scanner_scanner, "Scanner")
   status += CSpec_Run( DESCRIPTION( scanner_scanner_skip_blanks ), CSpec_NewOutputVerbose() );
   status += CSpec_Run( DESCRIPTION( scanner_scanner_get_token ), CSpec_NewOutputVerbose() );
   status += CSpec_Run( DESCRIPTION( scanner_scanner_commit_token ), CSpec_NewOutputVerbose() );
+  status += CSpec_Run( DESCRIPTION( scanner_scanner_get_number ), CSpec_NewOutputVerbose() );
+  status += CSpec_Run( DESCRIPTION( scanner_scanner_get_special ), CSpec_NewOutputVerbose() );
 
 END_DESCRIBE
