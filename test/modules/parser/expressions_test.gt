@@ -103,23 +103,7 @@ DESCRIBE(gambit_parser_expression, "Parser - Expression")
     SHOULD_BE_FALSE(p->errored);
 
 
-    print_node_tree(expression_tree, 0);
-/*
-    ASTNodePtr ref = expression_tree;
-    do {
-      printf("\n NodeType: %d \n", ref->type);
-
-      if (ref->type == LITERAL_NODE) {
-        LiteralNodePtr l = ref->node;
-        printf("\n Node Value: %d \n", l->value.integer);
-      } else {
-        UnaryOpNodePtr u = ref->node;
-        printf("\n Op Type: %d \n", u->op);
-      }
-
-      ref = ref->left;
-    } while(ref != NULL);
-*/
+    //print_node_tree(expression_tree, 0);
 
     free_node_tree(expression_tree);
 
