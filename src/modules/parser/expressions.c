@@ -23,7 +23,7 @@ ASTNodePtr expression(Parser* parser) {
   TOKEN_CODE op;
   ASTNodePtr node, left, right = NULL;
 
-  printf("\n\n expression: %s (%d) \n\n", parser->current_token->token_string, parser->current_token->code);
+  //printf("\n\n expression: %s (%d) \n\n", parser->current_token->token_string, parser->current_token->code);
 
   node = simple_expression(parser);
 
@@ -54,7 +54,7 @@ ASTNodePtr simple_expression(Parser* parser) {
   UnaryOpNodePtr unop;
   BOOLEAN saw_unary_op = FALSE;
 
-  printf("\n\n simple expression: %s (%d) \n\n", parser->current_token->token_string, parser->current_token->code);
+  //printf("\n\n simple expression: %s (%d) \n\n", parser->current_token->token_string, parser->current_token->code);
 
   /*
     possibly make unary a factor
@@ -86,7 +86,7 @@ ASTNodePtr simple_expression(Parser* parser) {
 
   while( token_in_list(parser->current_token->code, add_op_list) ) {
 
-    printf("\n\n add_op_list: (%p) \n\n", current_node);
+    //printf("\n\n add_op_list: (%p) \n\n", current_node);
 
     //
     // it1 - current node = 1
@@ -130,12 +130,12 @@ ASTNodePtr term(Parser* parser) {
   ASTNodePtr node, current_node, bn_op = NULL;
   UnaryOpNodePtr unop;
 
-  printf("\n\n term: %s (%d) \n\n", parser->current_token->token_string, parser->current_token->code);
+  //printf("\n\n term: %s (%d) \n\n", parser->current_token->token_string, parser->current_token->code);
 
   current_node = node = factor(parser);
 
   while ( token_in_list(parser->current_token->code, mult_op_list) ) {
-    printf("\n\n mult_op_list: (%p) \n\n", current_node);
+    //printf("\n\n mult_op_list: (%p) \n\n", current_node);
 
     BinaryOpNodePtr b = __MALLOC__(sizeof(BinaryOpNode));
     b->op = parser->current_token->code;
@@ -156,7 +156,7 @@ ASTNodePtr term(Parser* parser) {
 ASTNodePtr factor(Parser* parser) {
   ASTNodePtr node = NULL;
 
-  printf("\n\n factor: %s (%d) \n\n", parser->current_token->token_string, parser->current_token->code);
+  //printf("\n\n factor: %s (%d) \n\n", parser->current_token->token_string, parser->current_token->code);
 
   switch( parser->current_token->code ) {
     case T_IDENTIFIER: {
@@ -193,19 +193,17 @@ ASTNodePtr factor(Parser* parser) {
       break;
     }
 
-    case T_LPAREN: {
+    case T_LPAREN:
       next_token(parser);
       node = expression(parser);
       if (parser->current_token->code != T_RPAREN) {
         parser->errored = TRUE;
-      } else { next_token(parser); }
+      }
       break;
-    }
 
-    default: {
+    default:
       parser->errored = TRUE;
       break;
-    }
   }
 
   return node;

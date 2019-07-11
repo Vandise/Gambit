@@ -11,6 +11,23 @@ ASTNodePtr build_node(NODE_TYPE type, void* node) {
   return np;
 }
 
+void print_node_tree(ASTNodePtr root, int space) {
+  if (root == NULL) { return; }
+
+  space += PRINT_TREE_COUNT;
+
+  print_node_tree(root->right, space);
+  printf("\n");
+
+  for (int i = PRINT_TREE_COUNT; i < space; i++) {
+    printf(" ");
+  }
+
+  printf("(%d)\n", root->type);
+
+  print_node_tree(root->left, space);
+}
+
 void free_node_tree(ASTNodePtr root) {
   if (root != NULL) {
     free_node_tree(root->left);

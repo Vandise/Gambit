@@ -4,6 +4,8 @@
 #include "common.h"
 #include "shared/tokens.h"
 
+#define PRINT_TREE_COUNT 10
+
 typedef enum {
   NOOP_NODE, LITERAL_NODE, GET_LOCAL_NODE, BINARY_OP_NODE, UNARY_OP_NODE, VARIABLE_DECLARATION_NODE
 } NODE_TYPE;
@@ -64,6 +66,7 @@ typedef struct UnaryOpNodeStruct {
 } UnaryOpNode, *UnaryOpNodePtr;
 
 ASTNodePtr build_node(NODE_TYPE type, void* node);
+void print_node_tree(ASTNodePtr root, int space);
 void free_node_tree(ASTNodePtr root);
 
 #endif
