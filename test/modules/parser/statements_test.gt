@@ -26,6 +26,7 @@ x = (2 * 3) + 4
     ASTNodePtr statement_tree = statement(p);
 
     SHOULD_BE_FALSE(p->errored);
+    SHOULD_EQUAL(statement_tree->type, ASSIGNMENT_NODE);
 
     print_node_tree(statement_tree, 0);
 
