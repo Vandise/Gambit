@@ -191,6 +191,7 @@ void get_special(Scanner *scanner) {
     case ';':   scanner->current_token.token = T_SEMICOLON; get_character(scanner);  break;
     case '/':   scanner->current_token.token = T_SLASH;     get_character(scanner);  break;
     case '.':   scanner->current_token.token = T_PERIOD;     get_character(scanner);  break;
+    case '$':   scanner->current_token.token = T_DOLLARSIGN; get_character(scanner);  break;
     case '<':
       get_character(scanner);
       if (scanner->current_char == '=') {
