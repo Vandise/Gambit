@@ -194,6 +194,84 @@ let($x:String) = 'Bender'
     exit_scanner(scanner);
   END_IT
 
+--FILE declare_match_chain.g--
+let($x:String, $y:Integer) = 'Bender'
+--ENDFILE--
+
+  IT("can parse declaration chains")
+    Scanner* scanner = init_scanner(__TEST_FILE__(declare_match_chain.g));
+    do {
+      get_token(scanner);
+      commit_token(scanner);
+    } while (scanner->current_token.token != T_END_OF_FILE && scanner->current_token.token != T_ERROR);
+
+    Parser* p = init_parser(get_tokens(scanner));
+
+    ASTNodePtr declaration_tree = declarations(p);
+
+    // parsing success
+    SHOULD_BE_FALSE(p->errored);
+
+    // parsing resulting in the correct node
+    SHOULD_EQUAL(declaration_tree->type, VARIABLE_DECLARATION_NODE);
+
+    // left node is the variable name
+    LiteralNodePtr l = declaration_tree->left->node;
+    SHOULD_EQUAL(l->type, STRING_LIT);
+    SHOULD_EQUAL(strcmp(l->value.stringp, "x"), 0);
+
+
+    // declaration is a simple assignment
+    VariableDeclarationNodePtr node = declaration_tree->node;
+    SHOULD_EQUAL(node->definition.info.variable.type, VARIABLE_MATCH_CONSTANT);
+    SHOULD_EQUAL(node->definition.info.variable.value_type, STRING_LIT);
+    SHOULD_EQUAL(strcmp(node->definition.info.variable.value.stringp, "String"), 0);
+
+
+    // right node is the expression ( literal in this case )
+    SHOULD_EQUAL(declaration_tree->right->type, LITERAL_NODE);
+
+    LiteralNodePtr r = declaration_tree->right->node;
+    SHOULD_EQUAL(r->type, STRING_LIT);
+    SHOULD_EQUAL(strcmp(r->value.stringp, "Bender"), 0);
+
+    //
+    //
+    // next node should be the same
+    //
+    //
+    SHOULD_BE_FALSE(declaration_tree->next == NULL);
+
+    ASTNodePtr next_tree = declaration_tree->next;
+
+    // parsing resulting in the correct node
+    SHOULD_EQUAL(next_tree->type, VARIABLE_DECLARATION_NODE);
+
+    l = next_tree->left->node;
+    SHOULD_EQUAL(l->type, STRING_LIT);
+    SHOULD_EQUAL(strcmp(l->value.stringp, "y"), 0);
+
+    node = next_tree->node;
+    SHOULD_EQUAL(node->definition.info.variable.type, VARIABLE_MATCH_CONSTANT);
+    SHOULD_EQUAL(node->definition.info.variable.value_type, STRING_LIT);
+    SHOULD_EQUAL(strcmp(node->definition.info.variable.value.stringp, "Integer"), 0);
+
+    SHOULD_EQUAL(next_tree->right->type, LITERAL_NODE);
+
+    r = next_tree->right->node;
+    SHOULD_EQUAL(r->type, STRING_LIT);
+    SHOULD_EQUAL(strcmp(r->value.stringp, "Bender"), 0);
+
+    //
+    // memory cleanup
+    //
+    free_node_tree(next_tree);
+    free_node_tree(declaration_tree);
+
+    exit_parser(p);
+    exit_scanner(scanner);
+  END_IT
+
 END_DESCRIBE
 
 DESCRIBE(gambit_parser_declarations, "Parser - Declarations")

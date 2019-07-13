@@ -117,7 +117,6 @@ typedef struct AssignmentNodeStruct {
 //
 typedef struct VariableDeclarationNodeStruct {
   NodeDefinition definition;
-  struct VariableDeclarationNodeStruct* next;
 } VariableDeclarationNode, *VariableDeclarationNodePtr;
 
 ASTNodePtr build_node(NODE_TYPE type, void* node);

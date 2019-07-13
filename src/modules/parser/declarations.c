@@ -25,8 +25,22 @@ ASTNodePtr declarations(Parser* parser) {
 
 TOKEN_CODE var_definition_type_list[] = { T_DOLLARSIGN, T_IDENTIFIER, 0 };
 
+static void insert_declaration_chain(ASTNodePtr root, ASTNodePtr node) {
+  printf("\n variable_declaration - inserting into node chain %p %p \n", root, node);
+  if (root == node) { return; }
+
+  ASTNodePtr current_element = root;
+  while(current_element->next != NULL) {
+    current_element = current_element->next;
+  }
+
+  current_element->next = node;
+}
+
 ASTNodePtr variable_declaration(Parser* parser) {
   ASTNodePtr node = NULL;
+  ASTNodePtr root = NULL;
+
   BOOLEAN saw_dollarsign = FALSE;
   BOOLEAN saw_colon = FALSE;
 
@@ -57,6 +71,16 @@ ASTNodePtr variable_declaration(Parser* parser) {
       return NULL;
     }
 
+    VariableDeclarationNodePtr var = __MALLOC__(sizeof(VariableDeclarationNode));
+    var->definition.type = DEFINITION_VARIABLE;
+
+    node = build_node(VARIABLE_DECLARATION_NODE, var);
+
+    if (root == NULL) {
+      root = node;
+      printf("\n variable_declaration - no root node, setting ( %p )\n", root);
+    }
+
     //
     // variable name
     //
@@ -64,25 +88,15 @@ ASTNodePtr variable_declaration(Parser* parser) {
     l->type = STRING_LIT;
 
     l->value.stringp = parser->current_token->token_string;
+    node->left = build_node(LITERAL_NODE, l);
 
     printf("\n variable_declaration - build identifier %s \n", l->value.stringp);
-
-    VariableDeclarationNodePtr var = __MALLOC__(sizeof(VariableDeclarationNode));
-    var->definition.type = DEFINITION_VARIABLE;
-
-    node = build_node(VARIABLE_DECLARATION_NODE, var);
-    node->left = build_node(LITERAL_NODE, l);
 
     //
     // colon : T_CONSTANT|T_LITERAL 
     //
     next_token(parser);
 
-    //
-    // todo: create variable definition chain
-    //        root = node if root == null
-    //        current_node = var->next
-    //
     if (parser->current_token->code == T_COLON) {
 
       printf("\n variable_declaration - saw_colon \n");
@@ -141,14 +155,25 @@ ASTNodePtr variable_declaration(Parser* parser) {
       }
     }
 
+    printf("\n variable_declaration - check T_COMMA %d \n", parser->current_token->code);
+
     //
     // comma or right paren
     //
-    if ((peek_token(parser, 1))->code == T_COMMA) {
-      next_token(parser); // get comma
+    if (parser->current_token->code == T_COMMA) {
+      printf("\n variable_declaration - found T_COMMA \n");
       next_token(parser); // get next in var_definition_type_list
     }
+
+    //
+    // essentially this just splits a declaration let(a, b) = <expression>
+    // into two different assignment nodes
+    // this allows easier pattern matching on objects
+    //
+    insert_declaration_chain(root, node);
   }
+
+  printf("\n variable_declaration - check  T_RPAREN \n");
 
   //
   // todo: memory leak if errored
@@ -157,6 +182,8 @@ ASTNodePtr variable_declaration(Parser* parser) {
     parser->errored = TRUE;
     return NULL;
   }
+
+  printf("\n variable_declaration - check  T_EQUAL \n");
 
   if ((next_token(parser))->code != T_EQUAL) {
     parser->errored = TRUE;
@@ -168,7 +195,17 @@ ASTNodePtr variable_declaration(Parser* parser) {
   //
   next_token(parser);
 
-  node->right = expression(parser);
+  printf("\n variable_declaration - set root->right  %p \n", root);
 
-  return node;
+  root->right = expression(parser);
+
+  node = root->next;
+  printf("\n variable_declaration - root next  %p \n", node);
+  while(node != NULL) {
+    node->right = root->right;
+    printf("\n variable_declaration - setting next node\n");
+    node = node->next;
+  }
+
+  return root;
 }

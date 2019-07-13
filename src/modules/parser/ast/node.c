@@ -36,6 +36,8 @@ void free_node_tree(ASTNodePtr root) {
     __FREE__(root->node);
     __FREE__(root);
 
+    root->left = NULL;
+    root->right = NULL;
     root = NULL;
   }
 }

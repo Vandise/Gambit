@@ -25,6 +25,6 @@ void  debug_list_destroy(void *pp);
 
 static void memory_list_init();
 void print_memory_summary();
-void remove_memory_list_item(void *p);
+int remove_memory_list_item(void *p);
 
 #endif

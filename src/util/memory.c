@@ -42,14 +42,20 @@ void* realloc_trace(void *pp, size_t size, const char *file, int line, const cha
 }
 
 void free_trace(void *p, const char *file, int line, const char *func) {
+  int freed = 0;
+
   if (PROJECT_MEMORY_DEBUG) {
     memory_list_init();
     #if PROJECT_MEMORY_DEBUG_VERBOSE == 1
       printf ("Free = %s, %i, %s, %p\n", file, line, func, p);
     #endif
-    remove_memory_list_item(p);
+    freed = remove_memory_list_item(p);
   }
-  free(p);
+
+  if (!freed) {
+    free(p);
+  }
+
   p = NULL;
 }
 
@@ -57,7 +63,7 @@ void debug_list_destroy(void *pp) {
   __FREE__(pp);
 }
 
-void remove_memory_list_item(void *p) {
+int remove_memory_list_item(void *p) {
   ListElmt *element = list_head(&memory_list);
   MemoryItem *itm = list_data(element);
 
@@ -65,10 +71,18 @@ void remove_memory_list_item(void *p) {
   if (itm->pp == p) {
     list_rem_next(&memory_list, NULL, (void **)&itm->pp);
     free(itm);
-    return;
+    return 0;
   }
 
   while (1) {
+    if (element == NULL || element->next == NULL) {
+      #if PROJECT_MEMORY_DEBUG_VERBOSE == 1
+        printf ("pointer being freed was not allocated by __MALLOC__ or has already been removed =  %p\n", p);
+        return -1;
+      #endif
+      break;
+    }
+
     itm = element->next->data;
     if (itm->pp == p) {
       list_rem_next(&memory_list, element, (void **)&itm->pp);
@@ -81,6 +95,8 @@ void remove_memory_list_item(void *p) {
     else
       element = list_next(element);
   }
+
+  return 0;
 }
 
 static void memory_list_init() {
