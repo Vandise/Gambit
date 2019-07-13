@@ -12,11 +12,18 @@ typedef enum {
 
 typedef enum {
   DEFINITION_NO_TYPE,
+  DEFINITION_VARIABLE,
 } DEFINITION_TYPE;
 
+//
+// let(year)  = 2015          -> VARIABLE_SIMPLE_ASSIGN
+// let($year) = 2015          -> VARIABLE_MATCH_BIND_ALL
+// let($year:Number) = 2015   -> VARIABLE_MATCH_CONSTANT
+// let($year:2015) = 2015     -> VARIABLE_MATCH_VALUE
+//
 typedef enum {
-  SIMPLE_ASSIGN, MATCH_ALL, MATCH_VALUE, MATCH_CONSTANT
-} VARIABLE_TYPE;
+  VARIABLE_SIMPLE_ASSIGN, VARIABLE_MATCH_ALL, VARIABLE_MATCH_VALUE, VARIABLE_MATCH_CONSTANT
+} VARIABLE_DECLARATION_TYPE;
 
 typedef union {
   int integer;
@@ -42,7 +49,8 @@ typedef struct {
   DEFINITION_TYPE type;
   union {
     struct {
-      VARIABLE_TYPE type;
+      VARIABLE_DECLARATION_TYPE type;
+      LITERAL_TYPE value_type;
       Value value;
     } variable;
   } info;
@@ -97,6 +105,20 @@ typedef struct AssignmentNodeStruct {
   // make everything immutable?
   //
 } AssignmentNode, *AssignmentNodePtr;
+
+//
+// Variable Declaration Node
+//  left: identifier
+//  right: expression
+//
+//  body:
+//    definition:  variable definition info
+//    next: if variables declared in a chain -- let(a, b, c) = <expression>
+//
+typedef struct VariableDeclarationNodeStruct {
+  NodeDefinition definition;
+  struct VariableDeclarationNodeStruct* next;
+} VariableDeclarationNode, *VariableDeclarationNodePtr;
 
 ASTNodePtr build_node(NODE_TYPE type, void* node);
 void print_node_tree(ASTNodePtr root, int space);

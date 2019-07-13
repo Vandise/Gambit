@@ -1,0 +1,64 @@
+#include "cspec.h"
+#include "cspec_output_header.h"
+#include "cspec_output_verbose.h"
+#include "cspec_output_unit.h"
+
+#include "test/macros.h"
+#include "modules/scanner/scanner_module.h"
+#include "modules/parser/declarations.h"
+
+extern int status;
+
+DESCRIBE(gambit_parser_declarations_variables, "Parser - Variable Declarations")
+
+--FILE declare_simple_assign.g--
+let(x) = 10
+--ENDFILE--
+
+  IT("can parse simple declarations")
+    Scanner* scanner = init_scanner(__TEST_FILE__(declare_simple_assign.g));
+    do {
+      get_token(scanner);
+      commit_token(scanner);
+    } while (scanner->current_token.token != T_END_OF_FILE && scanner->current_token.token != T_ERROR);
+
+    Parser* p = init_parser(get_tokens(scanner));
+
+    ASTNodePtr declaration_tree = declarations(p);
+
+    // parsing success
+    SHOULD_BE_FALSE(p->errored);
+
+    // parsing resulting in the correct node
+    SHOULD_EQUAL(declaration_tree->type, VARIABLE_DECLARATION_NODE);
+
+    // left node is the variable name
+    LiteralNodePtr l = declaration_tree->left->node;
+    SHOULD_EQUAL(l->type, STRING_LIT);
+    SHOULD_EQUAL(strcmp(l->value.stringp, "x"), 0);
+
+    // declaration is a simple assignment
+    VariableDeclarationNodePtr node = declaration_tree->node;
+    SHOULD_EQUAL(node->definition.info.variable.type, VARIABLE_SIMPLE_ASSIGN);
+
+    // right node is the expression ( literal in this case )
+    SHOULD_EQUAL(declaration_tree->right->type, LITERAL_NODE);
+
+    LiteralNodePtr r = declaration_tree->right->node;
+    SHOULD_EQUAL(r->type, INTEGER_LIT);
+    SHOULD_EQUAL(r->value.integer, 10);
+
+    free_node_tree(declaration_tree);
+
+    exit_parser(p);
+    exit_scanner(scanner);
+  END_IT
+
+END_DESCRIBE
+
+DESCRIBE(gambit_parser_declarations, "Parser - Declarations")
+
+
+  status += CSpec_Run( DESCRIPTION( gambit_parser_declarations_variables ), CSpec_NewOutputVerbose() );
+
+END_DESCRIBE
