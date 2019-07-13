@@ -4,10 +4,10 @@
 ## Grammar
 
 ```
-let(<arguments) = <literal>
+let( [ T_PARAM ] T_IDENTIFIER [ T_COLON T_CONSTANT|T_LITERAL ]) = <expression>
 ```
 
-## Example
+## Examples
 
 ```
 struct Person do
@@ -15,22 +15,35 @@ struct Person do
   age: null
 end
 
-let(greeting) = 'Hello world!'
+======================
 
-let(bender) = %Person{ name: 'Bender', age: 20 }
+let(T_IDENTIFIER) = <expression>
 
-let(name) = bender
-# => 'Bender'
+let(year) = 2015
 
-let(name, age) = bender
-# => 'Bender'
-# => 20
 
-let(name: 'Bob', age: 20) = bender
-# => Error
+<<< compiles to >>>
 
-let(name: 'Bob', age) = bender
-# => Error
+var year = 2015;
 
+======================
+
+let(T_PARAM T_IDENTIFIER) = <expression>
+
+let($year) = 2015
+
+<<< compiles to >>>
+
+var year = match([$, (year) => year ])(2015);
+
+======================
+
+let(T_PARAM T_IDENTIFIER T_COLON T_CONSTANT) = <expression>
+
+let($year:Number) = 2015
+
+<<< compiles to >>>
+
+var year = match([Number, (year) => year ])(2015);
 
 ```
