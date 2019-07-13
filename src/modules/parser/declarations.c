@@ -95,7 +95,7 @@ ASTNodePtr variable_declaration(Parser* parser) {
       switch(parser->current_token->code) {
         case T_CONSTANT: {
           printf("\n variable_declaration - saw_colon : T_CONSTANT \n");
-          var->definition.info.variable.value.stringp = parser->current_token->literal.value.string;
+          var->definition.info.variable.value.stringp = parser->current_token->token_string;
           var->definition.info.variable.type = VARIABLE_MATCH_CONSTANT;
           var->definition.info.variable.value_type = STRING_LIT;
           break;
