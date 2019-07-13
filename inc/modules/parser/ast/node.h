@@ -10,6 +10,14 @@ typedef enum {
   NOOP_NODE, LITERAL_NODE, GET_LOCAL_NODE, BINARY_OP_NODE, UNARY_OP_NODE, VARIABLE_DECLARATION_NODE, ASSIGNMENT_NODE
 } NODE_TYPE;
 
+typedef enum {
+  DEFINITION_NO_TYPE,
+} DEFINITION_TYPE;
+
+typedef enum {
+  SIMPLE_ASSIGN, MATCH_ALL, MATCH_VALUE, MATCH_CONSTANT
+} VARIABLE_TYPE;
+
 typedef union {
   int integer;
   float real;
@@ -26,6 +34,19 @@ typedef struct ASTNodeStruct {
   struct ASTNodeStruct *next;
   struct ASTNodeStruct *left, *right;
 } ASTNode, *ASTNodePtr;
+
+//
+// Definition Struct: variable type info
+//
+typedef struct {
+  DEFINITION_TYPE type;
+  union {
+    struct {
+      VARIABLE_TYPE type;
+      Value value;
+    } variable;
+  } info;
+} NodeDefinition;
 
 //
 // NO-OP Node - used for root and debugging
@@ -71,7 +92,10 @@ typedef struct UnaryOpNodeStruct {
 //   right: <expression>
 //
 typedef struct AssignmentNodeStruct {
-  // todo: type info
+  //
+  // simple assign shortcut?
+  // make everything immutable?
+  //
 } AssignmentNode, *AssignmentNodePtr;
 
 ASTNodePtr build_node(NODE_TYPE type, void* node);

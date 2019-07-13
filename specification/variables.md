@@ -4,7 +4,7 @@
 ## Grammar
 
 ```
-let( [ T_PARAM ] T_IDENTIFIER [ T_COLON T_CONSTANT|T_LITERAL ]) = <expression>
+let( [ T_PARAM ] T_IDENTIFIER [ T_COLON T_CONSTANT|T_LITERAL ] [T_COMMA] ...) = <expression>
 ```
 
 ## Examples
@@ -20,7 +20,6 @@ end
 let(T_IDENTIFIER) = <expression>
 
 let(year) = 2015
-
 
 <<< compiles to >>>
 
@@ -45,5 +44,15 @@ let($year:Number) = 2015
 <<< compiles to >>>
 
 var year = match([Number, (year) => year ])(2015);
+
+======================
+
+let(T_PARAM T_IDENTIFIER T_COLON T_LITERAL) = <expression>
+
+let($year:2015) = 2015
+
+<<< compiles to >>>
+
+var year = match([$(2015), (year) => year ])(2015);
 
 ```
