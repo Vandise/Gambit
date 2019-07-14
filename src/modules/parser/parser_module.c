@@ -39,8 +39,10 @@ void push_node(Parser* parser, ASTNodePtr np) {
   parser->current_node = parser->current_node->next;
 }
 
-static void increment_current_node(Parser* parser) {
-  parser->current_node = parser->current_node->next;
+static void synchronize_current_node(Parser* parser) {
+  while(parser->current_node->next != NULL) {
+    parser->current_node = parser->current_node->next;
+  }
 }
 
 /*
@@ -61,26 +63,27 @@ static void increment_current_node(Parser* parser) {
 
 */
 void parse(Parser* parser) {
+  // <expressions>
   do {
     printf("Parser -- parse, current token: ( %d ) \n", parser->current_token->code);
 
     if ( (parser->current_node->next = declarations(parser)) != NULL ) {
-      increment_current_node(parser);
+      synchronize_current_node(parser);
       continue;
     }
 
     if ( (parser->current_node->next = statement(parser)) != NULL ) {
-      increment_current_node(parser);
+      synchronize_current_node(parser);
       continue;
     }
 
     if ( (parser->current_node->next = expression(parser)) != NULL ) {
-      increment_current_node(parser);
+      synchronize_current_node(parser);
       continue;
     }
 
     if ( (parser->current_node->next = terminator(parser)) != NULL ) {
-      increment_current_node(parser);
+      synchronize_current_node(parser);
       continue;
     }
 
@@ -92,13 +95,12 @@ void parse(Parser* parser) {
 }
 
 void exit_parser(Parser* parser) {
-
   while(parser->root_node != NULL) {
-    ASTNodePtr n = parser->root_node->next;
-    __FREE__(parser->root_node->node);
-    __FREE__(parser->root_node);
-    parser->root_node = n;
-  }
+    ASTNodePtr next_node = parser->root_node->next;
 
+    free_node_tree(parser->root_node);
+
+    parser->root_node = next_node;
+  }
   __FREE__(parser);
 }

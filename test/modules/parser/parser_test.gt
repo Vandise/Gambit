@@ -146,6 +146,37 @@ DESCRIBE(gambit_parser_parse, "Parser - parse")
     exit_parser(p);
     exit_scanner(scanner);
   END_IT
+
+--FILE compound_declarations.g--
+let($x:Integer, $y:Integer) = 2019
+
+2015
+--ENDFILE--
+
+  IT("recognizes compound declarations  as a program")
+    Scanner* scanner = init_scanner(__TEST_FILE__(compound_declarations.g));
+    do {
+      get_token(scanner);
+      commit_token(scanner);
+    } while (scanner->current_token.token != T_END_OF_FILE && scanner->current_token.token != T_ERROR);
+
+    Parser* p = init_parser(get_tokens(scanner));
+
+    parse(p);
+
+    SHOULD_BE_FALSE(p->errored);
+
+    SHOULD_EQUAL(p->root_node->type, NOOP_NODE);
+    SHOULD_EQUAL(p->root_node->next->type, VARIABLE_DECLARATION_NODE);
+    SHOULD_EQUAL(p->root_node->next->next->type, VARIABLE_DECLARATION_NODE);
+    SHOULD_EQUAL(p->root_node->next->next->next->type, NOOP_NODE);
+    SHOULD_EQUAL(p->root_node->next->next->next->next->type, NOOP_NODE);
+    SHOULD_EQUAL(p->root_node->next->next->next->next->next->type, LITERAL_NODE);
+    SHOULD_EQUAL(p->root_node->next->next->next->next->next->next, NULL);
+
+    exit_parser(p);
+    exit_scanner(scanner);
+  END_IT
 END_DESCRIBE
 
 DESCRIBE(gambit_parser, "Parser")
