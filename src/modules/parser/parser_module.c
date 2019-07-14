@@ -10,8 +10,9 @@ Parser* init_parser(TokenArray* tokens) {
   parser->errored = FALSE;
 
   parser->root_node = __MALLOC__(sizeof(ASTNode));
-  parser->root_node->type = NOOP_NODE;
+  parser->root_node->type = CORE_LOAD_NODE;
   parser->root_node->node = __MALLOC__(sizeof(NOOPNode));
+
   parser->root_node->next = NULL;
   parser->root_node->left = NULL;
   parser->root_node->right = NULL;

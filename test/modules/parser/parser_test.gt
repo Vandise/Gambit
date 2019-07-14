@@ -94,7 +94,7 @@ DESCRIBE(gambit_parser_parse, "Parser - parse")
     parse(p);
 
     SHOULD_BE_FALSE(p->errored);
-    SHOULD_EQUAL(p->root_node->type, NOOP_NODE);
+    SHOULD_EQUAL(p->root_node->type, CORE_LOAD_NODE);
     SHOULD_EQUAL(p->root_node->next->type, VARIABLE_DECLARATION_NODE);
     SHOULD_EQUAL(p->root_node->next->next, NULL);
 
@@ -114,7 +114,7 @@ DESCRIBE(gambit_parser_parse, "Parser - parse")
     parse(p);
 
     SHOULD_BE_FALSE(p->errored);
-    SHOULD_EQUAL(p->root_node->type, NOOP_NODE);
+    SHOULD_EQUAL(p->root_node->type, CORE_LOAD_NODE);
     SHOULD_EQUAL(p->root_node->next->type, BINARY_OP_NODE);
     SHOULD_EQUAL(p->root_node->next->next, NULL);
 
@@ -139,7 +139,7 @@ DESCRIBE(gambit_parser_parse, "Parser - parse")
     parse(p);
 
     SHOULD_BE_FALSE(p->errored);
-    SHOULD_EQUAL(p->root_node->type, NOOP_NODE);
+    SHOULD_EQUAL(p->root_node->type, CORE_LOAD_NODE);
     SHOULD_EQUAL(p->root_node->next->type, NOOP_NODE);
     SHOULD_EQUAL(p->root_node->next->next, NULL);
 
@@ -166,7 +166,7 @@ let($x:Integer, $y:Integer) = 2019
 
     SHOULD_BE_FALSE(p->errored);
 
-    SHOULD_EQUAL(p->root_node->type, NOOP_NODE);
+    SHOULD_EQUAL(p->root_node->type, CORE_LOAD_NODE);
     SHOULD_EQUAL(p->root_node->next->type, VARIABLE_DECLARATION_NODE);
     SHOULD_EQUAL(p->root_node->next->next->type, VARIABLE_DECLARATION_NODE);
     SHOULD_EQUAL(p->root_node->next->next->next->type, NOOP_NODE);
