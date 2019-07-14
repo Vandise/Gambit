@@ -61,11 +61,11 @@ int main(int argc, const char* argv[]) {
 
   */
 
-  status += CSpec_Run(DESCRIPTION(gambit_parser), CSpec_NewOutputVerbose());
   status += CSpec_Run(DESCRIPTION(gambit_parser_expressions), CSpec_NewOutputVerbose());
   status += CSpec_Run(DESCRIPTION(gambit_parser_statements), CSpec_NewOutputVerbose());
   status += CSpec_Run(DESCRIPTION(gambit_parser_declarations), CSpec_NewOutputVerbose());
   status += CSpec_Run(DESCRIPTION(ast_symbol_table), CSpec_NewOutputVerbose());
+  status += CSpec_Run(DESCRIPTION(gambit_parser), CSpec_NewOutputVerbose());
 
   print_memory_summary();
 

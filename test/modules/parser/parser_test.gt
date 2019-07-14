@@ -5,6 +5,7 @@
 
 #include "test/macros.h"
 #include "modules/parser/parser_module.h"
+#include "modules/scanner/scanner_module.h"
 
 extern int status;
 
@@ -79,6 +80,74 @@ DESCRIBE(gambit_parser_init_parser, "Parser - init_parser")
 
 END_DESCRIBE
 
+DESCRIBE(gambit_parser_parse, "Parser - parse")
+
+  IT("recognizes a declaration as a program")
+    Scanner* scanner = init_scanner(__TEST_FILE__(declare_match_constant.g));
+    do {
+      get_token(scanner);
+      commit_token(scanner);
+    } while (scanner->current_token.token != T_END_OF_FILE && scanner->current_token.token != T_ERROR);
+
+    Parser* p = init_parser(get_tokens(scanner));
+
+    parse(p);
+
+    SHOULD_BE_FALSE(p->errored);
+    SHOULD_EQUAL(p->root_node->type, NOOP_NODE);
+    SHOULD_EQUAL(p->root_node->next->type, VARIABLE_DECLARATION_NODE);
+    SHOULD_EQUAL(p->root_node->next->next, NULL);
+
+    exit_parser(p);
+    exit_scanner(scanner);
+  END_IT
+
+  IT("recognizes an expression as a program")
+    Scanner* scanner = init_scanner(__TEST_FILE__(exp_math_precedence.g));
+    do {
+      get_token(scanner);
+      commit_token(scanner);
+    } while (scanner->current_token.token != T_END_OF_FILE && scanner->current_token.token != T_ERROR);
+
+    Parser* p = init_parser(get_tokens(scanner));
+
+    parse(p);
+
+    SHOULD_BE_FALSE(p->errored);
+    SHOULD_EQUAL(p->root_node->type, NOOP_NODE);
+    SHOULD_EQUAL(p->root_node->next->type, BINARY_OP_NODE);
+    SHOULD_EQUAL(p->root_node->next->next, NULL);
+
+    exit_parser(p);
+    exit_scanner(scanner);
+  END_IT
+
+--FILE terminator.g--
+
+
+--ENDFILE--
+
+  IT("recognizes a terminator as a program")
+    Scanner* scanner = init_scanner(__TEST_FILE__(terminator.g));
+    do {
+      get_token(scanner);
+      commit_token(scanner);
+    } while (scanner->current_token.token != T_END_OF_FILE && scanner->current_token.token != T_ERROR);
+
+    Parser* p = init_parser(get_tokens(scanner));
+
+    parse(p);
+
+    SHOULD_BE_FALSE(p->errored);
+    SHOULD_EQUAL(p->root_node->type, NOOP_NODE);
+    SHOULD_EQUAL(p->root_node->next->type, NOOP_NODE);
+    SHOULD_EQUAL(p->root_node->next->next, NULL);
+
+    exit_parser(p);
+    exit_scanner(scanner);
+  END_IT
+END_DESCRIBE
+
 DESCRIBE(gambit_parser, "Parser")
 
   IT("defines the Parser struct")
@@ -89,6 +158,6 @@ DESCRIBE(gambit_parser, "Parser")
   status += CSpec_Run(DESCRIPTION(gambit_parser_init_parser), CSpec_NewOutputVerbose());
   status += CSpec_Run(DESCRIPTION(gambit_parser_next_token), CSpec_NewOutputVerbose());
   status += CSpec_Run(DESCRIPTION(gambit_parser_peek_token), CSpec_NewOutputVerbose());
-
+  status += CSpec_Run(DESCRIPTION(gambit_parser_parse), CSpec_NewOutputVerbose());
 
 END_DESCRIBE

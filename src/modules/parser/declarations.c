@@ -26,7 +26,7 @@ ASTNodePtr declarations(Parser* parser) {
 TOKEN_CODE var_definition_type_list[] = { T_DOLLARSIGN, T_IDENTIFIER, 0 };
 
 static void insert_declaration_chain(ASTNodePtr root, ASTNodePtr node) {
-  printf("\n variable_declaration - inserting into node chain %p %p \n", root, node);
+  //printf("\n variable_declaration - inserting into node chain %p %p \n", root, node);
   if (root == node) { return; }
 
   ASTNodePtr current_element = root;
@@ -54,19 +54,19 @@ ASTNodePtr variable_declaration(Parser* parser) {
   //
   while(token_in_list(parser->current_token->code, var_definition_type_list)) {
 
-    printf("\n variable_declaration - while in list \n");
+    //printf("\n variable_declaration - while in list \n");
 
     saw_dollarsign = FALSE;
     saw_colon = FALSE;
 
     if (parser->current_token->code == T_DOLLARSIGN) {
-      printf("\n variable_declaration - saw_dollarsign \n");
+      //printf("\n variable_declaration - saw_dollarsign \n");
       saw_dollarsign = TRUE;
       next_token(parser);
     }
 
     if (parser->current_token->code != T_IDENTIFIER) {
-      printf("\n variable_declaration - no T_IDENTIFIER \n");
+      //printf("\n variable_declaration - no T_IDENTIFIER \n");
       parser->errored = TRUE;
       return NULL;
     }
@@ -78,7 +78,7 @@ ASTNodePtr variable_declaration(Parser* parser) {
 
     if (root == NULL) {
       root = node;
-      printf("\n variable_declaration - no root node, setting ( %p )\n", root);
+      //printf("\n variable_declaration - no root node, setting ( %p )\n", root);
     }
 
     //
@@ -90,7 +90,7 @@ ASTNodePtr variable_declaration(Parser* parser) {
     l->value.stringp = parser->current_token->token_string;
     node->left = build_node(LITERAL_NODE, l);
 
-    printf("\n variable_declaration - build identifier %s \n", l->value.stringp);
+    //printf("\n variable_declaration - build identifier %s \n", l->value.stringp);
 
     //
     // colon : T_CONSTANT|T_LITERAL 
@@ -99,16 +99,16 @@ ASTNodePtr variable_declaration(Parser* parser) {
 
     if (parser->current_token->code == T_COLON) {
 
-      printf("\n variable_declaration - saw_colon \n");
+      //printf("\n variable_declaration - saw_colon \n");
 
       saw_colon = TRUE;
       next_token(parser);
 
-      printf("\n variable_declaration - saw_colon : token( %d ) \n", parser->current_token->code);
+      //printf("\n variable_declaration - saw_colon : token( %d ) \n", parser->current_token->code);
 
       switch(parser->current_token->code) {
         case T_CONSTANT: {
-          printf("\n variable_declaration - saw_colon : T_CONSTANT \n");
+          //printf("\n variable_declaration - saw_colon : T_CONSTANT \n");
           var->definition.info.variable.value.stringp = parser->current_token->token_string;
           var->definition.info.variable.type = VARIABLE_MATCH_CONSTANT;
           var->definition.info.variable.value_type = STRING_LIT;
@@ -117,12 +117,12 @@ ASTNodePtr variable_declaration(Parser* parser) {
 
         case T_NUMBER: {
           if (parser->current_token->literal.type == INTEGER_LIT) {
-            printf("\n variable_declaration - saw_colon : INTEGER_LIT \n");
+            //printf("\n variable_declaration - saw_colon : INTEGER_LIT \n");
             var->definition.info.variable.value.integer = parser->current_token->literal.value.integer;
             var->definition.info.variable.type = VARIABLE_MATCH_VALUE;
             var->definition.info.variable.value_type = INTEGER_LIT;
           } else {
-            printf("\n variable_declaration - saw_colon : REAL_LIT \n");
+            //printf("\n variable_declaration - saw_colon : REAL_LIT \n");
             var->definition.info.variable.value.real = parser->current_token->literal.value.real;
             var->definition.info.variable.type = VARIABLE_MATCH_VALUE;
             var->definition.info.variable.value_type = REAL_LIT;
@@ -131,7 +131,7 @@ ASTNodePtr variable_declaration(Parser* parser) {
         }
 
         case T_STRING: {
-          printf("\n variable_declaration - saw_colon : STRING_LIT \n");
+          //printf("\n variable_declaration - saw_colon : STRING_LIT \n");
           var->definition.info.variable.value.stringp = parser->current_token->literal.value.string;
           var->definition.info.variable.type = VARIABLE_MATCH_VALUE;
           var->definition.info.variable.value_type = STRING_LIT;
@@ -155,13 +155,13 @@ ASTNodePtr variable_declaration(Parser* parser) {
       }
     }
 
-    printf("\n variable_declaration - check T_COMMA %d \n", parser->current_token->code);
+    //printf("\n variable_declaration - check T_COMMA %d \n", parser->current_token->code);
 
     //
     // comma or right paren
     //
     if (parser->current_token->code == T_COMMA) {
-      printf("\n variable_declaration - found T_COMMA \n");
+      //printf("\n variable_declaration - found T_COMMA \n");
       next_token(parser); // get next in var_definition_type_list
     }
 
@@ -173,7 +173,7 @@ ASTNodePtr variable_declaration(Parser* parser) {
     insert_declaration_chain(root, node);
   }
 
-  printf("\n variable_declaration - check  T_RPAREN \n");
+  //printf("\n variable_declaration - check  T_RPAREN \n");
 
   //
   // todo: memory leak if errored
@@ -183,7 +183,7 @@ ASTNodePtr variable_declaration(Parser* parser) {
     return NULL;
   }
 
-  printf("\n variable_declaration - check  T_EQUAL \n");
+  //printf("\n variable_declaration - check  T_EQUAL \n");
 
   if ((next_token(parser))->code != T_EQUAL) {
     parser->errored = TRUE;
@@ -195,15 +195,15 @@ ASTNodePtr variable_declaration(Parser* parser) {
   //
   next_token(parser);
 
-  printf("\n variable_declaration - set root->right  %p \n", root);
+  //printf("\n variable_declaration - set root->right  %p \n", root);
 
   root->right = expression(parser);
 
   node = root->next;
-  printf("\n variable_declaration - root next  %p \n", node);
+  //printf("\n variable_declaration - root next  %p \n", node);
   while(node != NULL) {
     node->right = root->right;
-    printf("\n variable_declaration - setting next node\n");
+    //printf("\n variable_declaration - setting next node\n");
     node = node->next;
   }
 

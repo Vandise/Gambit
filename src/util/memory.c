@@ -78,8 +78,8 @@ int remove_memory_list_item(void *p) {
     if (element == NULL || element->next == NULL) {
       #if PROJECT_MEMORY_DEBUG_VERBOSE == 1
         printf ("pointer being freed was not allocated by __MALLOC__ or has already been removed =  %p\n", p);
-        return -1;
       #endif
+      return -1;
       break;
     }
 

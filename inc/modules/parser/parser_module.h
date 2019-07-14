@@ -18,6 +18,7 @@ Parser* init_parser(TokenArray* tokens);
 Token* next_token(Parser* parser);
 Token* peek_token(Parser* parser, int n);
 void push_node(Parser* parser, ASTNodePtr np);
+void parse(Parser* parser);
 void exit_parser(Parser* parser);
 
 #endif

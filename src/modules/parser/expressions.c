@@ -202,7 +202,6 @@ ASTNodePtr factor(Parser* parser) {
       break;
 
     default:
-      parser->errored = TRUE;
       break;
   }
 
