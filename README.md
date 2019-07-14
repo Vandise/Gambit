@@ -1,6 +1,21 @@
 # Gambit
 
-Functional Programming in the Browser.
+Gambit is a dynamically and statically typed, multi-paradigm, imperative (procedural) and functional programming language that compiles to JavaScript.
+
+## Installation
+
+Installation requires `git` and `autoconf` on linux distributions and OSX. Windows will require `MingW`. To generate the test suite, the `ruby` language will be required.
+
+```
+$ > git clone https://github.com/Vandise/gambit
+$ > cd gambit/
+$ > autoconf
+$ > ./configure
+$ > make
+$ > sh scripts/generate_tests
+$ > make tests
+$ > ./bin/test_suite
+``
 
 ## License
 
