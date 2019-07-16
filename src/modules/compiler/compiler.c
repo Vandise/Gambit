@@ -1,11 +1,31 @@
 #include "modules/compiler/compiler_module.h"
 
-static COMPILER_STATUS_CODE compile_NOOP_NODE(CompilerPtr compiler, ASTNodePtr node) {
+static COMPILER_STATUS_CODE compile_NOOP_NODE(CompilerPtr compiler, ASTNodePtr ref) {
   return OK;
 }
 
-static COMPILER_STATUS_CODE compile_CORE_LOAD_NODE(CompilerPtr compiler, ASTNodePtr node) {
+static COMPILER_STATUS_CODE compile_CORE_LOAD_NODE(CompilerPtr compiler, ASTNodePtr ref) {
   emit_core_load(compiler->out_file, CORE_LOAD_REQUIRE);
+  return OK;
+}
+
+static COMPILER_STATUS_CODE compile_LITERAL_NODE(CompilerPtr compiler, ASTNodePtr ref) {
+  LiteralNodePtr l = (LiteralNodePtr)ref->node;
+
+  switch(l->type) {
+    case INTEGER_LIT:
+      emit_integer_literal(compiler->out_file, l->value.integer);
+      break;
+    case REAL_LIT:
+      emit_real_literal(compiler->out_file, l->value.real);
+      break;
+    case STRING_LIT:
+      emit_string_literal(compiler->out_file, l->value.stringp);
+      break;
+    default:
+      return UNDEFINED_NODE;
+  }
+
   return OK;
 }
 
@@ -22,6 +42,7 @@ CompilerPtr init_compiler(char *file_name, ASTNodePtr tree) {
   //
   compiler->compile[NOOP_NODE] = compile_NOOP_NODE;
   compiler->compile[CORE_LOAD_NODE] = compile_CORE_LOAD_NODE;
+  compiler->compile[LITERAL_NODE] = compile_LITERAL_NODE;
 
   return compiler;
 }

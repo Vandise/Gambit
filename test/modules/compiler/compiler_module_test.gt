@@ -12,6 +12,27 @@
 
 extern int status;
 
+COMPILER_STATUS_CODE test_compile_file(char* file_name) {
+  Scanner* scanner = init_scanner(file_name);
+  do {
+    get_token(scanner);
+    commit_token(scanner);
+  } while (scanner->current_token.token != T_END_OF_FILE && scanner->current_token.token != T_ERROR);
+
+  Parser* p = init_parser(get_tokens(scanner));
+  parse(p);
+
+  CompilerPtr compiler = init_compiler(OUT_FILE, p->root_node);
+
+  COMPILER_STATUS_CODE status = compile(compiler);
+
+  exit_parser(p);
+  exit_scanner(scanner);
+  exit_compiler(compiler);
+
+  return status;
+}
+
 DESCRIBE(gambit_compiler_compile, "Compiler - compile")
 
 --FILE noop_node.g--
@@ -19,48 +40,35 @@ DESCRIBE(gambit_compiler_compile, "Compiler - compile")
 
 --ENDFILE--
   IT("compiles NOOP nodes")
-    Scanner* scanner = init_scanner(__TEST_FILE__(noop_node.g));
-    do {
-      get_token(scanner);
-      commit_token(scanner);
-    } while (scanner->current_token.token != T_END_OF_FILE && scanner->current_token.token != T_ERROR);
-
-    Parser* p = init_parser(get_tokens(scanner));
-    parse(p);
-
-    CompilerPtr compiler = init_compiler(OUT_FILE, p->root_node);
-
-    COMPILER_STATUS_CODE status = compile(compiler);
-
-    SHOULD_EQUAL(status, OK);
-
-    exit_parser(p);
-    exit_scanner(scanner);
-    exit_compiler(compiler);
+    SHOULD_EQUAL(test_compile_file(__TEST_FILE__(noop_node.g)), OK);
   END_IT
 
 --FILE core_load_node.g--
 
 --ENDFILE--
   IT("compiles CORE_LOAD_NODE nodes")
-    Scanner* scanner = init_scanner(__TEST_FILE__(core_load_node.g));
-    do {
-      get_token(scanner);
-      commit_token(scanner);
-    } while (scanner->current_token.token != T_END_OF_FILE && scanner->current_token.token != T_ERROR);
+    SHOULD_EQUAL(test_compile_file(__TEST_FILE__(core_load_node.g)), OK);
+  END_IT
 
-    Parser* p = init_parser(get_tokens(scanner));
-    parse(p);
+--FILE integer_literal_node.g--
+512017812
+--ENDFILE--
+  IT("compiles integer LITERAL nodes")
+    SHOULD_EQUAL(test_compile_file(__TEST_FILE__(integer_literal_node.g)), OK);
+  END_IT
 
-    CompilerPtr compiler = init_compiler(OUT_FILE, p->root_node);
+--FILE real_literal_node.g--
+3.14159268
+--ENDFILE--
+  IT("compiles real LITERAL nodes")
+    SHOULD_EQUAL(test_compile_file(__TEST_FILE__(real_literal_node.g)), OK);
+  END_IT
 
-    COMPILER_STATUS_CODE status = compile(compiler);
-
-    SHOULD_EQUAL(status, OK);
-
-    exit_parser(p);
-    exit_scanner(scanner);
-    exit_compiler(compiler);
+--FILE string_literal_node.g--
+'hello world!'
+--ENDFILE--
+  IT("compiles real LITERAL nodes")
+    SHOULD_EQUAL(test_compile_file(__TEST_FILE__(string_literal_node.g)), OK);
   END_IT
 
 END_DESCRIBE
