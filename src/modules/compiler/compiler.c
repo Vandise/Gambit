@@ -1,16 +1,17 @@
 #include "modules/compiler/compiler_module.h"
 
-static COMPILER_STATUS_CODE compile_NOOP_NODE(ASTNodePtr node) {
+static COMPILER_STATUS_CODE compile_NOOP_NODE(CompilerPtr compiler, ASTNodePtr node) {
   return OK;
 }
 
-static COMPILER_STATUS_CODE compile_CORE_LOAD_NODE(ASTNodePtr node) {
+static COMPILER_STATUS_CODE compile_CORE_LOAD_NODE(CompilerPtr compiler, ASTNodePtr node) {
+  emit_core_load(compiler->out_file, CORE_LOAD_REQUIRE);
   return OK;
 }
 
 CompilerPtr init_compiler(char *file_name, ASTNodePtr tree) {
   CompilerPtr compiler = __MALLOC__(sizeof(Compiler));
-  compiler->out_file = fopen(file_name, "rb");
+  compiler->out_file = fopen(file_name, "w");
   compiler->errored = FALSE;
 
   compiler->tree = tree;
@@ -31,7 +32,7 @@ COMPILER_STATUS_CODE compile(CompilerPtr compiler) {
   while(compiler->current_node != NULL && status == OK) {
 
     if (compiler->compile[compiler->current_node->type] != NULL) {
-      status = (compiler->compile[compiler->current_node->type])(compiler->current_node);
+      status = (compiler->compile[compiler->current_node->type])(compiler, compiler->current_node);
       next_node(compiler);
     } else {
       status = UNDEFINED_NODE;

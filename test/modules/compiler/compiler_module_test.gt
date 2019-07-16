@@ -8,7 +8,7 @@
 #include "modules/scanner/scanner_module.h"
 #include "modules/compiler/compiler_module.h"
 
-#define OUT_FILE "./tmp/compiler_out.js"
+#define OUT_FILE ".tmp/compiler_out.js"
 
 extern int status;
 

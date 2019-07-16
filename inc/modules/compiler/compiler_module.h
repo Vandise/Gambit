@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "modules/parser/ast/node.h"
+#include "modules/compiler/emitter.h"
 
 typedef enum {
   UNDEFINED_NODE, OK
@@ -16,7 +17,7 @@ typedef struct GambitCompiler {
   ASTNodePtr current_node;
   FILE *out_file;
   BOOLEAN errored;
-  COMPILER_STATUS_CODE (*compile[0xFF])(ASTNodePtr);
+  COMPILER_STATUS_CODE (*compile[0xFF])(struct GambitCompiler*, ASTNodePtr);
 } Compiler, *CompilerPtr;
 
 CompilerPtr init_compiler(char *file_name, ASTNodePtr tree);
