@@ -40,6 +40,7 @@ typedef struct GambitScanner {
   TokenArray tokens;
 } Scanner;
 
+Scanner* init_scanner(char *file_name);
 void populate_char_table(Scanner* scanner);
 BOOLEAN open_source_file(Scanner* scanner);
 void get_character(Scanner* scanner);

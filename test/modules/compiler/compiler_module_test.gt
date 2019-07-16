@@ -1,0 +1,77 @@
+#include "cspec.h"
+#include "cspec_output_header.h"
+#include "cspec_output_verbose.h"
+#include "cspec_output_unit.h"
+
+#include "test/macros.h"
+#include "modules/parser/parser_module.h"
+#include "modules/scanner/scanner_module.h"
+#include "modules/compiler/compiler_module.h"
+
+#define OUT_FILE "./tmp/compiler_out.js"
+
+extern int status;
+
+DESCRIBE(gambit_compiler_compile, "Compiler - compile")
+
+--FILE noop_node.g--
+
+
+--ENDFILE--
+  IT("compiles NOOP nodes")
+    Scanner* scanner = init_scanner(__TEST_FILE__(noop_node.g));
+    do {
+      get_token(scanner);
+      commit_token(scanner);
+    } while (scanner->current_token.token != T_END_OF_FILE && scanner->current_token.token != T_ERROR);
+
+    Parser* p = init_parser(get_tokens(scanner));
+    parse(p);
+
+    CompilerPtr compiler = init_compiler(OUT_FILE, p->root_node);
+
+    COMPILER_STATUS_CODE status = compile(compiler);
+
+    SHOULD_EQUAL(status, OK);
+
+    exit_parser(p);
+    exit_scanner(scanner);
+    exit_compiler(compiler);
+  END_IT
+
+--FILE core_load_node.g--
+
+--ENDFILE--
+  IT("compiles CORE_LOAD_NODE nodes")
+    Scanner* scanner = init_scanner(__TEST_FILE__(core_load_node.g));
+    do {
+      get_token(scanner);
+      commit_token(scanner);
+    } while (scanner->current_token.token != T_END_OF_FILE && scanner->current_token.token != T_ERROR);
+
+    Parser* p = init_parser(get_tokens(scanner));
+    parse(p);
+
+    CompilerPtr compiler = init_compiler(OUT_FILE, p->root_node);
+
+    COMPILER_STATUS_CODE status = compile(compiler);
+
+    SHOULD_EQUAL(status, OK);
+
+    exit_parser(p);
+    exit_scanner(scanner);
+    exit_compiler(compiler);
+  END_IT
+
+END_DESCRIBE
+
+DESCRIBE(gambit_compiler, "Compiler")
+
+  IT("defines the Compiler struct")
+    Compiler p;
+    SHOULD_EQUAL(&p, &p);
+  END_IT
+
+  status += CSpec_Run(DESCRIPTION(gambit_compiler_compile), CSpec_NewOutputVerbose());
+
+END_DESCRIBE
