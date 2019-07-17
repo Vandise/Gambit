@@ -17,7 +17,8 @@ DEFINE_DESCRIPTION(gambit_parser_expressions);
 DEFINE_DESCRIPTION(gambit_parser_statements);
 DEFINE_DESCRIPTION(ast_symbol_table);
 DEFINE_DESCRIPTION(gambit_parser_declarations);
-DEFINE_DESCRIPTION(gambit_compiler)
+DEFINE_DESCRIPTION(gambit_compiler);
+DEFINE_DESCRIPTION(gambit_compiler_symbol_table);
 
 int status = 0;
 
@@ -73,6 +74,7 @@ int main(int argc, const char* argv[]) {
   */
 
   status += CSpec_Run(DESCRIPTION(gambit_compiler), CSpec_NewOutputVerbose());
+  status += CSpec_Run(DESCRIPTION(gambit_compiler_symbol_table), CSpec_NewOutputVerbose());
 
   print_memory_summary();
 

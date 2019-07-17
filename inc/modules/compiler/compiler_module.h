@@ -4,18 +4,27 @@
 #include "common.h"
 #include "modules/parser/ast/node.h"
 #include "modules/compiler/emitter.h"
+#include "modules/compiler/symbol_table.h"
 
 typedef enum {
   UNDEFINED_NODE, OK
 } COMPILER_STATUS_CODE;
 
-//
-// TODO: context / symbol table
-//
+typedef struct GambitContext {
+
+  SymbolTablePtr symbol_table;
+  struct GambitContext *next, *previous;
+
+} Context, *ContextPtr;
+
 typedef struct GambitCompiler {
   ASTNodePtr tree;
   ASTNodePtr current_node;
   FILE *out_file;
+
+  ContextPtr root_context;
+  ContextPtr current_context;
+
   BOOLEAN errored;
   COMPILER_STATUS_CODE (*compile[0xFF])(struct GambitCompiler*, ASTNodePtr);
 } Compiler, *CompilerPtr;

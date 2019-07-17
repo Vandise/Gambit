@@ -1,0 +1,92 @@
+#include "cspec.h"
+#include "cspec_output_header.h"
+#include "cspec_output_verbose.h"
+#include "cspec_output_unit.h"
+
+#include "test/macros.h"
+#include "modules/compiler/symbol_table.h"
+
+extern int status;
+
+DESCRIBE(gambit_compiler_symbol_table, "Compiler - Symbol Table")
+
+  IT("sets the root node if empty")
+    SymbolTable tbl;
+    tbl.locals = NULL;
+
+    SymbolTableNodePtr np;
+
+    np = insert_symbol_table("TEST", &tbl.locals);
+
+    SHOULD_EQUAL(np, tbl.locals);
+
+    free_symbol_table(&tbl);
+  END_IT
+
+  IT("inserts a new node if it doesn't exist")
+    SymbolTable tbl;
+    tbl.locals = NULL;
+
+    SymbolTableNodePtr np;
+
+    np = insert_symbol_table("TEST", &tbl.locals);
+
+    SHOULD_MATCH(np->name, "TEST");
+
+    free_symbol_table(&tbl);
+  END_IT
+
+  IT("swaps root nodes based on name-size")
+    SymbolTable tbl;
+    tbl.locals = NULL;
+
+    SymbolTableNodePtr n1;
+    SymbolTableNodePtr n2;
+
+    n1 = insert_symbol_table("LARGER", &tbl.locals);
+    n2 = insert_symbol_table("SMALL", &tbl.locals);
+
+    SHOULD_MATCH(tbl.locals->name, "LARGER");
+    SHOULD_MATCH(tbl.locals->right->name, "SMALL");
+
+    free_symbol_table(&tbl);
+  END_IT
+
+  IT("swaps left and right nodes based on name-size")
+    SymbolTable tbl;
+    tbl.locals = NULL;
+
+    SymbolTableNodePtr n1;
+    SymbolTableNodePtr n2;
+    SymbolTableNodePtr n3;
+
+    n1 = insert_symbol_table("LARGER", &tbl.locals);
+    n2 = insert_symbol_table("SMALL", &tbl.locals);
+    n3 = insert_symbol_table("EST", &tbl.locals);
+
+    SHOULD_MATCH(tbl.locals->name, "LARGER");
+    SHOULD_MATCH(tbl.locals->right->name, "SMALL");
+    SHOULD_MATCH(tbl.locals->left->name, "EST");
+
+    free_symbol_table(&tbl);
+  END_IT
+
+  IT("returns NULL if the node isn't found")
+    SHOULD_EQUAL(search_symbol_table("TEST", NULL), NULL);
+  END_IT
+
+  IT("returns the node if present")
+    SymbolTable tbl;
+    tbl.locals = NULL;
+
+    SymbolTableNodePtr n1;
+
+    n1 = insert_symbol_table("TEST", &tbl.locals);
+    SymbolTableNodePtr result = search_symbol_table("TEST", tbl.locals);
+
+    SHOULD_EQUAL(n1, result);
+    SHOULD_MATCH(result->name, "TEST");
+
+    free_symbol_table(&tbl);
+  END_IT
+END_DESCRIBE
