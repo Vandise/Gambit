@@ -1,5 +1,16 @@
 #include "modules/compiler/symbol_table.h"
 
+SymbolTablePtr init_symbol_table() {
+  SymbolTablePtr table = __MALLOC__(sizeof(SymbolTable));
+  table->locals = NULL;
+  table->globals = NULL;
+
+  // todo: track constant value in info
+  insert_symbol_table("GAMIT_VERSION", &table->globals);
+
+  return table;
+}
+
 SymbolTableNodePtr search_symbol_table(const char *name, SymbolTableNodePtr nodep) {
   int compare;
 
@@ -50,4 +61,7 @@ static void free_symbol_table_ast(SymbolTableNodePtr node) {
 
 void free_symbol_table(SymbolTablePtr table) {
   free_symbol_table_ast(table->locals);
+  free_symbol_table_ast(table->globals);
+
+  __FREE__(table);
 }

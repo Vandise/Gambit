@@ -14,12 +14,15 @@ typedef struct GambitSymbolTableNode {
 
 typedef struct GambitSymbolTable {
 
+  SymbolTableNodePtr globals;
   SymbolTableNodePtr locals;
 
 } SymbolTable, *SymbolTablePtr;
 
+SymbolTablePtr init_symbol_table();
 SymbolTableNodePtr search_symbol_table(const char *name, SymbolTableNodePtr nodep);
 SymbolTableNodePtr insert_symbol_table(const char *name, SymbolTableNodePtr *nodepp);
 void free_symbol_table(SymbolTablePtr table);
+
 
 #endif
