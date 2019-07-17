@@ -73,8 +73,8 @@ int main(int argc, const char* argv[]) {
     Compiler
   */
 
-  status += CSpec_Run(DESCRIPTION(gambit_compiler), CSpec_NewOutputVerbose());
   status += CSpec_Run(DESCRIPTION(gambit_compiler_symbol_table), CSpec_NewOutputVerbose());
+  status += CSpec_Run(DESCRIPTION(gambit_compiler), CSpec_NewOutputVerbose());
 
   print_memory_summary();
 

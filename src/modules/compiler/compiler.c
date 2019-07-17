@@ -1,32 +1,15 @@
 #include "modules/compiler/compiler_module.h"
 
-static void compile_node_tree(CompilerPtr compiler, ASTNodePtr ref) {
-  if (ref != NULL && compiler->errored == FALSE) {
-    printf("\n Compile node tree \n");
-
-    // left nodes
-    compile_node_tree(compiler, ref->left);
-
-    // current node
-    (compiler->compile[ref->type])(compiler, ref);
-
-    // right nodes
-    compile_node_tree(compiler, ref->right);
-  }
-}
-
 static COMPILER_STATUS_CODE compile_NOOP_NODE(CompilerPtr compiler, ASTNodePtr ref) {
   return OK;
 }
 
 static COMPILER_STATUS_CODE compile_CORE_LOAD_NODE(CompilerPtr compiler, ASTNodePtr ref) {
-  printf("\n Compile core load node \n");
   emit_core_load(compiler->out_file, CORE_LOAD_REQUIRE);
   return OK;
 }
 
 static COMPILER_STATUS_CODE compile_LITERAL_NODE(CompilerPtr compiler, ASTNodePtr ref) {
-  printf("\n Compile literal node \n");
   LiteralNodePtr l = (LiteralNodePtr)ref->node;
 
   switch(l->type) {
@@ -59,39 +42,94 @@ static COMPILER_STATUS_CODE compile_GET_LOCAL_NODE(CompilerPtr compiler, ASTNode
   return OK;
 }
 
+//TOKEN_CODE add_op_list[] = { T_PLUS, T_MINUS, 0 };
+//TOKEN_CODE mult_op_list[] = { T_STAR, T_SLASH, 0 };
+
 static COMPILER_STATUS_CODE compile_BINARY_OP_NODE(CompilerPtr compiler, ASTNodePtr ref) {
-  printf("\n Compile binary op node \n");
   BinaryOpNodePtr n = (BinaryOpNodePtr)ref->node;
+  char op[] = "\0\0\0";
 
   switch(n->op) {
     case T_EQUAL:
-      compile_node_tree(compiler, ref->left);
-      emit_text(compiler->out_file, "==");
-      compile_node_tree(compiler, ref->right);
+      op[0] = op[1] = '=';
       break;
     case T_GT:
-      compile_node_tree(compiler, ref->left);
-      emit_text(compiler->out_file, ">");
-      compile_node_tree(compiler, ref->right);
+      op[0] = '>';
       break;
     case T_LT:
-      compile_node_tree(compiler, ref->left);
-      emit_text(compiler->out_file, "<");
-      compile_node_tree(compiler, ref->right);
+      op[0] = '<';
       break;
     case T_GE:
-      compile_node_tree(compiler, ref->left);
-      emit_text(compiler->out_file, ">=");
-      compile_node_tree(compiler, ref->right);
+      op[0] = '>';
+      op[1] = '=';
       break;
     case T_LE:
-      compile_node_tree(compiler, ref->left);
-      emit_text(compiler->out_file, "<=");
-      compile_node_tree(compiler, ref->right);
+      op[0] = '<';
+      op[1] = '=';
+      break;
+    case T_PLUS:
+      op[0] = '+';
+      break;
+    case T_MINUS:
+      op[0] = '-';
+      break;
+    case T_STAR:
+      op[0] = '*';
+      break;
+    case T_SLASH:
+      op[0] = '/';
       break;
     default:
       compiler->errored = TRUE;
       return INVALID_BINARY_OPERATION;
+  }
+
+  if (!compiler->errored) {
+    emit_text(compiler->out_file, "(");
+    if (ref->left != NULL) {
+      (compiler->compile[ref->left->type])(compiler, ref->left);
+    }
+
+    emit_text(compiler->out_file, op);
+
+    if (ref->right != NULL) {
+      (compiler->compile[ref->right->type])(compiler, ref->right);
+    }
+    emit_text(compiler->out_file, ")");
+  }
+
+  return OK;
+}
+
+static COMPILER_STATUS_CODE compile_UNARY_OP_NODE(CompilerPtr compiler, ASTNodePtr ref) {
+  UnaryOpNodePtr n = (UnaryOpNodePtr)ref->node;
+
+  char op[] = "\0\0";
+
+  switch(n->op) {
+    case T_PLUS:
+      op[0] = '+';
+      break;
+    case T_MINUS:
+      op[0] = '-';
+      break;
+    default:
+      compiler->errored = TRUE;
+      return INVALID_UNARY_OPERATION;
+  }
+
+  if (!compiler->errored) {
+    emit_text(compiler->out_file, "(");
+    if (ref->left != NULL) {
+      (compiler->compile[ref->left->type])(compiler, ref->left);
+    }
+
+    emit_text(compiler->out_file, op);
+
+    if (ref->right != NULL) {
+      (compiler->compile[ref->right->type])(compiler, ref->right);
+    }
+    emit_text(compiler->out_file, ")");
   }
 
   return OK;
@@ -113,6 +151,7 @@ CompilerPtr init_compiler(char *file_name, ASTNodePtr tree) {
   compiler->compile[LITERAL_NODE] = compile_LITERAL_NODE;
   compiler->compile[GET_LOCAL_NODE] = compile_GET_LOCAL_NODE;
   compiler->compile[BINARY_OP_NODE] = compile_BINARY_OP_NODE;
+  compiler->compile[UNARY_OP_NODE] = compile_UNARY_OP_NODE;
 
   return compiler;
 }
@@ -123,7 +162,6 @@ COMPILER_STATUS_CODE compile(CompilerPtr compiler) {
   while(compiler->errored == FALSE && compiler->current_node != NULL && status == OK) {
 
     if (compiler->compile[compiler->current_node->type] != NULL) {
-      printf("\n Compile current node: %d \n", compiler->current_node->type);
       status = (compiler->compile[compiler->current_node->type])(compiler, compiler->current_node);
       next_node(compiler);
     } else {

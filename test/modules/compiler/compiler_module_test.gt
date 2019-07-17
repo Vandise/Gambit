@@ -22,8 +22,6 @@ COMPILER_STATUS_CODE test_compile_file(char* file_name) {
   Parser* p = init_parser(get_tokens(scanner));
   parse(p);
 
-  print_node_tree(p->root_node, 10);
-
   CompilerPtr compiler = init_compiler(OUT_FILE, p->root_node);
 
   COMPILER_STATUS_CODE status = compile(compiler);
@@ -91,6 +89,20 @@ my_variable
 --ENDFILE--
   IT("compiles BINARY_OP nodes")
     SHOULD_EQUAL(test_compile_file(__TEST_FILE__(binary_op_node.g)), OK);
+  END_IT
+
+--FILE unary_op_node.g--
++5
+--ENDFILE--
+  IT("compiles real UNARY nodes when found in the symbol table")
+    SHOULD_EQUAL(test_compile_file(__TEST_FILE__(unary_op_node.g)), OK);
+  END_IT
+
+--FILE complex_binary_expressions.g--
+(7 + 2) * 3
+--ENDFILE--
+  IT("compiles real complex math expressions")
+    SHOULD_EQUAL(test_compile_file(__TEST_FILE__(complex_binary_expressions.g)), OK);
   END_IT
 
 END_DESCRIBE
