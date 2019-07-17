@@ -7,7 +7,7 @@
 #include "modules/compiler/symbol_table.h"
 
 typedef enum {
-  UNDEFINED_NODE, OK
+  UNDEFINED_NODE, OK, UNDEFINED_VARIABLE, INVALID_BINARY_OPERATION
 } COMPILER_STATUS_CODE;
 
 typedef struct GambitContext {

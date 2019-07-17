@@ -22,6 +22,8 @@ COMPILER_STATUS_CODE test_compile_file(char* file_name) {
   Parser* p = init_parser(get_tokens(scanner));
   parse(p);
 
+  print_node_tree(p->root_node, 10);
+
   CompilerPtr compiler = init_compiler(OUT_FILE, p->root_node);
 
   COMPILER_STATUS_CODE status = compile(compiler);
@@ -69,6 +71,26 @@ DESCRIBE(gambit_compiler_compile, "Compiler - compile")
 --ENDFILE--
   IT("compiles real LITERAL nodes")
     SHOULD_EQUAL(test_compile_file(__TEST_FILE__(string_literal_node.g)), OK);
+  END_IT
+
+--FILE get_local_node.g--
+my_variable
+--ENDFILE--
+  IT("compiles real GET_LOCAL nodes when found in the symbol table")
+    // TODO:
+    //  get_local is not yet defined and appears to be thought of as assignment in the statements
+    //            need to work more on statements
+    //SHOULD_EQUAL(test_compile_file(__TEST_FILE__(get_local_node_undefined.g)), OK);
+  END_IT
+
+--FILE binary_op_node.g--
+10 >= 10
+5 <= 2
+1 > 3
+2 < 3
+--ENDFILE--
+  IT("compiles BINARY_OP nodes")
+    SHOULD_EQUAL(test_compile_file(__TEST_FILE__(binary_op_node.g)), OK);
   END_IT
 
 END_DESCRIBE
