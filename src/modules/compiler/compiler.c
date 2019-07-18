@@ -135,6 +135,46 @@ static COMPILER_STATUS_CODE compile_UNARY_OP_NODE(CompilerPtr compiler, ASTNodeP
   return OK;
 }
 
+static COMPILER_STATUS_CODE compile_VARIABLE_DECLARATION_NODE(CompilerPtr compiler, ASTNodePtr ref) {
+  VariableDeclarationNodePtr n = (VariableDeclarationNodePtr)ref->node;
+
+  LiteralNodePtr identifier_node = (LiteralNodePtr)ref->left->node;
+  char* identifier = identifier_node->value.stringp;
+
+  //
+  // todo: verify identifier does not exist in the symbol table ( redefinition error )
+  //
+
+  //emit_simple_declaration
+
+  switch(n->definition.info.variable.type) {
+
+    case VARIABLE_SIMPLE_ASSIGN: {
+      emit_var_declaration(compiler->out_file, identifier);
+
+      if (ref->right != NULL) {
+        emit_text(compiler->out_file, "=");
+        (compiler->compile[ref->right->type])(compiler, ref->right);
+      }
+
+      emit_terminator(compiler->out_file);
+      break;
+    }
+
+    case VARIABLE_MATCH_ALL:
+      break;
+    case VARIABLE_MATCH_VALUE:
+      break;
+    case VARIABLE_MATCH_CONSTANT:
+      break;
+    default:
+      compiler->errored = TRUE;
+      return INVALID_UNARY_OPERATION;
+  }
+
+  return OK;
+}
+
 CompilerPtr init_compiler(char *file_name, ASTNodePtr tree) {
   CompilerPtr compiler = __MALLOC__(sizeof(Compiler));
   compiler->out_file = fopen(file_name, "w");
@@ -152,6 +192,7 @@ CompilerPtr init_compiler(char *file_name, ASTNodePtr tree) {
   compiler->compile[GET_LOCAL_NODE] = compile_GET_LOCAL_NODE;
   compiler->compile[BINARY_OP_NODE] = compile_BINARY_OP_NODE;
   compiler->compile[UNARY_OP_NODE] = compile_UNARY_OP_NODE;
+  compiler->compile[VARIABLE_DECLARATION_NODE] = compile_VARIABLE_DECLARATION_NODE;
 
   return compiler;
 }

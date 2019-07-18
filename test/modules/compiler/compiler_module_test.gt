@@ -33,6 +33,26 @@ COMPILER_STATUS_CODE test_compile_file(char* file_name) {
   return status;
 }
 
+BOOLEAN test_file_contains(char* contents) {
+  BOOLEAN infile = FALSE;
+  char *line = NULL;
+  size_t len = 0;
+  ssize_t read;
+
+  FILE *fp = fopen(OUT_FILE, "r");
+  while ((read = getline(&line, &len, fp)) != -1) {
+    line[strcspn(line, "\n")] = 0;
+    if (!strcmp(line, contents)) {
+      infile = TRUE;
+      break;
+    }
+  }
+
+  fclose(fp);
+
+  return infile;
+}
+
 DESCRIBE(gambit_compiler_compile, "Compiler - compile")
 
 --FILE noop_node.g--
@@ -48,13 +68,17 @@ DESCRIBE(gambit_compiler_compile, "Compiler - compile")
 --ENDFILE--
   IT("compiles CORE_LOAD_NODE nodes")
     SHOULD_EQUAL(test_compile_file(__TEST_FILE__(core_load_node.g)), OK);
+    SHOULD_BE_TRUE(test_file_contains("const match = require('./core/match');"));
+    SHOULD_BE_TRUE(test_file_contains("const $ = match.parameter;"));
+    SHOULD_BE_TRUE(test_file_contains("const _ = match.wildcard;"));
   END_IT
 
 --FILE integer_literal_node.g--
-512017812
+80000
 --ENDFILE--
   IT("compiles integer LITERAL nodes")
     SHOULD_EQUAL(test_compile_file(__TEST_FILE__(integer_literal_node.g)), OK);
+    SHOULD_BE_TRUE(test_file_contains("80000"));
   END_IT
 
 --FILE real_literal_node.g--
@@ -62,6 +86,7 @@ DESCRIBE(gambit_compiler_compile, "Compiler - compile")
 --ENDFILE--
   IT("compiles real LITERAL nodes")
     SHOULD_EQUAL(test_compile_file(__TEST_FILE__(real_literal_node.g)), OK);
+    SHOULD_BE_TRUE(test_file_contains("3.141593"));
   END_IT
 
 --FILE string_literal_node.g--
@@ -69,6 +94,7 @@ DESCRIBE(gambit_compiler_compile, "Compiler - compile")
 --ENDFILE--
   IT("compiles real LITERAL nodes")
     SHOULD_EQUAL(test_compile_file(__TEST_FILE__(string_literal_node.g)), OK);
+    SHOULD_BE_TRUE(test_file_contains("\"hello world!\""));
   END_IT
 
 --FILE get_local_node.g--
@@ -89,6 +115,7 @@ my_variable
 --ENDFILE--
   IT("compiles BINARY_OP nodes")
     SHOULD_EQUAL(test_compile_file(__TEST_FILE__(binary_op_node.g)), OK);
+    SHOULD_BE_TRUE(test_file_contains("(10>=10)(5<=2)(1>3)(2<3)"));
   END_IT
 
 --FILE unary_op_node.g--
@@ -96,6 +123,7 @@ my_variable
 --ENDFILE--
   IT("compiles real UNARY nodes when found in the symbol table")
     SHOULD_EQUAL(test_compile_file(__TEST_FILE__(unary_op_node.g)), OK);
+    SHOULD_BE_TRUE(test_file_contains("(+5)"));
   END_IT
 
 --FILE complex_binary_expressions.g--
@@ -103,6 +131,16 @@ my_variable
 --ENDFILE--
   IT("compiles real complex math expressions")
     SHOULD_EQUAL(test_compile_file(__TEST_FILE__(complex_binary_expressions.g)), OK);
+    SHOULD_BE_TRUE(test_file_contains("((7+2)*3)"));
+  END_IT
+
+
+--FILE variable_declaration_node.g--
+let(x) = 5 * 3 + 2
+--ENDFILE--
+  IT("compiles simple VARIABLE DECLARATION nodes")
+    SHOULD_EQUAL(test_compile_file(__TEST_FILE__(variable_declaration_node.g)), OK);
+    SHOULD_BE_TRUE(test_file_contains("var x=((5*3)+2);"));
   END_IT
 
 END_DESCRIBE

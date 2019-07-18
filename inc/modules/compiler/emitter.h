@@ -6,10 +6,13 @@
 #define CORE_LOAD_REQUIRE "require('./core/match')"
 
 void emit_text(FILE *fptr, char* text);
+void emit_terminator(FILE *fptr);
 
 void emit_core_load(FILE *fptr, char* core_require);
 void emit_integer_literal(FILE *fptr, int value);
 void emit_real_literal(FILE *fptr, float value);
 void emit_string_literal(FILE *fptr, char* string);
+
+void emit_var_declaration(FILE *fptr, char* identifier);
 
 #endif

@@ -4,6 +4,10 @@ void emit_text(FILE *fptr, char* text) {
   fprintf(fptr, "%s", text);
 }
 
+void emit_terminator(FILE *fptr) {
+  emit_text(fptr, ";");
+}
+
 void emit_core_load(FILE *fptr, char* core_require) {
   char* coreload = "const match = %s;\nconst $ = match.parameter;\nconst _ = match.wildcard;\n";
   fprintf(fptr, coreload, core_require);
@@ -22,4 +26,8 @@ void emit_real_literal(FILE *fptr, float value) {
 void emit_string_literal(FILE *fptr, char* value) {
   char* string_lit = "\"%s\"";
   fprintf(fptr, string_lit, value);
+}
+
+void emit_var_declaration(FILE *fptr, char* identifier) {
+  fprintf(fptr, "var %s", identifier);
 }
