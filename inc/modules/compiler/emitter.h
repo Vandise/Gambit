@@ -14,5 +14,6 @@ void emit_real_literal(FILE *fptr, float value);
 void emit_string_literal(FILE *fptr, char* string);
 
 void emit_var_declaration(FILE *fptr, char* identifier);
+void emit_var_declaration_match_all(FILE *fptr, char* identifier);
 
 #endif

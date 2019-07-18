@@ -31,3 +31,7 @@ void emit_string_literal(FILE *fptr, char* value) {
 void emit_var_declaration(FILE *fptr, char* identifier) {
   fprintf(fptr, "var %s", identifier);
 }
+
+void emit_var_declaration_match_all(FILE *fptr, char* identifier) {
+  fprintf(fptr, "match([$,(%s)=>%s])", identifier, identifier);
+}

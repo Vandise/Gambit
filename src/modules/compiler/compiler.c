@@ -161,8 +161,18 @@ static COMPILER_STATUS_CODE compile_VARIABLE_DECLARATION_NODE(CompilerPtr compil
       break;
     }
 
-    case VARIABLE_MATCH_ALL:
+    case VARIABLE_MATCH_ALL: {
+      emit_var_declaration(compiler->out_file, identifier);
+      emit_text(compiler->out_file, "=");
+      emit_var_declaration_match_all(compiler->out_file, identifier);
+
+      emit_text(compiler->out_file, "(");
+      (compiler->compile[ref->right->type])(compiler, ref->right);
+      emit_text(compiler->out_file, ")");
+
+      emit_terminator(compiler->out_file);
       break;
+    }
     case VARIABLE_MATCH_VALUE:
       break;
     case VARIABLE_MATCH_CONSTANT:
