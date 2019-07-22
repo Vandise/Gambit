@@ -35,3 +35,20 @@ void emit_var_declaration(FILE *fptr, char* identifier) {
 void emit_var_declaration_match_all(FILE *fptr, char* identifier) {
   fprintf(fptr, "match([$,(%s)=>%s])", identifier, identifier);
 }
+
+void emit_var_declaration_match_const(FILE *fptr, char* constant, char* identifier) {
+  fprintf(fptr, "match([%s,(%s)=>%s])", constant, identifier, identifier);
+}
+
+void emit_var_declaration_match_string(FILE *fptr, char* value, char* identifier) {
+  fprintf(fptr, "match([$(\"%s\"),(%s)=>%s])", value, identifier, identifier);
+}
+
+void emit_var_declaration_match_int(FILE *fptr, int value, char* identifier) {
+  fprintf(fptr, "match([$(%d),(%s)=>%s])", value, identifier, identifier);
+}
+
+void emit_var_declaration_match_float(FILE *fptr, float value, char* identifier) {
+  fprintf(fptr, "match([$(%f),(%s)=>%s])", value, identifier, identifier);
+}
+

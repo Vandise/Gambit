@@ -151,6 +151,22 @@ let($x) = 'Bender'
     SHOULD_BE_TRUE(test_file_contains("var x=match([$,(x)=>x])(\"Bender\");"));
   END_IT
 
+--FILE var_match_constant_node.g--
+let($x:String) = 'Bender'
+--ENDFILE--
+  IT("compiles simple VARIABLE DECLARATION match constant nodes")
+    SHOULD_EQUAL(test_compile_file(__TEST_FILE__(var_match_constant_node.g)), OK);
+    SHOULD_BE_TRUE(test_file_contains("var x=match([String,(x)=>x])(\"Bender\");"));
+  END_IT
+
+--FILE var_match_value_strlit_node.g--
+let($x:'Bender') = 'Bender'
+--ENDFILE--
+  IT("compiles simple VARIABLE DECLARATION match string literal nodes")
+    SHOULD_EQUAL(test_compile_file(__TEST_FILE__(var_match_value_strlit_node.g)), OK);
+    SHOULD_BE_TRUE(test_file_contains("var x=match([$(\"Bender\"),(x)=>x])(\"Bender\");"));
+  END_IT
+
 END_DESCRIBE
 
 DESCRIBE(gambit_compiler, "Compiler")

@@ -15,5 +15,9 @@ void emit_string_literal(FILE *fptr, char* string);
 
 void emit_var_declaration(FILE *fptr, char* identifier);
 void emit_var_declaration_match_all(FILE *fptr, char* identifier);
+void emit_var_declaration_match_const(FILE *fptr, char* constant, char* identifier);
+void emit_var_declaration_match_string(FILE *fptr, char* value, char* identifier);
+void emit_var_declaration_match_int(FILE *fptr, int value, char* identifier);
+void emit_var_declaration_match_float(FILE *fptr, float value, char* identifier);
 
 #endif

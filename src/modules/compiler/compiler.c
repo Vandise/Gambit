@@ -145,8 +145,6 @@ static COMPILER_STATUS_CODE compile_VARIABLE_DECLARATION_NODE(CompilerPtr compil
   // todo: verify identifier does not exist in the symbol table ( redefinition error )
   //
 
-  //emit_simple_declaration
-
   switch(n->definition.info.variable.type) {
 
     case VARIABLE_SIMPLE_ASSIGN: {
@@ -173,9 +171,66 @@ static COMPILER_STATUS_CODE compile_VARIABLE_DECLARATION_NODE(CompilerPtr compil
       emit_terminator(compiler->out_file);
       break;
     }
-    case VARIABLE_MATCH_VALUE:
+
+    case VARIABLE_MATCH_VALUE: {
+      emit_var_declaration(compiler->out_file, identifier);
+      emit_text(compiler->out_file, "=");
+
+      switch(n->definition.info.variable.value_type) {
+        case STRING_LIT: {
+          char* str_value = n->definition.info.variable.value.stringp;
+          emit_var_declaration_match_string(compiler->out_file, str_value, identifier);
+          emit_text(compiler->out_file, "(");
+          (compiler->compile[ref->right->type])(compiler, ref->right);
+          emit_text(compiler->out_file, ")");
+
+          emit_terminator(compiler->out_file);
+          break;
+        }
+
+        case INTEGER_LIT: {
+          int value = n->definition.info.variable.value.integer;
+          emit_var_declaration_match_int(compiler->out_file, value, identifier);
+          emit_text(compiler->out_file, "(");
+          (compiler->compile[ref->right->type])(compiler, ref->right);
+          emit_text(compiler->out_file, ")");
+
+          emit_terminator(compiler->out_file);
+          break;
+        }
+
+        case REAL_LIT: {
+          float value = n->definition.info.variable.value.real;
+          emit_var_declaration_match_float(compiler->out_file, value, identifier);
+          emit_text(compiler->out_file, "(");
+          (compiler->compile[ref->right->type])(compiler, ref->right);
+          emit_text(compiler->out_file, ")");
+
+          emit_terminator(compiler->out_file);
+          break;
+        }
+
+        default:
+          compiler->errored = TRUE;
+          return UNDEFINED_VAR_DECL_VALUE_TYPE;
+          break;
+      }
+
       break;
+    }
+
     case VARIABLE_MATCH_CONSTANT:
+      emit_var_declaration(compiler->out_file, identifier);
+      emit_text(compiler->out_file, "=");
+
+      char* constant = n->definition.info.variable.value.stringp;
+      emit_var_declaration_match_const(compiler->out_file, constant, identifier);
+
+      emit_text(compiler->out_file, "(");
+      (compiler->compile[ref->right->type])(compiler, ref->right);
+      emit_text(compiler->out_file, ")");
+
+      emit_terminator(compiler->out_file);
       break;
     default:
       compiler->errored = TRUE;
