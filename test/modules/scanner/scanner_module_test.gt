@@ -339,14 +339,14 @@ END_DESCRIBE
 DESCRIBE(scanner_scanner_get_special, "Scanner - get_special")
 
 --FILE specials.g--
-^ < <= > >=
+& && | || ^ < <= > >=
 .
 --ENDFILE--
 
   IT("extracts a sequence of tokens")
     Scanner* scanner = init_scanner(__TEST_FILE__(specials.g));
     int i = 0;
-    TOKEN_CODE tlist[] = { T_PIN, T_LT, T_LE, T_GT, T_GE, T_NEWLINE, T_PERIOD, T_END_OF_FILE };
+    TOKEN_CODE tlist[] = { T_AMP, T_AND, T_PIPE, T_OR, T_PIN, T_LT, T_LE, T_GT, T_GE, T_NEWLINE, T_PERIOD, T_END_OF_FILE };
     do {
       get_token(scanner);
       SHOULD_EQUAL(scanner->current_token.token, tlist[i]);

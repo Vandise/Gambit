@@ -213,6 +213,26 @@ void get_special(Scanner *scanner) {
         scanner->current_token.token = T_GT;
       }
       break;
+    case '&':
+      get_character(scanner);
+      if (scanner->current_char == '&') {
+        *(scanner->current_token.tokenp)++ = '&';
+        scanner->current_token.token = T_AND;
+        get_character(scanner);
+      } else {
+        scanner->current_token.token = T_AMP;
+      }
+      break;
+    case '|':
+      get_character(scanner);
+      if (scanner->current_char == '|') {
+        *(scanner->current_token.tokenp)++ = '|';
+        scanner->current_token.token = T_OR;
+        get_character(scanner);
+      } else {
+        scanner->current_token.token = T_PIPE;
+      }
+      break;
     default:
       scanner->current_token.token = T_ERROR;
   }
