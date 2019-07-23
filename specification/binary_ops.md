@@ -18,7 +18,7 @@ let($catch_phrase) = 'Bender is great'
 catch_phrase = 'Bender is not great'
 
 <<< compiles to >>>
-var catch_phrase = match([$, (catch_phrase) => catch_phrase ])('Bender is great');
+const catch_phrase = match([$, (catch_phrase) => catch_phrase ])('Bender is great');
 catch_phrase == 'Bender is not great'
 
 ======================

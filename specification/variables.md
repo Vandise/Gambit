@@ -23,7 +23,7 @@ let(year) = 2015
 
 <<< compiles to >>>
 
-var year = 2015;
+const year = 2015;
 
 ======================
 
@@ -33,7 +33,7 @@ let($year) = 2015
 
 <<< compiles to >>>
 
-var year = match([$, (year) => year ])(2015);
+const year = match([$, (year) => year ])(2015);
 
 ======================
 
@@ -43,7 +43,7 @@ let($year:Number) = 2015
 
 <<< compiles to >>>
 
-var year = match([Number, (year) => year ])(2015);
+const year = match([Number, (year) => year ])(2015);
 
 ======================
 
@@ -53,6 +53,6 @@ let($year:2015) = 2015
 
 <<< compiles to >>>
 
-var year = match([$(2015), (year) => year ])(2015);
+const year = match([$(2015), (year) => year ])(2015);
 
 ```
