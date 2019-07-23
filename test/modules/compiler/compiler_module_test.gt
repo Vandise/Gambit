@@ -167,6 +167,14 @@ let($x:'Bender') = 'Bender'
     SHOULD_BE_TRUE(test_file_contains("const x=match([$(\"Bender\"),(x)=>x])(\"Bender\");"));
   END_IT
 
+--FILE var_redcl_err_node.g--
+let($x:'Bender') = 'Bender'
+let($x:'Bender') = 'Bender'
+--ENDFILE--
+  IT("errors when a variable is re-bound")
+    SHOULD_EQUAL(test_compile_file(__TEST_FILE__(var_redcl_err_node.g)), REDECLARED_VARIABLE_BIND);
+  END_IT
+
 --FILE boolean_and_node.g--
 5 && 1
 --ENDFILE--

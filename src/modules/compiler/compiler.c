@@ -147,9 +147,12 @@ static COMPILER_STATUS_CODE compile_VARIABLE_DECLARATION_NODE(CompilerPtr compil
   LiteralNodePtr identifier_node = (LiteralNodePtr)ref->left->node;
   char* identifier = identifier_node->value.stringp;
 
-  //
-  // todo: verify identifier does not exist in the symbol table ( redefinition error )
-  //
+  if ( search_symbol_table(identifier, compiler->current_context->symbol_table->locals) != NULL ) {
+    compiler->errored = TRUE;
+    return REDECLARED_VARIABLE_BIND;
+  } else {
+    insert_symbol_table(identifier, &(compiler->current_context->symbol_table->locals));
+  }
 
   switch(n->definition.info.variable.type) {
 
