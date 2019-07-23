@@ -42,8 +42,18 @@ static COMPILER_STATUS_CODE compile_GET_LOCAL_NODE(CompilerPtr compiler, ASTNode
   return OK;
 }
 
-//TOKEN_CODE add_op_list[] = { T_PLUS, T_MINUS, 0 };
-//TOKEN_CODE mult_op_list[] = { T_STAR, T_SLASH, 0 };
+// match([c, (d) => true])(b);
+static COMPILER_STATUS_CODE compile_BINARY_OP_NODE_MATCH(CompilerPtr compiler, ASTNodePtr ref) {
+
+  emit_text(compiler->out_file, "match([");
+  (compiler->compile[ref->left->type])(compiler, ref->left);
+  emit_text(compiler->out_file, ",()=>true])(");
+  (compiler->compile[ref->right->type])(compiler, ref->right);
+  emit_text(compiler->out_file, ")");
+  emit_terminator(compiler->out_file);
+
+  return OK;
+}
 
 static COMPILER_STATUS_CODE compile_BINARY_OP_NODE(CompilerPtr compiler, ASTNodePtr ref) {
   BinaryOpNodePtr n = (BinaryOpNodePtr)ref->node;
@@ -57,7 +67,8 @@ static COMPILER_STATUS_CODE compile_BINARY_OP_NODE(CompilerPtr compiler, ASTNode
       op[0] = op[1] = '|';
       break;
     case T_EQUAL:
-      op[0] = op[1] = '=';
+      return compile_BINARY_OP_NODE_MATCH(compiler, ref);
+      //op[0] = op[1] = '=';
       break;
     case T_GT:
       op[0] = '>';

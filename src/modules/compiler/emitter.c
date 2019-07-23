@@ -51,4 +51,3 @@ void emit_var_declaration_match_int(FILE *fptr, int value, char* identifier) {
 void emit_var_declaration_match_float(FILE *fptr, float value, char* identifier) {
   fprintf(fptr, "match([$(%f),(%s)=>%s])", value, identifier, identifier);
 }
-

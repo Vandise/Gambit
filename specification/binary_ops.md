@@ -22,8 +22,9 @@ let($catch_phrase) = 'Bender is great'
 catch_phrase = 'Bender is not great'
 
 <<< compiles to >>>
+
 const catch_phrase = match([$, (catch_phrase) => catch_phrase ])('Bender is great');
-catch_phrase == 'Bender is not great'
+match([catch_phrase,()=>true])('Bender is not great');
 
 ======================
 
@@ -31,7 +32,7 @@ catch_phrase == 'Bender is not great'
 
 <<< compiles to >>>
 
-(10 == 11)
+match([10,()=>true])(11)
 
 ======================
 
