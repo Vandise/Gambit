@@ -15,7 +15,7 @@
       assignment: =
 */
 
-TOKEN_CODE rel_op_list[] = { T_LT, T_LE, T_EQUAL, T_GE, T_GT, 0 };
+TOKEN_CODE rel_op_list[] = { T_LT, T_LE, T_EQUAL, T_GE, T_GT, T_AND, T_OR, 0 };
 TOKEN_CODE add_op_list[] = { T_PLUS, T_MINUS, 0 };
 TOKEN_CODE mult_op_list[] = { T_STAR, T_SLASH, 0 };
 
