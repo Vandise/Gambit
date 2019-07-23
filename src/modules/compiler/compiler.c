@@ -50,6 +50,12 @@ static COMPILER_STATUS_CODE compile_BINARY_OP_NODE(CompilerPtr compiler, ASTNode
   char op[] = "\0\0\0";
 
   switch(n->op) {
+    case T_AND:
+      op[0] = op[1] = '&';
+      break;
+    case T_OR:
+      op[0] = op[1] = '|';
+      break;
     case T_EQUAL:
       op[0] = op[1] = '=';
       break;

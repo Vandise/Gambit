@@ -167,6 +167,21 @@ let($x:'Bender') = 'Bender'
     SHOULD_BE_TRUE(test_file_contains("var x=match([$(\"Bender\"),(x)=>x])(\"Bender\");"));
   END_IT
 
+--FILE boolean_and_node.g--
+5 && 1
+--ENDFILE--
+  IT("compiles AND expressions")
+    SHOULD_EQUAL(test_compile_file(__TEST_FILE__(boolean_and_node.g)), OK);
+    SHOULD_BE_TRUE(test_file_contains("(5&&1)"));
+  END_IT
+
+--FILE boolean_or_node.g--
+5 || 1
+--ENDFILE--
+  IT("compiles OR expressions")
+    SHOULD_EQUAL(test_compile_file(__TEST_FILE__(boolean_or_node.g)), OK);
+    SHOULD_BE_TRUE(test_file_contains("(5||1)"));
+  END_IT
 END_DESCRIBE
 
 DESCRIBE(gambit_compiler, "Compiler")
