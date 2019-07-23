@@ -5,9 +5,6 @@ SymbolTablePtr init_symbol_table() {
   table->locals = NULL;
   table->globals = NULL;
 
-  // todo: track constant value in info
-  insert_symbol_table("GAMIT_VERSION", &table->globals);
-
   return table;
 }
 

@@ -254,6 +254,9 @@ CompilerPtr init_compiler(char *file_name, ASTNodePtr tree) {
   compiler->tree = tree;
   compiler->current_node = compiler->tree;
 
+  compiler->root_context = init_context("main");
+  compiler->current_context = compiler->root_context;
+
   //
   // nodes
   //
@@ -266,6 +269,16 @@ CompilerPtr init_compiler(char *file_name, ASTNodePtr tree) {
   compiler->compile[VARIABLE_DECLARATION_NODE] = compile_VARIABLE_DECLARATION_NODE;
 
   return compiler;
+}
+
+ContextPtr init_context(char* name) {
+  ContextPtr ctx = __MALLOC__(sizeof(Context));
+  ctx->name = name;
+  ctx->symbol_table = init_symbol_table();
+  ctx->next = NULL;
+  ctx->previous = NULL;
+
+  return ctx;
 }
 
 COMPILER_STATUS_CODE compile(CompilerPtr compiler) {
@@ -289,10 +302,19 @@ void next_node(CompilerPtr compiler) {
   compiler->current_node = compiler->current_node->next;
 }
 
+void free_context_tree(ContextPtr root) {
+  if (root != NULL) {
+    free_context_tree(root->next);
+    free_symbol_table(root->symbol_table);
+    __FREE__(root);
+    root = NULL;
+  }
+}
+
 void exit_compiler(CompilerPtr compiler) {
   if (compiler->out_file != NULL) {
     fclose(compiler->out_file);
   }
-
+  free_context_tree(compiler->root_context);
   __FREE__(compiler);
 }

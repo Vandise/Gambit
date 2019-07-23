@@ -191,6 +191,12 @@ DESCRIBE(gambit_compiler, "Compiler")
     SHOULD_EQUAL(&p, &p);
   END_IT
 
+  IT("sets the current context to main")
+    CompilerPtr compiler = init_compiler(OUT_FILE, NULL);
+    SHOULD_EQUAL(strcmp(compiler->current_context->name, "main"), 0);
+    exit_compiler(compiler);
+  END_IT
+
   status += CSpec_Run(DESCRIPTION(gambit_compiler_compile), CSpec_NewOutputVerbose());
 
 END_DESCRIBE

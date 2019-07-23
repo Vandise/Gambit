@@ -7,7 +7,6 @@
 typedef struct GambitSymbolTableNode {
 
   char* name;
-
   struct GambitSymbolTableNode *left, *right;
 
 } SymbolTableNode, *SymbolTableNodePtr;

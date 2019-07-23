@@ -13,6 +13,7 @@ typedef enum {
 
 typedef struct GambitContext {
 
+  char* name;
   SymbolTablePtr symbol_table;
   struct GambitContext *next, *previous;
 
@@ -34,5 +35,7 @@ CompilerPtr init_compiler(char *file_name, ASTNodePtr tree);
 COMPILER_STATUS_CODE compile(CompilerPtr compiler);
 void next_node(CompilerPtr compiler);
 void exit_compiler(CompilerPtr compiler);
+void free_context_tree(ContextPtr ctx);
+ContextPtr init_context(char* name);
 
 #endif
