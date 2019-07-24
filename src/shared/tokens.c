@@ -1,10 +1,26 @@
 #include "shared/tokens.h"
 
-RESERVED_WORD_TOKEN rw3[] = {
-  {"let", T_LET }, { NULL, 0 }
+RESERVED_WORD_TOKEN rw2[] = {
+  {"do", T_DO }, { NULL, 0 }
 };
 
-RESERVED_WORD_TOKEN *rw_table[] = { NULL, NULL, NULL, rw3 };
+RESERVED_WORD_TOKEN rw3[] = {
+  {"let", T_LET }, {"end", T_END }, { NULL, 0 }
+};
+
+RESERVED_WORD_TOKEN rw4[] = {
+  { NULL, 0 }
+};
+
+RESERVED_WORD_TOKEN rw5[] = {
+  { NULL, 0 }
+};
+
+RESERVED_WORD_TOKEN rw6[] = {
+  { "struct", T_STRUCT }, { NULL, 0 }
+};
+
+RESERVED_WORD_TOKEN *rw_table[] = { NULL, NULL, rw2, rw3, rw4, rw5, rw6 };
 
 BOOLEAN string_is_reserved_word(const char* word_string) {
   int word_length = strlen(word_string);
