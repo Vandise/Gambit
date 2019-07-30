@@ -15,6 +15,7 @@ typedef struct GambitSymbolTable {
 
   SymbolTableNodePtr globals;
   SymbolTableNodePtr locals;
+  SymbolTableNodePtr constants;
 
 } SymbolTable, *SymbolTablePtr;
 

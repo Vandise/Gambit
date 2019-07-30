@@ -23,8 +23,9 @@ void emit_real_literal(FILE *fptr, float value) {
   fprintf(fptr, real_lit, value);
 }
 
-void emit_string_literal(FILE *fptr, char* value) {
-  char* string_lit = "\"%s\"";
+void emit_string_literal(FILE *fptr, char* value, BOOLEAN asParam) {
+  char* string_lit = !asParam ? "\"%s\"" : "%s";
+
   fprintf(fptr, string_lit, value);
 }
 
@@ -50,4 +51,12 @@ void emit_var_declaration_match_int(FILE *fptr, int value, char* identifier) {
 
 void emit_var_declaration_match_float(FILE *fptr, float value, char* identifier) {
   fprintf(fptr, "match([$(%f),(%s)=>%s])", value, identifier, identifier);
+}
+
+void emit_struct_prefix_declaration(FILE *fptr, char* structName) {
+  fprintf(fptr, "function %s", structName);
+}
+
+void emit_struct_this_dot(FILE *fptr) {
+  fprintf(fptr, "this.");
 }

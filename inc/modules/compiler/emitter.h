@@ -11,7 +11,7 @@ void emit_terminator(FILE *fptr);
 void emit_core_load(FILE *fptr, char* core_require);
 void emit_integer_literal(FILE *fptr, int value);
 void emit_real_literal(FILE *fptr, float value);
-void emit_string_literal(FILE *fptr, char* string);
+void emit_string_literal(FILE *fptr, char* string, BOOLEAN asParam);
 
 void emit_var_declaration(FILE *fptr, char* identifier);
 void emit_var_declaration_match_all(FILE *fptr, char* identifier);
@@ -19,5 +19,8 @@ void emit_var_declaration_match_const(FILE *fptr, char* constant, char* identifi
 void emit_var_declaration_match_string(FILE *fptr, char* value, char* identifier);
 void emit_var_declaration_match_int(FILE *fptr, int value, char* identifier);
 void emit_var_declaration_match_float(FILE *fptr, float value, char* identifier);
+
+void emit_struct_prefix_declaration(FILE *fptr, char* structName);
+void emit_struct_this_dot(FILE *fptr);
 
 #endif

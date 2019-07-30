@@ -69,6 +69,7 @@ typedef struct NOOPNodeStruct {
 //
 typedef struct LiteralNodeStruct {
   LITERAL_TYPE type;
+  BOOLEAN asParam;
   Value value;
 } LiteralNode, *LiteralNodePtr;
 

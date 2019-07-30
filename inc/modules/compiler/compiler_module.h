@@ -6,13 +6,15 @@
 #include "modules/compiler/emitter.h"
 #include "modules/compiler/symbol_table.h"
 
+#define MAIN_CONTEXT "main"
+
 typedef enum {
   UNDEFINED_NODE, OK, UNDEFINED_VARIABLE, INVALID_BINARY_OPERATION,
-  INVALID_UNARY_OPERATION, UNDEFINED_VAR_DECL_VALUE_TYPE, REDECLARED_VARIABLE_BIND
+  INVALID_UNARY_OPERATION, UNDEFINED_VAR_DECL_VALUE_TYPE, REDECLARED_VARIABLE_BIND,
+  REDECLARED_CONSTANT
 } COMPILER_STATUS_CODE;
 
 typedef struct GambitContext {
-
   char* name;
   SymbolTablePtr symbol_table;
   struct GambitContext *next, *previous;

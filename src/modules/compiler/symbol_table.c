@@ -4,6 +4,7 @@ SymbolTablePtr init_symbol_table() {
   SymbolTablePtr table = __MALLOC__(sizeof(SymbolTable));
   table->locals = NULL;
   table->globals = NULL;
+  table->constants = NULL;
 
   return table;
 }
@@ -59,6 +60,7 @@ static void free_symbol_table_ast(SymbolTableNodePtr node) {
 void free_symbol_table(SymbolTablePtr table) {
   free_symbol_table_ast(table->locals);
   free_symbol_table_ast(table->globals);
+  free_symbol_table_ast(table->constants);
 
   __FREE__(table);
 }

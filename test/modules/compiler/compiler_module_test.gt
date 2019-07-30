@@ -199,6 +199,17 @@ let($x:'Bender') = 'Bender'
     SHOULD_BE_TRUE(test_file_contains("match([5,()=>true])(1);"));
   END_IT
 
+--FILE struct_definition_node.g--
+struct User do
+  name: ''
+  age: 25
+end
+--ENDFILE--
+  IT("compiles struct definitions")
+    SHOULD_EQUAL(test_compile_file(__TEST_FILE__(struct_definition_node.g)), OK);
+    SHOULD_BE_TRUE(test_file_contains("function User(name,age){this.name=name||\"\";this.age=age||25;};"));
+  END_IT
+
 END_DESCRIBE
 
 DESCRIBE(gambit_compiler, "Compiler")

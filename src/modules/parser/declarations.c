@@ -75,6 +75,7 @@ ASTNodePtr struct_declaration(Parser* parser) {
 
     LiteralNodePtr l = __MALLOC__(sizeof(LiteralNode));
     l->type = STRING_LIT;
+    l->asParam = TRUE;
 
     l->value.stringp = parser->current_token->token_string;
     currentNode->left = build_node(LITERAL_NODE, l);

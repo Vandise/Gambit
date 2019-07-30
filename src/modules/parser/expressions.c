@@ -186,6 +186,7 @@ ASTNodePtr factor(Parser* parser) {
       LiteralNodePtr l = __MALLOC__(sizeof(LiteralNode));
       l->type = parser->current_token->literal.type;
       l->value.stringp = parser->current_token->literal.value.string;
+      l->asParam = FALSE;
 
       node = build_node(LITERAL_NODE, l);
 

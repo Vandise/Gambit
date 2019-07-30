@@ -20,7 +20,7 @@ static COMPILER_STATUS_CODE compile_LITERAL_NODE(CompilerPtr compiler, ASTNodePt
       emit_real_literal(compiler->out_file, l->value.real);
       break;
     case STRING_LIT:
-      emit_string_literal(compiler->out_file, l->value.stringp);
+      emit_string_literal(compiler->out_file, l->value.stringp, l->asParam);
       break;
     default:
       compiler->errored = TRUE;
@@ -260,6 +260,62 @@ static COMPILER_STATUS_CODE compile_VARIABLE_DECLARATION_NODE(CompilerPtr compil
   return OK;
 }
 
+static COMPILER_STATUS_CODE compile_STRUCT_DECLARATION_NODE(CompilerPtr compiler, ASTNodePtr ref) {
+  StructDeclarationNodePtr n = (StructDeclarationNodePtr)ref->node;
+  ASTNodePtr currentNode = NULL;
+
+  LiteralNodePtr identifier_node = (LiteralNodePtr)ref->left->node;
+  char* identifier = identifier_node->value.stringp;
+
+  if ( search_symbol_table(identifier, compiler->current_context->symbol_table->constants) != NULL ) {
+    compiler->errored = TRUE;
+    return REDECLARED_CONSTANT;
+  } else {
+    insert_symbol_table(identifier, &(compiler->current_context->symbol_table->constants));
+  }
+
+  emit_struct_prefix_declaration(compiler->out_file, identifier);
+  emit_text(compiler->out_file, "(");
+
+  currentNode = ref->right;
+  while(currentNode != NULL) {
+    (compiler->compile[currentNode->left->type])(compiler, currentNode->left);
+    if (currentNode->right != NULL) {
+      emit_text(compiler->out_file, ",");
+    }
+    currentNode = currentNode->right;
+  }
+
+  emit_text(compiler->out_file, "){");
+
+  currentNode = ref->right;
+  while(currentNode != NULL) {
+    emit_struct_this_dot(compiler->out_file);
+    (compiler->compile[currentNode->left->type])(compiler, currentNode->left);
+
+    emit_text(compiler->out_file, "=");
+
+    (compiler->compile[currentNode->left->type])(compiler, currentNode->left);
+
+    emit_text(compiler->out_file, "||");
+
+    StructPropertyNodePtr n = currentNode->node;
+    (compiler->compile[n->body->type])(compiler, n->body);
+
+    emit_text(compiler->out_file, ";");
+
+    currentNode = currentNode->right;
+  }
+
+  emit_text(compiler->out_file, "};");
+
+  return OK;
+}
+
+static COMPILER_STATUS_CODE compile_STRUCT_PROPERTY_NODE(CompilerPtr compiler, ASTNodePtr ref) {
+  return OK;
+}
+
 CompilerPtr init_compiler(char *file_name, ASTNodePtr tree) {
   CompilerPtr compiler = __MALLOC__(sizeof(Compiler));
   compiler->out_file = fopen(file_name, "w");
@@ -268,7 +324,7 @@ CompilerPtr init_compiler(char *file_name, ASTNodePtr tree) {
   compiler->tree = tree;
   compiler->current_node = compiler->tree;
 
-  compiler->root_context = init_context("main");
+  compiler->root_context = init_context(MAIN_CONTEXT);
   compiler->current_context = compiler->root_context;
 
   //
@@ -281,6 +337,8 @@ CompilerPtr init_compiler(char *file_name, ASTNodePtr tree) {
   compiler->compile[BINARY_OP_NODE] = compile_BINARY_OP_NODE;
   compiler->compile[UNARY_OP_NODE] = compile_UNARY_OP_NODE;
   compiler->compile[VARIABLE_DECLARATION_NODE] = compile_VARIABLE_DECLARATION_NODE;
+  compiler->compile[STRUCT_DECLARATION_NODE] = compile_STRUCT_DECLARATION_NODE;
+  compiler->compile[STRUCT_PROPERTY_NODE] = compile_STRUCT_PROPERTY_NODE;
 
   return compiler;
 }
