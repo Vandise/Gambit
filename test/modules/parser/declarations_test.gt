@@ -293,26 +293,38 @@ end
     // parsing success
     SHOULD_BE_FALSE(p->errored);
 
-/*
-    // parsing resulting in the correct node
-    SHOULD_EQUAL(declaration_tree->type, VARIABLE_DECLARATION_NODE);
+    SHOULD_EQUAL(declaration_tree->type, STRUCT_DECLARATION_NODE);
 
-    // left node is the variable name
+    // struct name
     LiteralNodePtr l = declaration_tree->left->node;
     SHOULD_EQUAL(l->type, STRING_LIT);
-    SHOULD_EQUAL(strcmp(l->value.stringp, "x"), 0);
+    SHOULD_EQUAL(strcmp(l->value.stringp, "User"), 0);
 
-    // declaration is a simple assignment
-    VariableDeclarationNodePtr node = declaration_tree->node;
-    SHOULD_EQUAL(node->definition.info.variable.type, VARIABLE_SIMPLE_ASSIGN);
+    // struct property
+    SHOULD_EQUAL(declaration_tree->right->type, STRUCT_PROPERTY_NODE);
+    l = declaration_tree->right->left->node;
+    SHOULD_EQUAL(l->type, STRING_LIT);
+    SHOULD_EQUAL(strcmp(l->value.stringp, "name"), 0);
 
-    // right node is the expression ( literal in this case )
-    SHOULD_EQUAL(declaration_tree->right->type, LITERAL_NODE);
+    // struct property value
+    StructPropertyNodePtr n = declaration_tree->right->node;
+    SHOULD_EQUAL(n->body->type, LITERAL_NODE);
+    l = n->body->node;
+    SHOULD_EQUAL(l->type, STRING_LIT);
+    SHOULD_EQUAL(strcmp(l->value.stringp, ""), 0);
 
-    LiteralNodePtr r = declaration_tree->right->node;
-    SHOULD_EQUAL(r->type, INTEGER_LIT);
-    SHOULD_EQUAL(r->value.integer, 10);
-*/
+    // struct property
+    SHOULD_EQUAL(declaration_tree->right->right->type, STRUCT_PROPERTY_NODE);
+    l = declaration_tree->right->right->left->node;
+    SHOULD_EQUAL(l->type, STRING_LIT);
+    SHOULD_EQUAL(strcmp(l->value.stringp, "age"), 0);
+
+    // struct property value
+    n = declaration_tree->right->right->node;
+    SHOULD_EQUAL(n->body->type, LITERAL_NODE);
+    l = n->body->node;
+    SHOULD_EQUAL(l->type, INTEGER_LIT);
+    SHOULD_EQUAL(l->value.integer, 25);
 
     free_node_tree(declaration_tree);
 
