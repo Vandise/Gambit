@@ -10,6 +10,11 @@ ASTNodePtr declarations(Parser* parser) {
       break;
     }
 
+    case T_STRUCT: {
+      node = struct_declaration(parser);
+      break;
+    }
+
     default: {
       break;
     }
@@ -17,6 +22,90 @@ ASTNodePtr declarations(Parser* parser) {
   }
 
   return node;
+}
+
+TOKEN_CODE struct_prop_type_list[] = { T_IDENTIFIER, 0 };
+
+//
+// struct <Constant> do
+//  <struct_properties>
+// end
+//
+// left: identifier, right: properties tree
+ASTNodePtr struct_declaration(Parser* parser) {
+  ASTNodePtr currentNode = NULL;
+  ASTNodePtr root = NULL;
+
+  if((next_token(parser))->code != T_CONSTANT) {
+    parser->errored = TRUE;
+    return root;
+  }
+
+  StructDeclarationNodePtr structdecl = __MALLOC__(sizeof(StructDeclarationNode));
+  root = build_node(STRUCT_DECLARATION_NODE, structdecl);
+  currentNode = root;
+
+  LiteralNodePtr l = __MALLOC__(sizeof(LiteralNode));
+  l->type = STRING_LIT;
+
+  l->value.stringp = parser->current_token->token_string;
+  currentNode->left = build_node(LITERAL_NODE, l);
+
+  if((next_token(parser))->code != T_DO) {
+    parser->errored = TRUE;
+    return root;
+  }
+
+  if((next_token(parser))->code != T_NEWLINE) {
+    parser->errored = TRUE;
+    return root;
+  }
+
+  next_token(parser);
+
+  //
+  // identifier : factor
+  //
+  while(token_in_list(parser->current_token->code, struct_prop_type_list)) {
+    StructPropertyNodePtr structProperty = __MALLOC__(sizeof(StructPropertyNode));
+    structProperty->body = NULL;
+
+    currentNode->right = build_node(STRUCT_PROPERTY_NODE, structProperty);
+    currentNode = currentNode->right;
+
+    LiteralNodePtr l = __MALLOC__(sizeof(LiteralNode));
+    l->type = STRING_LIT;
+
+    l->value.stringp = parser->current_token->token_string;
+    currentNode->left = build_node(LITERAL_NODE, l);
+
+    if((next_token(parser))->code != T_COLON) {
+      parser->errored = TRUE;
+      return root;
+    }
+
+    // factor
+    next_token(parser);
+
+    structProperty->body = factor(parser);
+
+    if(parser->current_token->code != T_NEWLINE) {
+      parser->errored = TRUE;
+      return root;
+    }
+
+    // identifier or end
+    next_token(parser);
+  }
+
+  if(parser->current_token->code != T_END) {
+    parser->errored = TRUE;
+    return root;
+  }
+
+  next_token(parser);
+
+  return root;
 }
 
 //

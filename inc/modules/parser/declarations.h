@@ -7,5 +7,6 @@
 
 ASTNodePtr declarations(Parser* parser);
 ASTNodePtr variable_declaration(Parser* parser);
+ASTNodePtr struct_declaration(Parser* parser);
 
 #endif

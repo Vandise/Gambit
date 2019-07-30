@@ -7,7 +7,8 @@
 #define PRINT_TREE_COUNT 10
 
 typedef enum {
-  NOOP_NODE, CORE_LOAD_NODE, LITERAL_NODE, GET_LOCAL_NODE, BINARY_OP_NODE, UNARY_OP_NODE, VARIABLE_DECLARATION_NODE, ASSIGNMENT_NODE
+  NOOP_NODE, CORE_LOAD_NODE, LITERAL_NODE, GET_LOCAL_NODE, BINARY_OP_NODE, UNARY_OP_NODE, VARIABLE_DECLARATION_NODE, ASSIGNMENT_NODE,
+  STRUCT_DECLARATION_NODE, STRUCT_PROPERTY_NODE
 } NODE_TYPE;
 
 typedef enum {
@@ -118,6 +119,22 @@ typedef struct AssignmentNodeStruct {
 typedef struct VariableDeclarationNodeStruct {
   NodeDefinition definition;
 } VariableDeclarationNode, *VariableDeclarationNodePtr;
+
+//
+// Struct declaration
+//
+// left: identifier
+// right: Properties tree
+typedef struct StructDeclarationNodeStruct {
+
+} StructDeclarationNode, *StructDeclarationNodePtr;
+
+// left: identifier
+// defaultValue: <factor>
+// right: Properties tree
+typedef struct StructPropertyNodeStruct {
+  ASTNodePtr body;
+} StructPropertyNode, *StructPropertyNodePtr;
 
 ASTNodePtr build_node(NODE_TYPE type, void* node);
 void print_node_tree(ASTNodePtr root, int space);

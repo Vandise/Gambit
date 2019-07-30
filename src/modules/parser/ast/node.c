@@ -30,8 +30,19 @@ void print_node_tree(ASTNodePtr root, int space) {
 
 void free_node_tree(ASTNodePtr root) {
   if (root != NULL) {
+
     free_node_tree(root->left);
     free_node_tree(root->right);
+
+    switch(root->type) {
+      case STRUCT_PROPERTY_NODE: {
+        StructPropertyNodePtr n = (StructPropertyNodePtr)root->node;
+        free_node_tree(n->body);
+        break;
+      }
+      default:
+        break;
+    }
 
     __FREE__(root->node);
     __FREE__(root);
