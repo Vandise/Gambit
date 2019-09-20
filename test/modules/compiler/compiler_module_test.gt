@@ -97,14 +97,20 @@ DESCRIBE(gambit_compiler_compile, "Compiler - compile")
     SHOULD_BE_TRUE(test_file_contains("\"hello world!\""));
   END_IT
 
---FILE get_local_node.g--
+--FILE get_local_node_undefined.g--
 my_variable
 --ENDFILE--
-  IT("compiles real GET_LOCAL nodes when found in the symbol table")
-    // TODO:
-    //  get_local is not yet defined and appears to be thought of as assignment in the statements
-    //            need to work more on statements
-    //SHOULD_EQUAL(test_compile_file(__TEST_FILE__(get_local_node_undefined.g)), OK);
+  IT("compiles GET_LOCAL nodes and error when not found in the symbol table")
+    SHOULD_EQUAL(test_compile_file(__TEST_FILE__(get_local_node_undefined.g)), UNDEFINED_VARIABLE);
+  END_IT
+
+--FILE get_local_node_defined.g--
+let($my_variable) = 'Bender'
+my_variable
+--ENDFILE--
+  IT("compiles GET_LOCAL nodes when found in the symbol table")
+    SHOULD_EQUAL(test_compile_file(__TEST_FILE__(get_local_node_defined.g)), OK);
+    SHOULD_BE_TRUE(test_file_contains("const my_variable=match([$,(my_variable)=>my_variable])(\"Bender\");my_variable"));
   END_IT
 
 --FILE binary_op_node.g--

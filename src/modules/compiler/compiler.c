@@ -31,14 +31,15 @@ static COMPILER_STATUS_CODE compile_LITERAL_NODE(CompilerPtr compiler, ASTNodePt
 }
 
 static COMPILER_STATUS_CODE compile_GET_LOCAL_NODE(CompilerPtr compiler, ASTNodePtr ref) {
-  // TODO:
-  //    statements treat get_locals as assignment
-  //
-  //    T_EQUAL needs to be T_EQUAL_EQUAL? maybe small_arrow. 
-  //
-  // GetLocalNodePtr n = (GetLocalNodePtr)ref->node;
-  //
-  //
+  GetLocalNodePtr n = (GetLocalNodePtr)ref->node;
+
+  if (search_symbol_table(n->identifier, compiler->current_context->symbol_table->locals) == NULL) {
+    compiler->errored = TRUE;
+    return UNDEFINED_VARIABLE;
+  }
+
+  emit_string_literal(compiler->out_file, n->identifier, TRUE);
+
   return OK;
 }
 

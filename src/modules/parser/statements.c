@@ -23,6 +23,13 @@ ASTNodePtr statement(Parser* parser) {
   T_IDENTIFIER = <expression>
 */
 ASTNodePtr assignment_statement(Parser* parser) {
+  //
+  // a GET_LOCAL node
+  //
+  if ( (peek_token(parser, 1))->code != T_EQUAL) {
+    return NULL;
+  }
+
   ASTNodePtr node, left, right;
 
   LiteralNodePtr l = __MALLOC__(sizeof(LiteralNode));
