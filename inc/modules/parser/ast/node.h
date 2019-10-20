@@ -8,7 +8,7 @@
 
 typedef enum {
   NOOP_NODE, CORE_LOAD_NODE, LITERAL_NODE, GET_LOCAL_NODE, BINARY_OP_NODE, UNARY_OP_NODE, VARIABLE_DECLARATION_NODE, ASSIGNMENT_NODE,
-  STRUCT_DECLARATION_NODE, STRUCT_PROPERTY_NODE
+  STRUCT_DECLARATION_NODE, STRUCT_PROPERTY_NODE, FUNCTION_DECLARACTION_NODE
 } NODE_TYPE;
 
 typedef enum {
@@ -136,6 +136,21 @@ typedef struct StructDeclarationNodeStruct {
 typedef struct StructPropertyNodeStruct {
   ASTNodePtr body;
 } StructPropertyNode, *StructPropertyNodePtr;
+
+//
+// Function Declaraction
+//
+typedef struct StructFunctionDeclaractionNode {
+  char* name;
+  char* module;
+  uint8_t parameter_count;
+  BOOLEAN private;
+
+  ASTNodePtr body;
+
+  // todo: arguments
+
+} FunctionDeclaractionNode, *FunctionDeclaractionNodePtr;
 
 ASTNodePtr build_node(NODE_TYPE type, void* node);
 void print_node_tree(ASTNodePtr root, int space);
