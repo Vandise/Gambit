@@ -30,6 +30,8 @@ DESCRIBE(gambit_compiler_symbol_table, "Compiler - Symbol Table")
     np = insert_symbol_table("TEST", &tbl->locals);
 
     SHOULD_MATCH(np->name, "TEST");
+    SHOULD_EQUAL(np->type, NOOP_NODE);
+    SHOULD_EQUAL(np->data, NULL);
 
     free_symbol_table(tbl);
   END_IT

@@ -30,6 +30,9 @@ SymbolTableNodePtr insert_symbol_table(const char *name, SymbolTableNodePtr *nod
 
   new_nodep = __MALLOC__(sizeof(SymbolTableNode));
   new_nodep->name = __MALLOC__(strlen(name) + 1);
+  new_nodep->type = NOOP_NODE;
+  new_nodep->data = NULL;
+
   strcpy(new_nodep->name, name);
 
   new_nodep->left = new_nodep->right = NULL;

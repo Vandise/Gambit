@@ -7,6 +7,8 @@
 typedef struct GambitSymbolTableNode {
 
   char* name;
+  NODE_TYPE type;
+  void* data;
   struct GambitSymbolTableNode *left, *right;
 
 } SymbolTableNode, *SymbolTableNodePtr;
