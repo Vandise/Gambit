@@ -30,7 +30,9 @@ typedef struct GambitCompiler {
   ContextPtr current_context;
 
   BOOLEAN errored;
-  COMPILER_STATUS_CODE (*compile[0xFF])(struct GambitCompiler*, ASTNodePtr);
+  COMPILER_STATUS_CODE status;
+
+  void (*compile[0xFF])(struct GambitCompiler*, ASTNodePtr);
 } Compiler, *CompilerPtr;
 
 CompilerPtr init_compiler(char *file_name, ASTNodePtr tree);

@@ -1,15 +1,15 @@
 #include "modules/compiler/compiler_module.h"
 
-static COMPILER_STATUS_CODE compile_NOOP_NODE(CompilerPtr compiler, ASTNodePtr ref) {
-  return OK;
+static void compile_NOOP_NODE(CompilerPtr compiler, ASTNodePtr ref) {
+  compiler->status = OK;
 }
 
-static COMPILER_STATUS_CODE compile_CORE_LOAD_NODE(CompilerPtr compiler, ASTNodePtr ref) {
+static void compile_CORE_LOAD_NODE(CompilerPtr compiler, ASTNodePtr ref) {
   emit_core_load(compiler->out_file, CORE_LOAD_REQUIRE);
-  return OK;
+  compiler->status = OK;
 }
 
-static COMPILER_STATUS_CODE compile_LITERAL_NODE(CompilerPtr compiler, ASTNodePtr ref) {
+static void compile_LITERAL_NODE(CompilerPtr compiler, ASTNodePtr ref) {
   LiteralNodePtr l = (LiteralNodePtr)ref->node;
 
   switch(l->type) {
@@ -24,27 +24,29 @@ static COMPILER_STATUS_CODE compile_LITERAL_NODE(CompilerPtr compiler, ASTNodePt
       break;
     default:
       compiler->errored = TRUE;
-      return UNDEFINED_NODE;
+      compiler->status = UNDEFINED_NODE;
+      return;
   }
 
-  return OK;
+  compiler->status = OK;
 }
 
-static COMPILER_STATUS_CODE compile_GET_LOCAL_NODE(CompilerPtr compiler, ASTNodePtr ref) {
+static void compile_GET_LOCAL_NODE(CompilerPtr compiler, ASTNodePtr ref) {
   GetLocalNodePtr n = (GetLocalNodePtr)ref->node;
 
   if (search_symbol_table(n->identifier, compiler->current_context->symbol_table->locals) == NULL) {
     compiler->errored = TRUE;
-    return UNDEFINED_VARIABLE;
+    compiler->status = UNDEFINED_VARIABLE;
+    return;
   }
 
   emit_string_literal(compiler->out_file, n->identifier, TRUE);
 
-  return OK;
+  compiler->status = OK;
 }
 
 // match([c, (d) => true])(b);
-static COMPILER_STATUS_CODE compile_BINARY_OP_NODE_MATCH(CompilerPtr compiler, ASTNodePtr ref) {
+static void compile_BINARY_OP_NODE_MATCH(CompilerPtr compiler, ASTNodePtr ref) {
 
   emit_text(compiler->out_file, "match([");
   (compiler->compile[ref->left->type])(compiler, ref->left);
@@ -53,10 +55,10 @@ static COMPILER_STATUS_CODE compile_BINARY_OP_NODE_MATCH(CompilerPtr compiler, A
   emit_text(compiler->out_file, ")");
   emit_terminator(compiler->out_file);
 
-  return OK;
+  compiler->status = OK;
 }
 
-static COMPILER_STATUS_CODE compile_BINARY_OP_NODE(CompilerPtr compiler, ASTNodePtr ref) {
+static void compile_BINARY_OP_NODE(CompilerPtr compiler, ASTNodePtr ref) {
   BinaryOpNodePtr n = (BinaryOpNodePtr)ref->node;
   char op[] = "\0\0\0";
 
@@ -99,7 +101,8 @@ static COMPILER_STATUS_CODE compile_BINARY_OP_NODE(CompilerPtr compiler, ASTNode
       break;
     default:
       compiler->errored = TRUE;
-      return INVALID_BINARY_OPERATION;
+      compiler->status = INVALID_BINARY_OPERATION;
+      return;
   }
 
   if (!compiler->errored) {
@@ -116,10 +119,10 @@ static COMPILER_STATUS_CODE compile_BINARY_OP_NODE(CompilerPtr compiler, ASTNode
     emit_text(compiler->out_file, ")");
   }
 
-  return OK;
+  compiler->status = OK;
 }
 
-static COMPILER_STATUS_CODE compile_UNARY_OP_NODE(CompilerPtr compiler, ASTNodePtr ref) {
+static void compile_UNARY_OP_NODE(CompilerPtr compiler, ASTNodePtr ref) {
   UnaryOpNodePtr n = (UnaryOpNodePtr)ref->node;
 
   char op[] = "\0\0";
@@ -133,7 +136,8 @@ static COMPILER_STATUS_CODE compile_UNARY_OP_NODE(CompilerPtr compiler, ASTNodeP
       break;
     default:
       compiler->errored = TRUE;
-      return INVALID_UNARY_OPERATION;
+      compiler->status = INVALID_UNARY_OPERATION;
+      return;
   }
 
   if (!compiler->errored) {
@@ -150,10 +154,10 @@ static COMPILER_STATUS_CODE compile_UNARY_OP_NODE(CompilerPtr compiler, ASTNodeP
     emit_text(compiler->out_file, ")");
   }
 
-  return OK;
+  compiler->status = OK;
 }
 
-static COMPILER_STATUS_CODE compile_VARIABLE_DECLARATION_NODE(CompilerPtr compiler, ASTNodePtr ref) {
+static void compile_VARIABLE_DECLARATION_NODE(CompilerPtr compiler, ASTNodePtr ref) {
   VariableDeclarationNodePtr n = (VariableDeclarationNodePtr)ref->node;
 
   LiteralNodePtr identifier_node = (LiteralNodePtr)ref->left->node;
@@ -161,7 +165,8 @@ static COMPILER_STATUS_CODE compile_VARIABLE_DECLARATION_NODE(CompilerPtr compil
 
   if ( search_symbol_table(identifier, compiler->current_context->symbol_table->locals) != NULL ) {
     compiler->errored = TRUE;
-    return REDECLARED_VARIABLE_BIND;
+    compiler->status = REDECLARED_VARIABLE_BIND;
+    return;
   } else {
     insert_symbol_table(identifier, &(compiler->current_context->symbol_table->locals));
   }
@@ -233,7 +238,8 @@ static COMPILER_STATUS_CODE compile_VARIABLE_DECLARATION_NODE(CompilerPtr compil
 
         default:
           compiler->errored = TRUE;
-          return UNDEFINED_VAR_DECL_VALUE_TYPE;
+          compiler->status = UNDEFINED_VAR_DECL_VALUE_TYPE;
+          return;
           break;
       }
 
@@ -255,13 +261,14 @@ static COMPILER_STATUS_CODE compile_VARIABLE_DECLARATION_NODE(CompilerPtr compil
       break;
     default:
       compiler->errored = TRUE;
-      return INVALID_UNARY_OPERATION;
+      compiler->status = INVALID_UNARY_OPERATION;
+      return;
   }
 
-  return OK;
+  compiler->status = OK;
 }
 
-static COMPILER_STATUS_CODE compile_STRUCT_DECLARATION_NODE(CompilerPtr compiler, ASTNodePtr ref) {
+static void compile_STRUCT_DECLARATION_NODE(CompilerPtr compiler, ASTNodePtr ref) {
   StructDeclarationNodePtr n = (StructDeclarationNodePtr)ref->node;
   ASTNodePtr currentNode = NULL;
 
@@ -270,7 +277,8 @@ static COMPILER_STATUS_CODE compile_STRUCT_DECLARATION_NODE(CompilerPtr compiler
 
   if ( search_symbol_table(identifier, compiler->current_context->symbol_table->constants) != NULL ) {
     compiler->errored = TRUE;
-    return REDECLARED_CONSTANT;
+    compiler->status = REDECLARED_CONSTANT;
+    return;
   } else {
     insert_symbol_table(identifier, &(compiler->current_context->symbol_table->constants));
   }
@@ -310,17 +318,18 @@ static COMPILER_STATUS_CODE compile_STRUCT_DECLARATION_NODE(CompilerPtr compiler
 
   emit_text(compiler->out_file, "};");
 
-  return OK;
+  compiler->status = OK;
 }
 
-static COMPILER_STATUS_CODE compile_STRUCT_PROPERTY_NODE(CompilerPtr compiler, ASTNodePtr ref) {
-  return OK;
+static void compile_STRUCT_PROPERTY_NODE(CompilerPtr compiler, ASTNodePtr ref) {
+  compiler->status = OK;
 }
 
 CompilerPtr init_compiler(char *file_name, ASTNodePtr tree) {
   CompilerPtr compiler = __MALLOC__(sizeof(Compiler));
   compiler->out_file = fopen(file_name, "w");
   compiler->errored = FALSE;
+  compiler->status = OK;
 
   compiler->tree = tree;
   compiler->current_node = compiler->tree;
@@ -360,7 +369,8 @@ COMPILER_STATUS_CODE compile(CompilerPtr compiler) {
   while(compiler->errored == FALSE && compiler->current_node != NULL && status == OK) {
 
     if (compiler->compile[compiler->current_node->type] != NULL) {
-      status = (compiler->compile[compiler->current_node->type])(compiler, compiler->current_node);
+      (compiler->compile[compiler->current_node->type])(compiler, compiler->current_node);
+      status = compiler->status;
       next_node(compiler);
     } else {
       status = UNDEFINED_NODE;

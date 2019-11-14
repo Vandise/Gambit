@@ -24,7 +24,9 @@ COMPILER_STATUS_CODE test_compile_file(char* file_name) {
 
   CompilerPtr compiler = init_compiler(OUT_FILE, p->root_node);
 
-  COMPILER_STATUS_CODE status = compile(compiler);
+  compile(compiler);
+
+  COMPILER_STATUS_CODE status = compiler->status;
 
   exit_parser(p);
   exit_scanner(scanner);
