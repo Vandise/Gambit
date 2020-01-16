@@ -1,0 +1,204 @@
+#include "cspec.h"
+#include "cspec_output_header.h"
+#include "cspec_output_verbose.h"
+#include "cspec_output_unit.h"
+
+#include "test/macros.h"
+#include "modules/scanner/scanner_module.h"
+
+extern int status;
+
+--FILE exists.g--
+This file exists!
+--ENDFILE--
+
+--FILE exists_multiple.g--
+Hello
+World!
+--ENDFILE--
+
+DESCRIBE(scanner_module_init, "ScannerModule - init")
+
+  IT("sets the source_name from the file_name parameter")
+    Scanner* scanner = ScannerModule.init(__TEST_FILE__(exists.g));
+    SHOULD_MATCH(scanner->source_name, __TEST_FILE__(exists.g));
+    ScannerModule.close(scanner);
+  END_IT
+
+  IT("opens the file from the file_name parameter")
+    Scanner* scanner = ScannerModule.init(__TEST_FILE__(exists.g));
+    SHOULD_EQUAL(errno, 0);
+    SHOULD_NOT_BE_NULL(scanner->source_file);
+    ScannerModule.close(scanner);
+  END_IT
+
+  IT("errors if the input file cannot be found")
+    Scanner* scanner = ScannerModule.init(__TEST_FILE__(does_not_exists.g));
+    SHOULD_NOT_EQUAL(errno, 0);
+    SHOULD_EQUAL(scanner->errored, TRUE);
+    ScannerModule.close(scanner);
+  END_IT
+
+  IT("sets the error code")
+    Scanner* scanner = ScannerModule.init(__TEST_FILE__(does_not_exists.g));
+    SHOULD_EQUAL(scanner->error_code, SCANNER_FAILED_TO_OPEN_FILE);
+    ScannerModule.close(scanner);
+  END_IT
+
+  IT("sets the line number to 1")
+    Scanner* scanner = ScannerModule.init(__TEST_FILE__(exists.g));
+    SHOULD_EQUAL(scanner->line_number, 1);
+    ScannerModule.close(scanner);
+  END_IT
+
+  IT("sets the level to 0")
+    Scanner* scanner = ScannerModule.init(__TEST_FILE__(exists.g));
+    SHOULD_EQUAL(scanner->level, 0);
+    ScannerModule.close(scanner);
+  END_IT
+
+  IT("sets errored to FALSE")
+    Scanner* scanner = ScannerModule.init(__TEST_FILE__(exists.g));
+    SHOULD_EQUAL(scanner->errored, FALSE);
+    ScannerModule.close(scanner);
+  END_IT
+
+  IT("assigns a CHAR_CODE for each character")
+    Scanner* scanner = ScannerModule.init(__TEST_FILE__(exists.g));
+    int ch;
+
+    for (ch = 0; ch < 256; ++ch) {
+      CHAR_CODE code = scanner->char_table[ch];
+      if (code != LETTER && code != DIGIT &&
+          code != QUOTE && code != SPECIAL &&
+          code != EOF_CODE && code != NEWLINE && code != UPPERCASE_LETTER && code != UNDERSCORE) {
+        SHOULD_BE_TRUE(0);
+      }
+    }
+
+    SHOULD_BE_TRUE(1);
+
+    ScannerModule.close(scanner);
+  END_IT
+
+END_DESCRIBE
+
+DESCRIBE(scanner_module_get_character, "ScannerModule - get_character")
+
+  IT("gets the next character")
+    Scanner* scanner = ScannerModule.init(__TEST_FILE__(exists.g));
+    SHOULD_EQUAL(scanner->current_char, 'T');
+    ScannerModule.get_character(scanner);
+    SHOULD_EQUAL(scanner->current_char, 'h');
+    ScannerModule.close(scanner);
+  END_IT
+
+  IT("sets the current character to EOF_CHAR when the buffer is exhausted")
+    Scanner* scanner = ScannerModule.init(__TEST_FILE__(exists_multiple.g));
+
+    ScannerModule.get_source_line(scanner);
+
+    int i;
+
+    for(i = 0; i < 7; i++) {
+      ScannerModule.get_character(scanner);
+    }
+
+    SHOULD_EQUAL(scanner->current_char, EOF_CHAR);
+
+    ScannerModule.close(scanner);
+  END_IT
+
+END_DESCRIBE
+
+DESCRIBE(scanner_module_open_source_file, "ScannerModule - open_source_file")
+
+  IT("returns true on success")
+    Scanner* scanner = ScannerModule.init(__TEST_FILE__(exists.g));
+    SHOULD_EQUAL(ScannerModule.open_source_file(scanner), TRUE);
+    ScannerModule.close(scanner);
+  END_IT
+
+  IT("returns false on failure")
+    Scanner* scanner = ScannerModule.init(__TEST_FILE__(exists.g));
+    strcpy(scanner->source_name, "not_found.in");;
+    SHOULD_EQUAL(ScannerModule.open_source_file(scanner), FALSE);
+    ScannerModule.close(scanner);
+  END_IT
+
+END_DESCRIBE
+
+DESCRIBE(scanner_module_get_source_line, "ScannerModule - get_source_line")
+
+  IT("increments the line_number")
+    Scanner* scanner = ScannerModule.init(__TEST_FILE__(exists.g));
+    SHOULD_EQUAL(scanner->line_number, 1);
+    ScannerModule.close(scanner);
+  END_IT
+
+  IT("sets the source_buffer")
+    Scanner* scanner = ScannerModule.init(__TEST_FILE__(exists.g));
+    ScannerModule.get_source_line(scanner);
+    SHOULD_MATCH(scanner->source_buffer, "This file exists!");
+    ScannerModule.close(scanner);
+  END_IT
+
+END_DESCRIBE
+
+DESCRIBE(scanner_module_skip_comment, "ScannerModule - skip comment")
+
+--FILE comment_text.g--
+# this is a comment that will be skipped
+Hello World!
+--ENDFILE--
+
+  IT("skips the comment line")
+    Scanner* scanner = ScannerModule.init(__TEST_FILE__(comment_text.g));
+    ScannerModule.get_character(scanner);
+    SHOULD_EQUAL(scanner->current_char, 'H');
+    ScannerModule.close(scanner);
+  END_IT
+
+END_DESCRIBE
+
+DESCRIBE(scanner_module_skip_blanks, "ScannerModule - skip_blanks")
+
+--FILE blanks_text.g--
+     Hello World!
+--ENDFILE--
+
+  IT("gets the first token after skipping blanks")
+    Scanner* scanner = ScannerModule.init(__TEST_FILE__(blanks_text.g));
+    ScannerModule.get_character(scanner);
+    ScannerModule.skip_blanks(scanner);
+    SHOULD_EQUAL(scanner->current_char, 'H');
+    ScannerModule.close(scanner);
+  END_IT
+
+END_DESCRIBE
+
+
+DESCRIBE(scanner_module, "Scanner")
+
+  IT("defines the Scanner struct")
+    Scanner scanner;
+    SHOULD_EQUAL(&scanner, &scanner);
+  END_IT
+
+  IT("defines the scanner_module struct")
+    struct scanner_module sm;
+    SHOULD_EQUAL(&sm, &sm);
+  END_IT
+
+  IT("exposes ScannerModule")
+    SHOULD_EQUAL(ScannerModule.version, GAMBIT_SCANNER_VERSION);
+  END_IT
+
+  status += CSpec_Run( DESCRIPTION( scanner_module_init ), CSpec_NewOutputVerbose() );
+  status += CSpec_Run( DESCRIPTION( scanner_module_get_character ), CSpec_NewOutputVerbose() );
+  status += CSpec_Run( DESCRIPTION( scanner_module_open_source_file ), CSpec_NewOutputVerbose() );
+  status += CSpec_Run( DESCRIPTION( scanner_module_get_source_line ), CSpec_NewOutputVerbose() );
+  status += CSpec_Run( DESCRIPTION( scanner_module_skip_comment ), CSpec_NewOutputVerbose() );
+  status += CSpec_Run( DESCRIPTION( scanner_module_skip_blanks ), CSpec_NewOutputVerbose() );
+
+END_DESCRIBE
