@@ -6,7 +6,7 @@ BOOLEAN list_initialized = FALSE;
 
 void* malloc_trace(size_t size, const char *file, int line, const char *func) {
   void *p = malloc(size);
-  if (PROJECT_MEMORY_DEBUG) {
+  if (GAMBIT_MEMORY_DEBUG) {
     memory_list_init();
 
     MemoryItem *itm = malloc(sizeof(MemoryItem));
@@ -14,7 +14,7 @@ void* malloc_trace(size_t size, const char *file, int line, const char *func) {
     itm->pp = p;
     list_ins_next(&memory_list, NULL, itm);
 
-    #if PROJECT_MEMORY_DEBUG_VERBOSE == 1
+    #if GAMBIT_MEMORY_DEBUG_VERBOSE == 1
       printf ("Allocated = %s, %i, %s, %p[%li]\n", file, line, func, p, size);
     #endif
   }
@@ -25,7 +25,7 @@ void* realloc_trace(void *pp, size_t size, const char *file, int line, const cha
   void *p = realloc(pp, size);
   remove_memory_list_item(pp);
 
-  if (PROJECT_MEMORY_DEBUG) {
+  if (GAMBIT_MEMORY_DEBUG) {
     memory_list_init();
 
     MemoryItem *itm = malloc(sizeof(MemoryItem));
@@ -33,7 +33,7 @@ void* realloc_trace(void *pp, size_t size, const char *file, int line, const cha
     itm->pp = p;
     list_ins_next(&memory_list, NULL, itm);
 
-    #if PROJECT_MEMORY_DEBUG_VERBOSE == 1
+    #if GAMBIT_MEMORY_DEBUG_VERBOSE == 1
       printf ("ReAllocated = %s, %i, %s, %p[%li]\n", file, line, func, p, size);
     #endif
   }
@@ -44,9 +44,9 @@ void* realloc_trace(void *pp, size_t size, const char *file, int line, const cha
 void free_trace(void *p, const char *file, int line, const char *func) {
   int freed = 0;
 
-  if (PROJECT_MEMORY_DEBUG) {
+  if (GAMBIT_MEMORY_DEBUG) {
     memory_list_init();
-    #if PROJECT_MEMORY_DEBUG_VERBOSE == 1
+    #if GAMBIT_MEMORY_DEBUG_VERBOSE == 1
       printf ("Free = %s, %i, %s, %p\n", file, line, func, p);
     #endif
     freed = remove_memory_list_item(p);
@@ -76,7 +76,7 @@ int remove_memory_list_item(void *p) {
 
   while (1) {
     if (element == NULL || element->next == NULL) {
-      #if PROJECT_MEMORY_DEBUG_VERBOSE == 1
+      #if GAMBIT_MEMORY_DEBUG_VERBOSE == 1
         printf ("pointer being freed was not allocated by __MALLOC__ or has already been removed =  %p\n", p);
       #endif
       return -1;
@@ -107,7 +107,7 @@ static void memory_list_init() {
 }
 
 void print_memory_summary() {
-  #if PROJECT_MEMORY_DEBUG_VERBOSE == 1
+  #if GAMBIT_MEMORY_DEBUG_VERBOSE == 1
     printf ("Memory List: Objects allocated - %d\n", list_size(&memory_list));
   #endif
 
@@ -120,7 +120,7 @@ void print_memory_summary() {
 
   while (1) {
 
-    #if PROJECT_MEMORY_DEBUG_VERBOSE == 1
+    #if GAMBIT_MEMORY_DEBUG_VERBOSE == 1
       printf ("Leaked Memory Item: %s, %i, %s, %p\n", itm->file, itm->line, itm->func, itm->pp);
     #endif
 

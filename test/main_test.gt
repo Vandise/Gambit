@@ -9,16 +9,6 @@
 
 DEFINE_DESCRIPTION(initial_test)
 DEFINE_DESCRIPTION(utility_generic_linked_list)
-DEFINE_DESCRIPTION(token_array)
-DEFINE_DESCRIPTION(scanner_scanner);
-DEFINE_DESCRIPTION(tokens)
-DEFINE_DESCRIPTION(gambit_parser);
-DEFINE_DESCRIPTION(gambit_parser_expressions);
-DEFINE_DESCRIPTION(gambit_parser_statements);
-DEFINE_DESCRIPTION(ast_symbol_table);
-DEFINE_DESCRIPTION(gambit_parser_declarations);
-DEFINE_DESCRIPTION(gambit_compiler);
-DEFINE_DESCRIPTION(gambit_compiler_symbol_table);
 
 int status = 0;
 
@@ -40,41 +30,6 @@ int main(int argc, const char* argv[]) {
   */
     status += CSpec_Run( DESCRIPTION( utility_generic_linked_list ), CSpec_NewOutputVerbose() );
 
-  /*
-
-    Shared Section
-
-  */
-
-  status += CSpec_Run( DESCRIPTION( token_array ), CSpec_NewOutputVerbose() );
-  status += CSpec_Run( DESCRIPTION( tokens ), CSpec_NewOutputVerbose() );
-
-  /*
-
-  Scanner
-
-  */
-
-  status += CSpec_Run( DESCRIPTION( scanner_scanner ), CSpec_NewOutputVerbose() );
-
-  /*
-
-  Parser
-
-  */
-
-  status += CSpec_Run(DESCRIPTION(gambit_parser_expressions), CSpec_NewOutputVerbose());
-  status += CSpec_Run(DESCRIPTION(gambit_parser_statements), CSpec_NewOutputVerbose());
-  status += CSpec_Run(DESCRIPTION(gambit_parser_declarations), CSpec_NewOutputVerbose());
-  status += CSpec_Run(DESCRIPTION(ast_symbol_table), CSpec_NewOutputVerbose());
-  status += CSpec_Run(DESCRIPTION(gambit_parser), CSpec_NewOutputVerbose());
-
-  /*
-    Compiler
-  */
-
-  status += CSpec_Run(DESCRIPTION(gambit_compiler_symbol_table), CSpec_NewOutputVerbose());
-  status += CSpec_Run(DESCRIPTION(gambit_compiler), CSpec_NewOutputVerbose());
 
   print_memory_summary();
 

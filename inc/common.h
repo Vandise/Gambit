@@ -1,5 +1,5 @@
-#ifndef __PROJECT_COMMON__
-#define __PROJECT_COMMON__ 1
+#ifndef __GAMBIT_COMMON__
+#define __GAMBIT_COMMON__ 1
 
 #include <errno.h>
 #include <stdint.h>
@@ -7,13 +7,9 @@
 #include <string.h>
 #include "util/memory.h"
 
-#define PROJECT_MEMORY_DEBUG 1
-#define PROJECT_MEMORY_DEBUG_VERBOSE 1
-#define PROJECT_OUTPUT_VERBOSE 0
-
-#define MAX_FILE_NAME_LENGTH    64
-#define MAX_TOKEN_STRING_LENGTH 1024
-#define MAX_SOURCE_LINE_LENGTH  1024
+#define GAMBIT_MEMORY_DEBUG 1
+#define GAMBIT_MEMORY_DEBUG_VERBOSE 1
+#define GAMBIT_OUTPUT_VERBOSE 0
 
 typedef enum {
     FALSE, TRUE,
