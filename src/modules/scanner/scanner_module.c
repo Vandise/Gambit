@@ -12,6 +12,7 @@ static void get_character(Scanner *scanner);
 static void skip_comment(Scanner* scanner);
 static void skip_blanks(Scanner* scanner);
 static void close(Scanner *scanner);
+static void get_word(Scanner* scanner, BOOLEAN is_constant);
 
 // ============================
 //        Implementation
@@ -25,6 +26,8 @@ static Scanner* init(const char *file_name) {
   Scanner* scanner = __MALLOC__(sizeof(Scanner));
   strcpy(scanner->source_name, file_name);
   strcpy(scanner->source_buffer, "");
+
+  scanner->current_token.tokenp = scanner->current_token.token_string;
 
   scanner->current_char = '\0';
   scanner->source_bufferp = NULL;
@@ -133,6 +136,33 @@ static void skip_blanks(Scanner* scanner) {
   }
 }
 
+static void get_word(Scanner* scanner, BOOLEAN is_constant) {
+  log_trace("Scanner::get_word (%d)", is_constant);
+
+  while(
+    CHAR_CODE(scanner) == LETTER ||
+    CHAR_CODE(scanner) == UPPERCASE_LETTER ||
+    CHAR_CODE(scanner) == UNDERSCORE
+  ) {
+    *(scanner->current_token.tokenp)++ = scanner->current_char;
+    get_character(scanner);
+  }
+
+  *(scanner->current_token.tokenp) = '\0';
+
+  log_info("Scanner::get_word (%s)", scanner->current_token.token_string);
+
+  if(!TokenModule.string_is_reserved_word(scanner->current_token.token_string)) {
+    if (is_constant) {
+      scanner->current_token.token = T_CONSTANT;
+    } else {
+      scanner->current_token.token = T_IDENTIFIER;
+    }
+  } else {
+    scanner->current_token.token = TokenModule.get_token_code(scanner->current_token.token_string);
+  }
+}
+
 static void close(Scanner *scanner) {
   log_trace("Scanner::close");
 
@@ -155,5 +185,6 @@ const struct scanner_module ScannerModule = {
   .skip_comment = skip_comment,
   .get_source_line = get_source_line,
   .skip_blanks = skip_blanks,
+  .get_word = get_word,
   .close = close
 };

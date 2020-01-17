@@ -5,7 +5,7 @@
 //           Includes
 // ============================
 
-#include "modules/tokens/token_module.h"
+#include "modules/shared/tokens/token_module.h"
 
 // ============================
 //           Macros

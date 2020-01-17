@@ -4,7 +4,7 @@
 #include "cspec_output_unit.h"
 
 #include "test/macros.h"
-#include "modules/tokens/token_module.h"
+#include "modules/shared/tokens/token_module.h"
 
 extern int status;
 

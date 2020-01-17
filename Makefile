@@ -67,6 +67,7 @@ $(BUILDDIR)/%.$(OBJEXT): $(SRCDIR)/%.$(SRCEXT)
 	@rm -f $(BUILDDIR)/$*.$(DEPEXT).tmp
 
 -include build/scanner.mk
+-include build/shared.mk
 
 tests:
 	$(CC) $(CXXSTD) $(INC) $(LINKLIB) $(TESTFILES) -lcspec -lm -o $(TARGETDIR)/$(TESTTARGET)

@@ -7,6 +7,7 @@
 
 #include "common.h"
 #include "modules/scanner/error.h"
+#include "modules/shared/tokens/shared.h"
 
 // ============================
 //           Macros
@@ -34,6 +35,14 @@ typedef enum {
     EOF_CODE
 } CHAR_CODE;
 
+typedef struct GambitScannerToken {
+  char word_string[1024];
+  char token_string[1024];
+  char *tokenp;
+  TOKEN_CODE token;
+  LITERAL literal;
+} ScannerToken;
+
 typedef struct GambitScanner {
   unsigned int line_number;
   unsigned int level;
@@ -47,6 +56,9 @@ typedef struct GambitScanner {
 
   char *source_bufferp;
   char current_char;
+
+  ScannerToken current_token;
+  TokenArray tokens;
 
   BOOLEAN errored;
   SCANNER_ERROR_CODE error_code;
@@ -63,6 +75,8 @@ struct scanner_module {
   void (*get_character)(Scanner*);
   void (*skip_comment)(Scanner*);
   void (*skip_blanks)(Scanner*);
+
+  void (*get_word)(Scanner*, BOOLEAN);
 
   void (*close)(Scanner*);
 };

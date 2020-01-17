@@ -177,6 +177,35 @@ DESCRIBE(scanner_module_skip_blanks, "ScannerModule - skip_blanks")
 
 END_DESCRIBE
 
+DESCRIBE(scanner_module_get_word, "ScannerModule - get_word")
+
+--FILE constant.g--
+User
+--ENDFILE--
+
+  IT("scans a constant")
+    Scanner* scanner = ScannerModule.init(__TEST_FILE__(constant.g));
+    ScannerModule.get_word(scanner, TRUE);
+
+    SHOULD_EQUAL(scanner->current_token.token, T_CONSTANT);
+
+    ScannerModule.close(scanner);
+  END_IT
+
+--FILE identifier.g--
+name
+--ENDFILE--
+
+  IT("scans an identifier")
+    Scanner* scanner = ScannerModule.init(__TEST_FILE__(identifier.g));
+    ScannerModule.get_word(scanner, FALSE);
+
+    SHOULD_EQUAL(scanner->current_token.token, T_IDENTIFIER);
+
+    ScannerModule.close(scanner);
+  END_IT
+
+END_DESCRIBE
 
 DESCRIBE(scanner_module, "Scanner")
 
@@ -200,5 +229,6 @@ DESCRIBE(scanner_module, "Scanner")
   status += CSpec_Run( DESCRIPTION( scanner_module_get_source_line ), CSpec_NewOutputVerbose() );
   status += CSpec_Run( DESCRIPTION( scanner_module_skip_comment ), CSpec_NewOutputVerbose() );
   status += CSpec_Run( DESCRIPTION( scanner_module_skip_blanks ), CSpec_NewOutputVerbose() );
+  status += CSpec_Run( DESCRIPTION( scanner_module_get_word ), CSpec_NewOutputVerbose() );
 
 END_DESCRIBE

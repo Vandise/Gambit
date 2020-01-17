@@ -1,4 +1,4 @@
-#include "modules/tokens/token_module.h"
+#include "modules/shared/tokens/token_module.h"
 
 RESERVED_WORD_TOKEN rw1[] = {
   { NULL, 0 }
