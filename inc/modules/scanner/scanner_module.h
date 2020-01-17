@@ -77,6 +77,7 @@ struct scanner_module {
   void (*skip_blanks)(Scanner*);
 
   void (*get_word)(Scanner*, BOOLEAN);
+  void (*get_string)(Scanner*);
 
   void (*close)(Scanner*);
 };

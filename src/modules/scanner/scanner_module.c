@@ -13,6 +13,7 @@ static void skip_comment(Scanner* scanner);
 static void skip_blanks(Scanner* scanner);
 static void close(Scanner *scanner);
 static void get_word(Scanner* scanner, BOOLEAN is_constant);
+static void get_string(Scanner* scanner);
 
 // ============================
 //        Implementation
@@ -163,6 +164,39 @@ static void get_word(Scanner* scanner, BOOLEAN is_constant) {
   }
 }
 
+static void get_string(Scanner* scanner) {
+  log_trace("Scanner::get_string");
+
+  char* literalp = scanner->current_token.literal.value.string;
+  *(scanner->current_token.tokenp)++ = '\'';
+
+  get_character(scanner);
+
+  while(scanner->current_char != EOF_CHAR) {
+    if(scanner->current_char == '\'') {
+      *(scanner->current_token.tokenp)++ = scanner->current_char;
+      get_character(scanner);
+      if(scanner->current_char != '\'') { break; }
+    }
+
+    *(scanner->current_token.tokenp)++ = scanner->current_char;
+    *literalp++ = scanner->current_char;
+    get_character(scanner);
+  }
+
+  log_trace("Scanner::get_string (%s) (%d)",
+    scanner->current_token.literal.value.string,
+    strlen(scanner->current_token.literal.value.string)
+  );
+
+  *(scanner->current_token.tokenp) = '\0';
+  *literalp = '\0';
+
+  scanner->current_token.token = T_STRING;
+  scanner->current_token.literal.type = STRING_LIT;
+  scanner->current_token.literal.size = strlen(scanner->current_token.literal.value.string);
+}
+
 static void close(Scanner *scanner) {
   log_trace("Scanner::close");
 
@@ -186,5 +220,6 @@ const struct scanner_module ScannerModule = {
   .get_source_line = get_source_line,
   .skip_blanks = skip_blanks,
   .get_word = get_word,
+  .get_string = get_string,
   .close = close
 };

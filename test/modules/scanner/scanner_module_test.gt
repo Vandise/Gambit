@@ -207,6 +207,27 @@ name
 
 END_DESCRIBE
 
+DESCRIBE(scanner_module_get_string, "ScannerModule - get_string")
+
+--FILE string.g--
+'Hello World'
+--ENDFILE--
+
+  IT("scans a string")
+    Scanner* scanner = ScannerModule.init(__TEST_FILE__(string.g));
+    ScannerModule.get_string(scanner);
+
+    SHOULD_EQUAL(scanner->current_token.token, T_STRING);
+    SHOULD_EQUAL(scanner->current_token.literal.size, 11);
+    SHOULD_MATCH(
+      scanner->current_token.literal.value.string,
+      "Hello World"
+    );
+    ScannerModule.close(scanner);
+  END_IT
+
+END_DESCRIBE
+
 DESCRIBE(scanner_module, "Scanner")
 
   IT("defines the Scanner struct")
@@ -230,5 +251,6 @@ DESCRIBE(scanner_module, "Scanner")
   status += CSpec_Run( DESCRIPTION( scanner_module_skip_comment ), CSpec_NewOutputVerbose() );
   status += CSpec_Run( DESCRIPTION( scanner_module_skip_blanks ), CSpec_NewOutputVerbose() );
   status += CSpec_Run( DESCRIPTION( scanner_module_get_word ), CSpec_NewOutputVerbose() );
+  status += CSpec_Run( DESCRIPTION( scanner_module_get_string ), CSpec_NewOutputVerbose() );
 
 END_DESCRIBE
