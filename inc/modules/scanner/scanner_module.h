@@ -47,6 +47,7 @@ typedef struct GambitScanner {
   unsigned int line_number;
   unsigned int level;
   unsigned int buffer_offset;
+  unsigned int digit_count;
 
   CHAR_CODE char_table[256];
 
@@ -78,6 +79,7 @@ struct scanner_module {
 
   void (*get_word)(Scanner*, BOOLEAN);
   void (*get_string)(Scanner*);
+  void (*get_number)(Scanner*);
 
   void (*close)(Scanner*);
 };

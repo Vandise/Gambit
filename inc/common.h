@@ -1,6 +1,7 @@
 #ifndef __GAMBIT_COMMON__
 #define __GAMBIT_COMMON__ 1
 
+#include <math.h>
 #include <errno.h>
 #include <stdint.h>
 #include <stdlib.h>

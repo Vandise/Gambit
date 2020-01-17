@@ -228,6 +228,80 @@ DESCRIBE(scanner_module_get_string, "ScannerModule - get_string")
 
 END_DESCRIBE
 
+DESCRIBE(scanner_module_get_number, "ScannerModule - get_number")
+
+--FILE i32.g--
+32767
+--ENDFILE--
+
+  IT("scans an i32")
+    Scanner* scanner = ScannerModule.init(__TEST_FILE__(i32.g));
+    ScannerModule.get_number(scanner);
+
+    SHOULD_EQUAL(scanner->current_token.token, T_NUMERIC);
+    SHOULD_EQUAL(scanner->current_token.literal.size, 4);
+    SHOULD_EQUAL(
+      scanner->current_token.literal.value.i32,
+      32767
+    );
+
+    ScannerModule.close(scanner);
+  END_IT
+
+--FILE i64.g--
+21474836470
+--ENDFILE--
+
+  IT("scans an i64")
+    Scanner* scanner = ScannerModule.init(__TEST_FILE__(i64.g));
+    ScannerModule.get_number(scanner);
+
+    SHOULD_EQUAL(scanner->current_token.token, T_NUMERIC);
+    SHOULD_EQUAL(scanner->current_token.literal.size, 8);
+    SHOULD_EQUAL(
+      scanner->current_token.literal.value.i64,
+      21474836470
+    );
+
+    ScannerModule.close(scanner);
+  END_IT
+
+--FILE f32.g--
+3.14
+--ENDFILE--
+
+  IT("scans an f32")
+    Scanner* scanner = ScannerModule.init(__TEST_FILE__(f32.g));
+    ScannerModule.get_number(scanner);
+
+    SHOULD_EQUAL(scanner->current_token.token, T_NUMERIC);
+    SHOULD_EQUAL(scanner->current_token.literal.size, 4);
+    SHOULD_BE_TRUE(
+      fabs(scanner->current_token.literal.value.f32 - 3.14) < 0.001
+    );
+
+    ScannerModule.close(scanner);
+  END_IT
+
+--FILE f64.g--
+3.14159265359
+--ENDFILE--
+
+  IT("scans an f64")
+    Scanner* scanner = ScannerModule.init(__TEST_FILE__(f64.g));
+    ScannerModule.get_number(scanner);
+
+    SHOULD_EQUAL(scanner->current_token.token, T_NUMERIC);
+    SHOULD_EQUAL(scanner->current_token.literal.size, 8);
+    SHOULD_BE_TRUE(
+      fabs(scanner->current_token.literal.value.f64 - 3.14159265359)
+      < 0.000000000001
+    );
+
+    ScannerModule.close(scanner);
+  END_IT
+END_DESCRIBE
+
 DESCRIBE(scanner_module, "Scanner")
 
   IT("defines the Scanner struct")
@@ -252,5 +326,6 @@ DESCRIBE(scanner_module, "Scanner")
   status += CSpec_Run( DESCRIPTION( scanner_module_skip_blanks ), CSpec_NewOutputVerbose() );
   status += CSpec_Run( DESCRIPTION( scanner_module_get_word ), CSpec_NewOutputVerbose() );
   status += CSpec_Run( DESCRIPTION( scanner_module_get_string ), CSpec_NewOutputVerbose() );
+  status += CSpec_Run( DESCRIPTION( scanner_module_get_number ), CSpec_NewOutputVerbose() );
 
 END_DESCRIBE

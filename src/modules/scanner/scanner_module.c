@@ -14,6 +14,8 @@ static void skip_blanks(Scanner* scanner);
 static void close(Scanner *scanner);
 static void get_word(Scanner* scanner, BOOLEAN is_constant);
 static void get_string(Scanner* scanner);
+static void get_number(Scanner* scanner);
+static void accumulate_value(Scanner *scanner, double *valuep);
 
 // ============================
 //        Implementation
@@ -197,6 +199,112 @@ static void get_string(Scanner* scanner) {
   scanner->current_token.literal.size = strlen(scanner->current_token.literal.value.string);
 }
 
+static void get_number(Scanner* scanner) {
+  log_trace("Scanner::get_number");
+
+  // assume larger unsigned 8 bytes
+  long int whole_count = 0;
+  long int decimal_offset = 0;
+  long int exponent = 0;
+  double nvalue = 0.0;
+  double evalue = 0.0;
+
+  scanner->digit_count = 0;
+  scanner->current_token.token = NO_TOKEN;
+  scanner->current_token.literal.type = I_64LIT;
+
+  accumulate_value(scanner, &nvalue);
+
+  log_trace("%f", nvalue);
+
+  if (scanner->errored == TRUE) {
+    return;
+  }
+
+  whole_count = scanner->digit_count;
+
+  if (scanner->current_char == '.') {
+    get_character(scanner);
+
+    scanner->current_token.literal.type = F_64LIT;
+    *(scanner->current_token.tokenp)++ = '.';
+
+    accumulate_value(scanner, &nvalue);
+
+    if (scanner->errored == TRUE) {
+      return;
+    }
+
+    decimal_offset = whole_count - scanner->digit_count;
+  }
+
+  exponent = evalue + decimal_offset;
+
+  if (exponent != 0) {
+    nvalue *= pow(10, exponent);
+  }
+
+  log_info("Scanner::get_number exp(%ld)", exponent);
+  log_info("Scanner::get_number FLT_DIG(%d)", FLT_DIG);
+
+  if (scanner->current_token.literal.type == I_64LIT) {
+    if (nvalue >= I_32_LOWER && nvalue <= I_32_UPPER) {
+      log_info("Scanner::get_number i32");
+      scanner->current_token.literal.type = I_32LIT;
+      scanner->current_token.literal.value.i32 = nvalue;
+      scanner->current_token.literal.size = sizeof(int);
+    } else {
+      log_info("Scanner::get_number i64");
+      scanner->current_token.literal.value.i64 = nvalue;
+      scanner->current_token.literal.size = sizeof(long int);
+    }
+  } else {
+    if (labs(exponent) <= FLT_DIG && nvalue >= FLT_MIN && nvalue <= FLT_MAX) {
+      log_info("Scanner::get_number f32");
+      scanner->current_token.literal.type = F_32LIT;
+      scanner->current_token.literal.value.f32 = nvalue;
+      scanner->current_token.literal.size = sizeof(float);
+    } else {
+      log_info("Scanner::get_number f64");
+      scanner->current_token.literal.value.f64 = nvalue;
+      scanner->current_token.literal.size = sizeof(double);
+    }
+  }
+
+  *(scanner->current_token.tokenp) = '\0';
+  scanner->current_token.token = T_NUMERIC;
+}
+
+static void accumulate_value(Scanner *scanner, double *valuep) {
+  log_trace("Scanner::accumulate_value");
+
+  double value = *valuep;
+
+  if (CHAR_CODE(scanner) != DIGIT) {
+    scanner->current_token.token = T_ERROR;
+    scanner->errored = TRUE;
+    scanner->error_code = SCANNER_INVALID_NUMERIC_DEFINITION;
+    return;
+  }
+
+  do {
+    *(scanner->current_token.tokenp)++ = scanner->current_char;
+
+    if (++scanner->digit_count <= DECIMAL_DIG) {
+      value = 10 * value + (scanner->current_char - '0');
+    } else {
+      log_error("Scanner::accumulate_value diget overflow");
+      scanner->errored = TRUE;
+      scanner->error_code = SCANNER_PRECISION_LOST;
+    }
+
+    get_character(scanner);
+
+  } while(CHAR_CODE(scanner) == DIGIT);
+
+  *valuep = value;
+}
+
 static void close(Scanner *scanner) {
   log_trace("Scanner::close");
 
@@ -221,5 +329,6 @@ const struct scanner_module ScannerModule = {
   .skip_blanks = skip_blanks,
   .get_word = get_word,
   .get_string = get_string,
+  .get_number = get_number,
   .close = close
 };

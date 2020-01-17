@@ -34,7 +34,7 @@ typedef enum {
 
 typedef enum {
   NO_TOKEN, T_ERROR, T_NEWLINE, T_END_OF_FILE,
-  T_CONSTANT, T_IDENTIFIER, T_STRING
+  T_CONSTANT, T_IDENTIFIER, T_STRING, T_NUMERIC
 } TOKEN_CODE;
 
 typedef struct scanner_reserved_word_token {
@@ -46,8 +46,8 @@ typedef struct scanner_literal {
   LITERAL_TYPE type;
   size_t size;
   union {
-    long int i32;
-    long long int i64;
+    int i32;
+    long int i64;
     float f32;
     double f64;
     char  string[1024];
