@@ -5,6 +5,7 @@
 //           Includes
 // ============================
 
+#include <float.h>
 #include "common.h"
 
 // ============================
@@ -14,6 +15,14 @@
 #define GAMBIT_TOKEN_MODULE_VERSION 100
 #define MIN_RESERVED_WORD_LENGTH 1
 #define MAX_RESERVED_WORD_LENGTH 6
+
+// FLT_MIN, FLT_MAX, FLT_DIG
+// DBL_MIN, DBL_MAX, DBL_DIG
+
+#define I_32_LOWER -2147483648
+#define I_32_UPPER  2147483647
+#define I_64_LOWER -9223372036854775807
+#define I_64_UPPER  9223372036854775806
 
 // ============================
 //       Structs & Types
