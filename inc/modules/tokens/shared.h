@@ -1,27 +1,23 @@
-#ifndef __GAMBIT_SCANNER_SHAREDH
-#define __GAMBIT_SCANNER_SHAREDH 1
+#ifndef __GAMBIT_TOKENS_SHAREDH
+#define __GAMBIT_TOKENS_SHAREDH 1
 
 // ============================
 //           Includes
 // ============================
 
-#include "modules/scanner/scanner_module.h"
+#include "modules/tokens/token_module.h"
 
 // ============================
 //           Macros
 // ============================
 
 // ============================
-//          Externs
-// ============================
-
-// ============================
-//       Structs & Types
-// ============================
-
-// ============================
 //      Forwards/Globals
 // ============================
 
+
+// ============================
+//          Externs
+// ============================
 
 #endif

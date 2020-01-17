@@ -1,0 +1,119 @@
+#include "cspec.h"
+#include "cspec_output_header.h"
+#include "cspec_output_verbose.h"
+#include "cspec_output_unit.h"
+
+#include "test/macros.h"
+#include "modules/tokens/token_module.h"
+
+extern int status;
+
+DESCRIBE(token_module_string_is_reserved_word, "TokenModule - string_is_reserved_word")
+
+  IT("returns true if token is reserved")
+    //SHOULD_BE_TRUE(TokenModule.string_is_reserved_word("todo"));
+  END_IT
+
+  IT("returns false if token is not reserved")
+    SHOULD_BE_FALSE(TokenModule.string_is_reserved_word("not_reserved"));
+  END_IT
+
+END_DESCRIBE
+
+DESCRIBE(token_module_get_token_code, "TokenModule - get_token_code")
+
+  IT("returns NO_TOKEN if not found")
+    SHOULD_EQUAL(TokenModule.get_token_code("unknown"), NO_TOKEN);
+  END_IT
+
+  IT("returns the token if found")
+    //SHOULD_EQUAL(TokenModule.get_token_code("let"), T_LET);
+  END_IT
+
+END_DESCRIBE
+
+DESCRIBE(token_module_init_token_array, "TokenModule - init_token_array")
+
+  TokenArray ta;
+  TokenModule.init_token_array(&ta, 10);
+
+  IT("initializes an array with n elements")
+    SHOULD_EQUAL(ta.size, 10);
+  END_IT
+
+  IT("sets used to 0")
+    SHOULD_EQUAL(ta.used, 0);
+  END_IT
+
+  TokenModule.free_token_array(&ta);
+
+END_DESCRIBE
+
+DESCRIBE(token_module_insert_token_array, "TokenModule - insert_token_array")
+
+  IT("adds the token to the array")
+    TokenArray ta;
+    TokenModule.init_token_array(&ta, 10);
+
+    Token t;
+    t.code = NO_TOKEN;
+
+    TokenModule.insert_token_array(&ta, t);
+
+    SHOULD_EQUAL(ta.used, 1);
+    SHOULD_EQUAL(ta.array[0].code, NO_TOKEN);
+
+    TokenModule.free_token_array(&ta);
+  END_IT
+
+  IT("grows the array when the threshold is hit ((n * 3) / 2 + 8 )")
+    TokenArray ta;
+    TokenModule.init_token_array(&ta, 10);
+
+    int new_size = (ta.size * 3) / 2 + 8;
+    int current_size = ta.size;
+
+    for (int i = 0; i < current_size + 1; i++) {
+      Token t;
+      TokenModule.insert_token_array(&ta, t);
+    }
+
+    SHOULD_EQUAL(ta.size, new_size);
+
+    TokenModule.free_token_array(&ta);
+  END_IT
+
+END_DESCRIBE
+
+DESCRIBE(tokens_module, "Tokens")
+
+  IT("defines the Token struct")
+    Token t;
+    SHOULD_EQUAL(&t, &t);
+  END_IT
+
+  IT("defines the token_module struct")
+    struct token_module tm;
+    SHOULD_EQUAL(&tm, &tm);
+  END_IT
+
+  IT("defines the LITERAL struct")
+    LITERAL l;
+    SHOULD_EQUAL(&l, &l);
+  END_IT
+
+  IT("defines the RESERVED_WORD_TOKEN struct")
+    RESERVED_WORD_TOKEN l;
+    SHOULD_EQUAL(&l, &l);
+  END_IT
+
+  IT("exposes TokenModule")
+    SHOULD_EQUAL(TokenModule.version, GAMBIT_TOKEN_MODULE_VERSION);
+  END_IT
+
+  status += CSpec_Run( DESCRIPTION( token_module_string_is_reserved_word ), CSpec_NewOutputVerbose() );
+  status += CSpec_Run( DESCRIPTION( token_module_get_token_code ), CSpec_NewOutputVerbose() );
+  status += CSpec_Run( DESCRIPTION( token_module_init_token_array ), CSpec_NewOutputVerbose() );
+  status += CSpec_Run( DESCRIPTION( token_module_insert_token_array ), CSpec_NewOutputVerbose() );
+
+END_DESCRIBE

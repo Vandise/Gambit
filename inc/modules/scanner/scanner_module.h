@@ -6,25 +6,33 @@
 // ============================
 
 #include "common.h"
-#include "modules/scanner/shared.h"
 #include "modules/scanner/error.h"
 
 // ============================
 //           Macros
 // ============================
 
-#define CHAR_CODE(scanner) scanner->char_table[scanner->current_char]
+#define EOF_CHAR '\x7f'
+#define NEWLINE_CHAR '\n'
+#define COMMENT_CHAR '#'
 #define GAMBIT_SCANNER_VERSION 100
 
-// ============================
-//          Externs
-// ============================
-
-extern const struct scanner_module ScannerModule;
+#define CHAR_CODE(scanner) scanner->char_table[scanner->current_char]
 
 // ============================
 //       Structs & Types
 // ============================
+
+typedef enum {
+    LETTER,
+    UPPERCASE_LETTER,
+    DIGIT,
+    QUOTE,
+    UNDERSCORE,
+    SPECIAL,
+    NEWLINE,
+    EOF_CODE
+} CHAR_CODE;
 
 typedef struct GambitScanner {
   unsigned int line_number;
@@ -63,5 +71,10 @@ struct scanner_module {
 //      Forwards/Globals
 // ============================
 
+// ============================
+//          Externs
+// ============================
+
+extern const struct scanner_module ScannerModule;
 
 #endif
