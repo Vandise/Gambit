@@ -5,5 +5,6 @@ const char* scanner_error_message[] = {
   "Scanner failed to open file",
   "Scanner failed to parse source line",
   "Scanner failed to parse numeric definition",
-  "Scanner failed to preserve numeric precision"
+  "Scanner failed to preserve numeric precision",
+  "Scanner failed to scan token"
 };

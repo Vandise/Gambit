@@ -80,6 +80,7 @@ struct scanner_module {
   void (*get_word)(Scanner*, BOOLEAN);
   void (*get_string)(Scanner*);
   void (*get_number)(Scanner*);
+  void (*get_special)(Scanner *scanner);
 
   void (*close)(Scanner*);
 };

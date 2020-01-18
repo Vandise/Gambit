@@ -16,6 +16,7 @@ static void get_word(Scanner* scanner, BOOLEAN is_constant);
 static void get_string(Scanner* scanner);
 static void get_number(Scanner* scanner);
 static void accumulate_value(Scanner *scanner, double *valuep);
+static void get_special(Scanner *scanner);
 
 // ============================
 //        Implementation
@@ -305,6 +306,24 @@ static void accumulate_value(Scanner *scanner, double *valuep) {
   *valuep = value;
 }
 
+static void get_special(Scanner *scanner) {
+  log_trace("Scanner::get_special");
+
+  *(scanner->current_token.tokenp) = scanner->current_char;
+
+  switch(scanner->current_char) {
+    case '(':   scanner->current_token.token = T_LPAREN; get_character(scanner);  break;
+    case ')':   scanner->current_token.token = T_RPAREN; get_character(scanner);  break;
+    case '=':   scanner->current_token.token = T_EQUAL;  get_character(scanner);  break;
+    default:
+      scanner->errored = TRUE;
+      scanner->error_code = SCANNER_INVALID_TOKEN;
+      scanner->current_token.token = T_ERROR;
+  }
+
+  *(scanner->current_token.tokenp) = '\0';
+}
+
 static void close(Scanner *scanner) {
   log_trace("Scanner::close");
 
@@ -330,5 +349,6 @@ const struct scanner_module ScannerModule = {
   .get_word = get_word,
   .get_string = get_string,
   .get_number = get_number,
+  .get_special = get_special,
   .close = close
 };

@@ -302,6 +302,26 @@ DESCRIBE(scanner_module_get_number, "ScannerModule - get_number")
   END_IT
 END_DESCRIBE
 
+DESCRIBE(scanner_module_get_special, "ScannerModule - get_special")
+
+--FILE specials.g--
+()=
+--ENDFILE--
+
+  IT("scans specials")
+    Scanner* scanner = ScannerModule.init(__TEST_FILE__(specials.g));
+    TOKEN_CODE tokens[] = { T_LPAREN, T_RPAREN, T_EQUAL };
+
+    for (int i = 0; i < 3; i++) {
+      ScannerModule.get_special(scanner);
+      SHOULD_EQUAL(scanner->current_token.token, tokens[i]);
+    }
+
+    ScannerModule.close(scanner);
+  END_IT
+
+END_DESCRIBE
+
 DESCRIBE(scanner_module, "Scanner")
 
   IT("defines the Scanner struct")
@@ -327,5 +347,6 @@ DESCRIBE(scanner_module, "Scanner")
   status += CSpec_Run( DESCRIPTION( scanner_module_get_word ), CSpec_NewOutputVerbose() );
   status += CSpec_Run( DESCRIPTION( scanner_module_get_string ), CSpec_NewOutputVerbose() );
   status += CSpec_Run( DESCRIPTION( scanner_module_get_number ), CSpec_NewOutputVerbose() );
+  status += CSpec_Run( DESCRIPTION( scanner_module_get_special ), CSpec_NewOutputVerbose() );
 
 END_DESCRIBE
