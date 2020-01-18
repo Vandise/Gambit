@@ -322,6 +322,106 @@ DESCRIBE(scanner_module_get_special, "ScannerModule - get_special")
 
 END_DESCRIBE
 
+DESCRIBE(scanner_module_get_token, "ScannerModule - get_token")
+
+--FILE eof.g--
+--ENDFILE--
+
+  IT("should extract an end of file token")
+    Scanner* scanner = ScannerModule.init(__TEST_FILE__(eof.g));
+    ScannerModule.get_token(scanner);
+    SHOULD_EQUAL(scanner->current_token.token, T_END_OF_FILE);
+    ScannerModule.close(scanner);
+  END_IT
+
+--FILE newline.g--
+
+
+--ENDFILE--
+
+  IT("should extract a newline token")
+    Scanner* scanner = ScannerModule.init(__TEST_FILE__(newline.g));
+    ScannerModule.get_token(scanner);
+    SHOULD_EQUAL(scanner->current_token.token, T_NEWLINE);
+    ScannerModule.close(scanner);
+  END_IT
+
+--FILE identifier.g--
+variable
+--ENDFILE--
+
+  IT("should extract a T_IDENTIFIER token")
+    Scanner* scanner = ScannerModule.init(__TEST_FILE__(identifier.g));
+    ScannerModule.get_token(scanner);
+    SHOULD_EQUAL(scanner->current_token.token, T_IDENTIFIER);
+    ScannerModule.close(scanner);
+  END_IT
+
+--FILE identifier_underscore.g--
+variable_here__name
+--ENDFILE--
+
+  IT("should extract a T_IDENTIFIER token with underscores")
+    Scanner* scanner = ScannerModule.init(__TEST_FILE__(identifier_underscore.g));
+    ScannerModule.get_token(scanner);
+    SHOULD_EQUAL(scanner->current_token.token, T_IDENTIFIER);
+    ScannerModule.close(scanner);
+  END_IT
+
+--FILE constant_underscore.g--
+Module_Name
+--ENDFILE--
+  IT("should extract a T_CONSTANT token")
+    Scanner* scanner = ScannerModule.init(__TEST_FILE__(constant_underscore.g));
+    ScannerModule.get_token(scanner);
+    SHOULD_EQUAL(scanner->current_token.token, T_CONSTANT);
+    ScannerModule.close(scanner);
+  END_IT
+
+--FILE parens.g--
+()
+--ENDFILE--
+  IT("should extract T_PAREN tokens")
+    Scanner* scanner = ScannerModule.init(__TEST_FILE__(parens.g));
+    ScannerModule.get_token(scanner);
+    SHOULD_EQUAL(scanner->current_token.token, T_LPAREN);
+    ScannerModule.get_token(scanner);
+    SHOULD_EQUAL(scanner->current_token.token, T_RPAREN);
+    ScannerModule.close(scanner);
+  END_IT
+
+  IT("should extract a T_STRING token")
+    Scanner* scanner = ScannerModule.init(__TEST_FILE__(string.g));
+
+    ScannerModule.get_token(scanner);
+    SHOULD_EQUAL(scanner->current_token.token, T_STRING);
+    SHOULD_EQUAL( strcmp(scanner->current_token.literal.value.string, "Hello World"), 0);
+    SHOULD_EQUAL(scanner->current_token.literal.type, STRING_LIT);
+    ScannerModule.close(scanner);
+  END_IT
+
+END_DESCRIBE
+
+DESCRIBE(scanner_module_commit_token, "ScannerModule - commit_token")
+
+  IT("pushes the token to the tokens array")
+    Scanner* scanner = ScannerModule.init(__TEST_FILE__(string.g));
+    ScannerModule.get_token(scanner);
+
+    SHOULD_EQUAL(scanner->current_token.token, T_STRING);
+
+    ScannerModule.commit_token(scanner);
+
+    SHOULD_EQUAL( (scanner->tokens.array[0]).code, T_STRING );
+    SHOULD_EQUAL( (scanner->tokens.array[0]).line_number, 1 );
+    SHOULD_EQUAL( strcmp((scanner->tokens.array[0]).source_name, ".tmp/gt/let_keyword.g"), 0 );
+    SHOULD_EQUAL( strcmp((scanner->tokens.array[0]).token_string, "let"), 0 );
+
+    ScannerModule.close(scanner);
+  END_IT
+
+END_DESCRIBE
+
 DESCRIBE(scanner_module, "Scanner")
 
   IT("defines the Scanner struct")
@@ -348,5 +448,6 @@ DESCRIBE(scanner_module, "Scanner")
   status += CSpec_Run( DESCRIPTION( scanner_module_get_string ), CSpec_NewOutputVerbose() );
   status += CSpec_Run( DESCRIPTION( scanner_module_get_number ), CSpec_NewOutputVerbose() );
   status += CSpec_Run( DESCRIPTION( scanner_module_get_special ), CSpec_NewOutputVerbose() );
+  status += CSpec_Run( DESCRIPTION( scanner_module_get_token ), CSpec_NewOutputVerbose() );
 
 END_DESCRIBE

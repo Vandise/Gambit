@@ -74,13 +74,16 @@ struct scanner_module {
   BOOLEAN (*get_source_line)(Scanner*);
 
   void (*get_character)(Scanner*);
+  void (*get_token)(Scanner*);
   void (*skip_comment)(Scanner*);
   void (*skip_blanks)(Scanner*);
 
   void (*get_word)(Scanner*, BOOLEAN);
   void (*get_string)(Scanner*);
   void (*get_number)(Scanner*);
-  void (*get_special)(Scanner *scanner);
+  void (*get_special)(Scanner*);
+  void (*commit_token)(Scanner*);
+  TokenArray* (*get_tokens)(Scanner*);
 
   void (*close)(Scanner*);
 };

@@ -9,6 +9,7 @@ static BOOLEAN open_source_file(Scanner *scanner);
 static BOOLEAN get_source_line(Scanner* scanner);
 static void populate_char_table(Scanner *scanner);
 static void get_character(Scanner *scanner);
+static void get_token(Scanner* scanner);
 static void skip_comment(Scanner* scanner);
 static void skip_blanks(Scanner* scanner);
 static void close(Scanner *scanner);
@@ -17,6 +18,8 @@ static void get_string(Scanner* scanner);
 static void get_number(Scanner* scanner);
 static void accumulate_value(Scanner *scanner, double *valuep);
 static void get_special(Scanner *scanner);
+static void commit_token(Scanner* scanner);
+static TokenArray* get_tokens(Scanner* scanner);
 
 // ============================
 //        Implementation
@@ -41,6 +44,8 @@ static Scanner* init(const char *file_name) {
   scanner->errored = FALSE;
 
   populate_char_table(scanner);
+
+  TokenModule.init_token_array(&(scanner->tokens), 0xFF);
 
   if (open_source_file(scanner) == FALSE) {
     log_error("Scanner failed to open file %s", file_name);
@@ -123,6 +128,36 @@ static void get_character(Scanner *scanner) {
       break;
     default:
       scanner->buffer_offset += 1;
+  }
+}
+
+static void get_token(Scanner* scanner) {
+  skip_blanks(scanner);
+
+  scanner->current_token.tokenp = scanner->current_token.token_string;
+
+  switch(CHAR_CODE(scanner)) {
+    case NEWLINE:
+      scanner->current_token.token = T_NEWLINE;
+      *(scanner->current_token.tokenp) = '\0';
+      get_character(scanner);
+      break;
+    case LETTER:
+      get_word(scanner, FALSE);
+      break;
+    case UPPERCASE_LETTER:
+      get_word(scanner, TRUE);
+      break;
+    case DIGIT:
+      get_number(scanner);
+      break;
+    case QUOTE:
+        get_string(scanner);
+        break;
+    case EOF_CODE:
+      scanner->current_token.token = T_END_OF_FILE;
+      break;
+    default: get_special(scanner);
   }
 }
 
@@ -324,12 +359,36 @@ static void get_special(Scanner *scanner) {
   *(scanner->current_token.tokenp) = '\0';
 }
 
+static void commit_token(Scanner* scanner) {
+  Token t = {
+    .line_number = scanner->line_number,
+    .level = scanner->level,
+    .source_name = '\0',
+    .word_string = '\0',
+    .token_string = '\0',
+    .code = scanner->current_token.token,
+    .literal = scanner->current_token.literal
+  };
+
+  strcpy(t.source_name, scanner->source_name);
+  strcpy(t.word_string, scanner->current_token.word_string);
+  strcpy(t.token_string, scanner->current_token.token_string);
+
+  TokenModule.insert_token_array(&(scanner->tokens), t);
+}
+
+static TokenArray* get_tokens(Scanner* scanner) {
+  return &(scanner->tokens);
+}
+
 static void close(Scanner *scanner) {
   log_trace("Scanner::close");
 
   if (scanner->source_file != NULL) {
     fclose(scanner->source_file);
   }
+
+  TokenModule.free_token_array(&(scanner->tokens));
 
   __FREE__(scanner);
 }
@@ -350,5 +409,8 @@ const struct scanner_module ScannerModule = {
   .get_string = get_string,
   .get_number = get_number,
   .get_special = get_special,
+  .commit_token = commit_token,
+  .get_tokens = get_tokens,
+  .get_token = get_token,
   .close = close
 };

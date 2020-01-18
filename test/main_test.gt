@@ -1,11 +1,12 @@
 #include <stdio.h>
 #include <string.h>
 
+
 #include "cspec.h"
 #include "cspec_output_header.h"
 #include "cspec_output_verbose.h"
 #include "cspec_output_unit.h"
-#include "util/memory.h"
+#include "common.h"
 
 DEFINE_DESCRIPTION(initial_test)
 DEFINE_DESCRIPTION(utility_generic_linked_list)
@@ -15,6 +16,8 @@ DEFINE_DESCRIPTION(tokens_module)
 int status = 0;
 
 int main(int argc, const char* argv[]) {
+
+  log_set_level(LOG_ERROR);
 
   /*
   
