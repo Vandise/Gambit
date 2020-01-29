@@ -10,6 +10,7 @@
 
 DEFINE_DESCRIPTION(initial_test)
 DEFINE_DESCRIPTION(utility_generic_linked_list)
+DEFINE_DESCRIPTION(file_module)
 DEFINE_DESCRIPTION(scanner_module)
 DEFINE_DESCRIPTION(tokens_module)
 
@@ -34,6 +35,7 @@ int main(int argc, const char* argv[]) {
   
   */
     status += CSpec_Run( DESCRIPTION( utility_generic_linked_list ), CSpec_NewOutputVerbose() );
+    status += CSpec_Run( DESCRIPTION( file_module ), CSpec_NewOutputVerbose() );
 
 
   /*

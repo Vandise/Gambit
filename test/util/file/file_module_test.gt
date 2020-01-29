@@ -1,0 +1,23 @@
+#include "cspec.h"
+#include "cspec_output_header.h"
+#include "cspec_output_verbose.h"
+#include "cspec_output_unit.h"
+
+#include "test/macros.h"
+#include "util/file/file_module.h"
+
+extern int status;
+
+DESCRIBE(file_module_get_file_real_path, "FileModule - get_file_real_path")
+
+
+END_DESCRIBE
+
+DESCRIBE(file_module, "File")
+
+  IT("defines the FileModule")
+    SHOULD_EQUAL(&FileModule, &FileModule);
+  END_IT
+
+  //status += CSpec_Run( DESCRIPTION( scanner_module_init ), CSpec_NewOutputVerbose() );
+END_DESCRIBE
