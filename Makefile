@@ -31,7 +31,7 @@ CXXSTD      := -Wno-deprecated-register -g -O0
 CFLAGS      := $(CXXSTD) -fopenmp -Wall -O3 -g
 DYNLIBPARAM := -dynamiclib
 INC         := -I$(INCDIR) -I/usr/local/include -Isrc -Isrc/test -I$(EXTDIR) -I/c/MinGW/msys/1.0/local/include
-LINKLIB     := -L$(LIBDIR) -L/c/MinGW/msys/1.0/local/lib
+LINKLIB     := -L$(LIBDIR) -L/usr/local/lib -L/c/MinGW/msys/1.0/local/lib
 SHAREDPARAM := -shared
 
 PROGRAMFILES := $(shell find $(SRCDIR)/ -type f -name "*.$(SRCEXT)" -not -path "*modules*")

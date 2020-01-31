@@ -19,6 +19,9 @@ jobs:
     - name: configure
       run: sudo ./configure
 
+    - name: configure tests
+      run: sudo ./configure
+
     - name: make directories
       run: make directories
 
