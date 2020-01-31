@@ -19,8 +19,8 @@ jobs:
     - name: configure
       run: sudo ./configure
 
-    - name: configure tests
-      run: sudo ./configure
+		- name: symlinks
+			run: cd /usr/local/lib && ls -al | grep cspec && ln -s -f libcspec.so.0.0.0 libcspec.so.0
 
     - name: make directories
       run: make directories
