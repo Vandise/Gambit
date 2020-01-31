@@ -2,6 +2,7 @@
 
 sudo mkdir .tmp
 sudo mkdir .tmp/gt
+sudo chown $(whoami) .tmp/gt
 
 FILES=$(find ./test/ -name "*.gt")
 for f in $FILES
