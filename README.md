@@ -1,4 +1,4 @@
-# Gambit
+# Gambit ![Windows](https://github.com/Vandise/gambit/workflows/Windows/badge.svg) ![Ubuntu](https://github.com/Vandise/gambit/workflows/Ubuntu/badge.svg) ![MacOS](https://github.com/Vandise/gambit/workflows/MacOS/badge.svg)
 
 Gambit is a dynamically and statically typed, multi-paradigm, imperative (procedural) and functional programming language that compiles to JavaScript.
 

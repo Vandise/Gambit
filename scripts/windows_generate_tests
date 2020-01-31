@@ -9,3 +9,5 @@ do
   echo "Generating test: $f"
   ruby scripts/generate_test_file.rb $f
 done
+
+ls -al .tmp/gt
