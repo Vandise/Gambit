@@ -16,8 +16,9 @@ puts File.dirname(test_file);
 
 contents.scan(/--FILE\s+(.*?)--(.*?)--ENDFILE--/m).each do |matches|
   filename,content = matches
-  content[0] = '' # remove first newline char
-  content.chomp!
+  c_spit = content.split("\n")[1..-1]
+  content = !c_spit.nil? ? c_spit.join("\n") : ""
+  #content.chomp!
   if !created_files.include?(filename)
     File.open(".tmp/gt/#{filename}", "w") { |f| f.write(content) }
     created_files << filename
