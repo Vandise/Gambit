@@ -22,12 +22,6 @@ jobs:
     - name: configure
       run: sudo ./configure
 
-    - name: Apply Permissions
-      run: sudo chown $(whoami) -R /usr/local/lib/libcspec* && sudo chown $(whoami) -R /usr/local/include/cspec*
-
-    - name: Cache Libraries
-      run: sudo /sbin/ldconfig -v
-
     - name: make directories
       run: make directories
 
