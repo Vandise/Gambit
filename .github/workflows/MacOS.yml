@@ -1,10 +1,10 @@
-name: Test Suite
+name: MacOS Test Suite
 
 on: [push]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
     - uses: actions/checkout@v2
 
@@ -12,6 +12,15 @@ jobs:
       uses: actions/setup-ruby@v1
       with:
         ruby-version: 2.6
+
+    - name: Install Homebrew
+      run: /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+
+    - name: Set /usr/local permissions
+      run: sudo chown $(whoami) -R /usr/local
+
+    - name: Install autotools
+      run: brew install autoconf automake libtool
 
     - name: autoconf
       run: autoconf
