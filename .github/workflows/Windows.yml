@@ -16,12 +16,12 @@ jobs:
     - name: Install MSYS2
       run: choco install msys2
 
-    #- name: Build and install package
-    #  run: C:\tools\msys64\usr\bin\bash -lc "ls -al ./msys2-mingw"
-    #  env:
-    #    HOME: ${{ runner.workspace }}/gambit
-    #    MINGW_INSTALLS: ${{ matrix.task.installs }}
-    #    CI: true
+    - name: Build and install tools
+      run: C:\tools\msys64\usr\bin\bash -lc "pacman -Sy git tar binutils autoconf make libtool automake p7zip patch gcc"
+      env:
+        HOME: ${{ runner.workspace }}/gambit
+        MINGW_INSTALLS: ${{ matrix.task.installs }}
+        CI: true
 
     - name: Test Autoconf
       run: C:\tools\msys64\usr\bin\bash -lc "autoconf --version"
