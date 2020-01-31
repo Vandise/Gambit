@@ -58,21 +58,20 @@ jobs:
         MINGW_INSTALLS: ${{ matrix.task.installs }}
         CI: true
 
-    - name: Inspect Binaries
-      run: C:\tools\msys64\usr\bin\bash -lc "ls -al ./bin"
-      env:
-        HOME: ${{ runner.workspace }}/gambit
-        MINGW_INSTALLS: ${{ matrix.task.installs }}
-        CI: true
+    - name: Archive tmp test files
+      uses: actions/upload-artifact@v1
+      with:
+        name: tmpfiles
+        path: .tmp/
 
-    - name: Inspect files
-      run: |
-        type .tmp/gt/exists.g
-        type .tmp/gt/exists_multiple.g
-        type .tmp/gt/identifier.g
+    - name: Archive Binaries
+      uses: actions/upload-artifact@v1
+      with:
+        name: tmpfiles
+        path: .tmp
 
     - name: Run Tests
-      run: ./bin/test_suite.exe
+      run: bin/
 
     #- name: Run Test Suite
     #  run: C:\tools\msys64\usr\bin\bash -lc "./bin/test_suite"
