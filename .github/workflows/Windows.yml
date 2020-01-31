@@ -17,7 +17,7 @@ jobs:
       run: choco install msys2
 
     - name: Build and install package
-      run: C:\tools\msys64\usr\bin\bash -lc "./msys2-mingw/run.sh -b"
+      run: C:\tools\msys64\usr\bin\bash -lc "./msys2-mingw/"
       env:
         HOME: ${{ runner.workspace }}/myrepo
         MINGW_INSTALLS: ${{ matrix.task.installs }}
