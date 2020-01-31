@@ -13,20 +13,8 @@ jobs:
       with:
         ruby-version: 2.6
 
-    - name: autoconf
-      run: sh autoconf
+    - name: Test Autoconf
+      run: C:\tools\msys64\usr\bin\bash -lc "autoconf --version"
 
-    - name: configure
-      run: sh configure
-
-    - name: make directories
-      run: make directories
-
-    - name: generate tests
-      run: sh scripts/generate_tests
-  
-    - name: make tests
-      run: make tests
-
-    - name: run tests
-      run: ./bin/test_suite
+    - name: Test Make
+      run: C:\tools\msys64\usr\bin\bash -lc "make -v"
