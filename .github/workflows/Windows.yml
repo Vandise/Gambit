@@ -13,6 +13,16 @@ jobs:
       with:
         ruby-version: 2.6
 
+    - name: Install MSYS2
+      run: choco install msys2
+
+    - name: Build and install package
+      run: C:\tools\msys64\usr\bin\bash -lc "./msys2-mingw/run.sh -b"
+      env:
+        HOME: ${{ runner.workspace }}/myrepo
+        MINGW_INSTALLS: ${{ matrix.task.installs }}
+        CI: true
+
     - name: Test Autoconf
       run: C:\tools\msys64\usr\bin\bash -lc "autoconf --version"
 
