@@ -19,12 +19,12 @@ jobs:
     - name: configure
       run: sudo ./configure
 
+    - name: make directories
+      run: make directories
+
     - name: generate tests
       run: sh scripts/generate_tests
-
-    - name: make
-      run: make
-   
+  
     - name: make tests
       run: make tests
 
