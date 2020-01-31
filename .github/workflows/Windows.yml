@@ -1,0 +1,32 @@
+name: Windows Test Suite
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Ruby 2.6
+      uses: actions/setup-ruby@v1
+      with:
+        ruby-version: 2.6
+
+    - name: autoconf
+      run: autoconf
+
+    - name: configure
+      run: ./configure
+
+    - name: make directories
+      run: make directories
+
+    - name: generate tests
+      run: sh scripts/generate_tests
+  
+    - name: make tests
+      run: make tests
+
+    - name: run tests
+      run: ./bin/test_suite
