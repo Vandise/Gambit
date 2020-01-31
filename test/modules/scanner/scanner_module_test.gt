@@ -87,8 +87,10 @@ DESCRIBE(scanner_module_get_character, "ScannerModule - get_character")
 
   IT("gets the next character")
     Scanner* scanner = ScannerModule.init(__TEST_FILE__(exists.g));
+    printf("\n%c\n", scanner->current_char);
     SHOULD_EQUAL(scanner->current_char, 'T');
     ScannerModule.get_character(scanner);
+    printf("\n%c\n", scanner->current_char);
     SHOULD_EQUAL(scanner->current_char, 'h');
     ScannerModule.close(scanner);
   END_IT

@@ -58,9 +58,20 @@ jobs:
         MINGW_INSTALLS: ${{ matrix.task.installs }}
         CI: true
 
-    - name: Run Test Suite
-      run: C:\tools\msys64\usr\bin\bash -lc "./bin/test_suite"
+    - name: Inspect Binaries
+      run: C:\tools\msys64\usr\bin\bash -lc "ls -al ./bin"
       env:
         HOME: ${{ runner.workspace }}/gambit
         MINGW_INSTALLS: ${{ matrix.task.installs }}
         CI: true
+
+    - name: Run Tests
+      run: ./bin/test_suite.exe
+
+    #- name: Run Test Suite
+    #  run: C:\tools\msys64\usr\bin\bash -lc "./bin/test_suite"
+    #  env:
+    #    HOME: ${{ runner.workspace }}/gambit
+    #    MINGW_INSTALLS: ${{ matrix.task.installs }}
+    #    CI: true
+
