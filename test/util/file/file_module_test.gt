@@ -10,6 +10,38 @@ extern int status;
 
 DESCRIBE(file_module_get_file_real_path, "FileModule - get_file_real_path")
 
+	IT("returns TRUE if the file is valid")
+  	char path[255];
+		char *pathp = path;
+
+		BOOLEAN valid = FileModule.get_file_real_path(".tmp/gt/exists.g",pathp);
+
+		SHOULD_EQUAL(valid, TRUE);
+	END_IT
+
+	IT("returns FALSE if the file is not valid")
+  	char path[255];
+		char *pathp = path;
+
+		BOOLEAN valid = FileModule.get_file_real_path(".tmp/gt/fake_file_never.g",pathp);
+
+		SHOULD_EQUAL(valid, FALSE);
+	END_IT
+
+	IT("returns the full file path")
+  	char path[255];
+		char *pathp = path;
+
+		FileModule.get_file_real_path(".tmp/gt/exists.g", pathp);
+
+		int size = strlen(pathp);
+
+		SHOULD_EQUAL(pathp[size - 4], '/');
+		SHOULD_EQUAL(pathp[size - 3], 'g');
+		SHOULD_EQUAL(pathp[size - 2], 't');
+		SHOULD_EQUAL(pathp[size - 1], '/');
+
+	END_IT
 
 END_DESCRIBE
 
@@ -19,5 +51,5 @@ DESCRIBE(file_module, "File")
     SHOULD_EQUAL(&FileModule, &FileModule);
   END_IT
 
-  //status += CSpec_Run( DESCRIPTION( scanner_module_init ), CSpec_NewOutputVerbose() );
+  status += CSpec_Run( DESCRIPTION( file_module_get_file_real_path ), CSpec_NewOutputVerbose() );
 END_DESCRIBE

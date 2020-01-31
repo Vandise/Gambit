@@ -43,8 +43,8 @@ int main(int argc, const char* argv[]) {
     Scanner Section
   
   */
-    status += CSpec_Run( DESCRIPTION( tokens_module ), CSpec_NewOutputVerbose() );
-    status += CSpec_Run( DESCRIPTION( scanner_module ), CSpec_NewOutputVerbose() );
+    //status += CSpec_Run( DESCRIPTION( tokens_module ), CSpec_NewOutputVerbose() );
+    //status += CSpec_Run( DESCRIPTION( scanner_module ), CSpec_NewOutputVerbose() );
 
 
   print_memory_summary();
