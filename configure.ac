@@ -23,15 +23,15 @@ function require_cspec {
   if test "$libpresent" == 0
   then
     AC_MSG_NOTICE([CSpec not found. Attempting to install CSpec])
+    mkdir .tmp
     cd .tmp/
     git clone https://github.com/arnaudbrejeon/cspec
-    cd cspec && ./autogen.sh && ./configure && make && make install && cd ..
+    cd cspec && ./autogen.sh && ./configure && make && make install
+    cd ..
     cd ..
   fi
 }
 
 require_cspec 0
-
-sh scripts/generate_tests
 
 AC_OUTPUT(Makefile)
