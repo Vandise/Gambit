@@ -47,10 +47,10 @@ directories:
 	mkdir -p $(INCDIR)
 
 main_nodeps:
-	$(CC) $(CXXSTD) $(INC) $(LINKLIB) $(LIBLINK) $(PROGRAMFILES) -lm -o $(TARGETDIR)/$(TARGET)
+	$(CC) $(CXXSTD) $(INC) $(LINKLIB) $(PROGRAMFILES) -lm -o $(TARGETDIR)/$(TARGET)
 
 main: $(OBJECTS)
-	$(CC) $(LINKLIB) $(LIBLINK) -o $(TARGETDIR)/$(TARGET) $^
+	$(CC) $(LINKLIB) -o $(TARGETDIR)/$(TARGET) $^
 
 sharedlib: $(OBJECTS)
 	$(CC) $(SHAREDPARAM) -o $(LIBDIR)/$(SHAREDLIBTARGET).$(LIBEXT) $^

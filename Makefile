@@ -21,7 +21,7 @@ DEPEXT      := d
 OBJEXT      := o
 LIBEXT      := so
 LIBDIR      := lib
-LIBFILES    := $(wildcard ./lib/*.so)
+LIBFILES    := $(wildcard lib/*.so)
 LIBLINK     := $(addprefix -l, $(LIBFILES))
 
 current_dir = $(shell pwd)
@@ -30,12 +30,12 @@ current_dir = $(shell pwd)
 CXXSTD      := -Wno-deprecated-register -g -O0
 CFLAGS      := $(CXXSTD) -fopenmp -Wall -O3 -g
 DYNLIBPARAM := -dynamiclib
-INC         := -I$(INCDIR) -I/usr/local/include -Isrc -Isrc/test -I$(EXTDIR)
-LINKLIB     := -L$(LIBDIR)
+INC         := -I$(INCDIR) -I/usr/local/include -Isrc -Isrc/test -I$(EXTDIR) -I/c/MinGW/msys/1.0/local/include
+LINKLIB     := -L$(LIBDIR) -L/c/MinGW/msys/1.0/local/lib
 SHAREDPARAM := -shared
 
 PROGRAMFILES := $(shell find $(SRCDIR)/ -type f -name "*.$(SRCEXT)" -not -path "*modules*")
-TESTFILES  := $(shell find $(TESTDIR)/ $(SRCDIR)/ ! -name 'main.c' -type f -name "*.$(SRCEXT)" )
+TESTFILES  := $(shell find $(TESTDIR)/ $(SRCDIR)/ ! -name 'main.c' -type f -name "*.$(SRCEXT)")
 OBJECTS     := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(PROGRAMFILES:.$(SRCEXT)=.$(OBJEXT)))
 
 all: directories main tests

@@ -1,0 +1,23 @@
+name: C/C++ CI
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v2
+    - name: autoconf
+      run: autoconf
+    - name: configure
+      run: ./configure
+    - name: configure tests
+      run: ./configure
+    - name: generate tests
+      run: sh scripts/generate_tests      
+    - name: make tests
+      run: make tests
+    - name: run tests
+      run: ./bin/test_suite
