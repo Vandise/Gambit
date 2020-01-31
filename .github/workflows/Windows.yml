@@ -14,10 +14,10 @@ jobs:
         ruby-version: 2.6
 
     - name: autoconf
-      run: autoconf
+      run: sh autoconf
 
     - name: configure
-      run: ./configure
+      run: sh configure
 
     - name: make directories
       run: make directories
