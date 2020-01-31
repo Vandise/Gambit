@@ -65,6 +65,20 @@ jobs:
         MINGW_INSTALLS: ${{ matrix.task.installs }}
         CI: true
 
+    - name: Debug Spec Libraries
+      run: C:\tools\msys64\usr\bin\bash -lc "ls -al /usr/lib/"
+      env:
+        HOME: ${{ runner.workspace }}/gambit
+        MINGW_INSTALLS: ${{ matrix.task.installs }}
+        CI: true
+
+    - name: Debug Spec Headers
+      run: C:\tools\msys64\usr\bin\bash -lc "ls -al /usr/include/"
+      env:
+        HOME: ${{ runner.workspace }}/gambit
+        MINGW_INSTALLS: ${{ matrix.task.installs }}
+        CI: true
+
     - name: Make Directories
       run: C:\tools\msys64\usr\bin\bash -lc "make directories"
       env:
@@ -73,7 +87,7 @@ jobs:
         CI: true
 
     - name: Generate Tests
-      run: C:\tools\msys64\usr\bin\bash -lc "./scripts/generate_tests"
+      run: C:\tools\msys64\usr\bin\bash -lc "./scripts/windows_generate_tests"
       env:
         HOME: ${{ runner.workspace }}/gambit
         MINGW_INSTALLS: ${{ matrix.task.installs }}
