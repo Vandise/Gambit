@@ -24,7 +24,10 @@ jobs:
 
     - name: generate tests
       run: sh scripts/generate_tests
-    
+
+    - name: make
+      run: make
+   
     - name: make tests
       run: make tests
 
