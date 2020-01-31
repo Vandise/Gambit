@@ -17,7 +17,7 @@ jobs:
       run: choco install msys2
 
     - name: Build and install tools
-      run: C:\tools\msys64\usr\bin\bash -lc "pacman -Sy autoconf make gcc git --noconfirm"
+      run: C:\tools\msys64\usr\bin\bash -lc "pacman -Sy autoconf make gcc git automake libtool --noconfirm"
       env:
         HOME: ${{ runner.workspace }}/gambit
         MINGW_INSTALLS: ${{ matrix.task.installs }}
