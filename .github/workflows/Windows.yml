@@ -1,4 +1,4 @@
-name: Windows Test Suite
+name: Windows
 
 on: [push]
 
@@ -17,7 +17,7 @@ jobs:
       run: choco install msys2
 
     - name: Build and install tools
-      run: C:\tools\msys64\usr\bin\bash -lc "pacman -Sy autoconf make gcc --noconfirm"
+      run: C:\tools\msys64\usr\bin\bash -lc "pacman -Sy autoconf make gcc git --noconfirm"
       env:
         HOME: ${{ runner.workspace }}/gambit
         MINGW_INSTALLS: ${{ matrix.task.installs }}
@@ -43,3 +43,32 @@ jobs:
         HOME: ${{ runner.workspace }}/gambit
         MINGW_INSTALLS: ${{ matrix.task.installs }}
         CI: true
+
+    - name: Test Git
+      run: C:\tools\msys64\usr\bin\bash -lc "git --version"
+      env:
+        HOME: ${{ runner.workspace }}/gambit
+        MINGW_INSTALLS: ${{ matrix.task.installs }}
+        CI: true
+
+    - name: Autoconf
+      run: C:\tools\msys64\usr\bin\bash -lc "autoconf"
+      env:
+        HOME: ${{ runner.workspace }}/gambit
+        MINGW_INSTALLS: ${{ matrix.task.installs }}
+        CI: true
+
+    - name: Configure
+      run: C:\tools\msys64\usr\bin\bash -lc "./configure"
+      env:
+        HOME: ${{ runner.workspace }}/gambit
+        MINGW_INSTALLS: ${{ matrix.task.installs }}
+        CI: true
+
+    - name: Make Directories
+      run: C:\tools\msys64\usr\bin\bash -lc "make directories"
+      env:
+        HOME: ${{ runner.workspace }}/gambit
+        MINGW_INSTALLS: ${{ matrix.task.installs }}
+        CI: true
+
