@@ -2,6 +2,12 @@
 #define __GAMBIT_SCANNER_ERRORH 1
 
 // ============================
+//           Includes
+// ============================
+
+#include "common.h"
+
+// ============================
 //       Structs & Types
 // ============================
 
@@ -19,5 +25,6 @@ typedef enum {
 // ============================
 
 extern const char* scanner_error_message[];
+extern const char* scanner_error_suggestions[][3];
 
 #endif
