@@ -67,11 +67,11 @@ jobs:
     - name: Archive Binaries
       uses: actions/upload-artifact@v1
       with:
-        name: tmpfiles
-        path: .tmp
+        name: gambitexe
+        path: bin/
 
     - name: Run Tests
-      run: bin/
+      run: ./bin/test_suite.exe
 
     #- name: Run Test Suite
     #  run: C:\tools\msys64\usr\bin\bash -lc "./bin/test_suite"
