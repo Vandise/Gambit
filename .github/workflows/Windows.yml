@@ -65,6 +65,12 @@ jobs:
         MINGW_INSTALLS: ${{ matrix.task.installs }}
         CI: true
 
+    - name: Inspect files
+      run: |
+        type .tmp/gt/exists.g
+        type .tmp/gt/exists_multiple.g
+        type .tmp/gt/identifier.g
+
     - name: Run Tests
       run: ./bin/test_suite.exe
 
